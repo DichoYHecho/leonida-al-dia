@@ -1,0 +1,54 @@
+name: Preparar el entorno de vídeo
+description: Python, FFmpeg, la fuente Inter, librerías, la voz de reserva (Piper) y las cachés (capturas, Whisper y voces)
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-python@v6
+      with:
+        python-version: "3.13"
+        cache: pip
+
+    - name: Instalar FFmpeg y la fuente Inter
+      shell: bash
+      run: |
+        sudo apt-get update -q
+        sudo apt-get install -y -q ffmpeg fonts-inter
+
+    - name: Instalar librerías de Python
+      shell: bash
+      run: pip install -q -r requirements.txt
+
+    - name: Caché de las capturas oficiales
+      uses: actions/cache@v4
+      with:
+        path: cache/capturas
+        key: capturas-v1
+
+    - name: Caché del modelo de Whisper
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/huggingface
+        key: whisper-base-v1
+
+    - name: Caché de la voz de reserva (Piper sharvard)
+      id: piper
+      uses: actions/cache@v4
+      with:
+        path: modelos
+        key: piper-sharvard-v1
+
+    - name: Descargar la voz de reserva
+      if: steps.piper.outputs.cache-hit != 'true'
+      shell: bash
+      run: |
+        mkdir -p modelos && cd modelos
+        curl -sSfL -o voz.tar.bz2 https://github.com/k2-fsa/sherpa-onnx/releases/download/tts-models/vits-piper-es_ES-sharvard-medium.tar.bz2
+        echo "b30a7a83df0518f0ee1c7039506648cade99f1f9b498fc49ed2ced2e2536bb5a  voz.tar.bz2" | sha256sum -c -
+        tar xjf voz.tar.bz2 && rm voz.tar.bz2
+
+    - name: Recuperar las voces ya hechas
+      uses: actions/cache/restore@v4
+      with:
+        path: cache/voces
+        key: voces-${{ github.run_id }}
+        restore-keys: voces-
