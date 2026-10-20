@@ -43,7 +43,11 @@ def caducar(regs):
 
 
 def fila(g, tipo, fuente, oficial, enlace, texto_fuente, dia, orden=None):
-    caps = medios.elegir(g["grupo"], g["titular"] + str(orden or ""), 3 if len(" ".join(g["trozos"])) > 330 else 2)
+    cuantas = 3 if len(" ".join(g["trozos"])) > 330 else 2
+    caps = g.get("capturas") or []
+    if len(caps) < 2:
+        caps = (caps + [c for c in medios.elegir(g["grupo"], g["titular"] + str(orden or ""), 3) if c not in caps])[:cuantas]
+    caps = caps[:3]
     f = {"Titular": g["titular"], "Estado": "Por Revisar", "Tipo": tipo, "Info": "Oficial" if oficial else "Según medios",
          "Guion": guion.guion_a_texto(g["trozos"]), "Etiqueta": g["etiqueta"], "Personaje": g["personaje"],
          "Capturas": ", ".join(caps), "Caption": guion.caption(g, fuente, oficial), "Título YouTube": g["titulo"],
