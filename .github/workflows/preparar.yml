@@ -1,0 +1,48 @@
+name: Preparar propuestas (noticias y datos)
+
+on:
+  schedule:
+    # Hora UTC. En horario de invierno de Madrid (desde el 25 de octubre): 08:00 y 19:00
+    - cron: "0 7 * * *"
+    - cron: "0 18 * * *"
+  workflow_dispatch:
+    inputs:
+      que:
+        description: "Qué preparar"
+        type: choice
+        options: [todo, noticias, datos]
+        default: todo
+      max:
+        description: "Máximo de noticias (vacío = 3 por la mañana y 2 por la tarde)"
+        required: false
+        default: ""
+
+concurrency:
+  group: videos
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  preparar:
+    # Las ejecuciones programadas solo funcionan cuando el proyecto está activado (variable ACTIVO = si)
+    if: github.event_name == 'workflow_dispatch' || vars.ACTIVO == 'si'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    env:
+      AIRTABLE_TOKEN: ${{ secrets.AIRTABLE_TOKEN }}
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      QUE: ${{ inputs.que || 'todo' }}
+      MAX: ${{ inputs.max }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: ./.github/actions/entorno
+      - name: Preparar las propuestas y sus vídeos
+        run: python gta/preparar.py
+      - name: Guardar las voces
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: cache/voces
+          key: voces-${{ github.run_id }}

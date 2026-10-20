@@ -1,0 +1,35 @@
+name: Prueba (sin publicar ni tocar Airtable)
+
+on:
+  workflow_dispatch:
+    inputs:
+      orden:
+        description: "Número del dato del banco para el vídeo de prueba"
+        default: "5"
+      noticias:
+        description: "Probar también la lectura de noticias"
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+jobs:
+  prueba:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      ORDEN: ${{ inputs.orden }}
+      NOTICIAS: ${{ inputs.noticias }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: ./.github/actions/entorno
+      - name: Hacer el vídeo de prueba
+        run: python gta/prueba.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: video-de-prueba
+          path: salida_prueba/
+          retention-days: 7

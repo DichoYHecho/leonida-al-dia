@@ -1,0 +1,33 @@
+name: Comprobar publicaciones
+
+on:
+  schedule:
+    - cron: "40 13 * * *"
+    - cron: "40 20 * * *"
+    - cron: "40 17 16-22 11 *"
+  workflow_dispatch:
+    inputs:
+      dias:
+        description: "Cuántos días hacia atrás mirar en Buffer"
+        default: "4"
+
+permissions:
+  contents: read
+
+jobs:
+  comprobar:
+    if: github.event_name == 'workflow_dispatch' || vars.ACTIVO == 'si'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      AIRTABLE_TOKEN: ${{ secrets.AIRTABLE_TOKEN }}
+      BUFFER_API_KEY: ${{ secrets.BUFFER_API_KEY }}
+      DIAS: ${{ inputs.dias || '4' }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+      - run: pip install -q requests==2.34.2
+      - name: Comprobar en Buffer
+        run: python gta/comprobar.py

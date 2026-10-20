@@ -1,0 +1,42 @@
+name: Publicar la aprobada
+
+on:
+  schedule:
+    - cron: "0 13 * * *"         # 14:00 en invierno
+    - cron: "0 20 * * *"         # 21:00 en invierno
+    - cron: "0 17 16-22 11 *"    # 18:00, solo en la semana del lanzamiento (16-22 nov)
+  workflow_dispatch:
+    inputs:
+      prueba:
+        description: "Prueba: montar el vídeo pero NO publicar"
+        type: boolean
+        default: true
+
+concurrency:
+  group: publicar
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  publicar:
+    if: github.event_name == 'workflow_dispatch' || vars.ACTIVO == 'si'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      AIRTABLE_TOKEN: ${{ secrets.AIRTABLE_TOKEN }}
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      BUFFER_API_KEY: ${{ secrets.BUFFER_API_KEY }}
+      PRUEBA: ${{ github.event_name == 'workflow_dispatch' && inputs.prueba && 'true' || 'false' }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: ./.github/actions/entorno
+      - name: Publicar
+        run: python gta/publicar.py
+      - name: Guardar las voces
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: cache/voces
+          key: voces-${{ github.run_id }}

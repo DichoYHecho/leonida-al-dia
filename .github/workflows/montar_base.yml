@@ -1,0 +1,22 @@
+name: Montar la base de Airtable (una vez)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  montar:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    env:
+      AIRTABLE_TOKEN: ${{ secrets.AIRTABLE_TOKEN }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+      - run: pip install -q requests==2.34.2
+      - name: Crear la tabla Publicaciones
+        run: python gta/montar_base.py

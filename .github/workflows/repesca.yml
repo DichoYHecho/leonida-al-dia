@@ -1,0 +1,43 @@
+name: Repesca de vídeos
+
+on:
+  schedule:
+    - cron: "30 11 * * *"   # 12:30 en invierno: rehace los vídeos que he cambiado en Airtable
+  workflow_dispatch:
+    inputs:
+      limite:
+        description: "Cuántos vídeos rehacer como máximo"
+        default: "5"
+      limpiar:
+        description: "Quitar también los vídeos de publicaciones de hace más de 30 días"
+        type: boolean
+        default: false
+
+concurrency:
+  group: videos
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  repesca:
+    if: github.event_name == 'workflow_dispatch' || vars.ACTIVO == 'si'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    env:
+      AIRTABLE_TOKEN: ${{ secrets.AIRTABLE_TOKEN }}
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      LIMITE: ${{ inputs.limite || '5' }}
+      LIMPIAR: ${{ inputs.limpiar }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: ./.github/actions/entorno
+      - name: Rehacer vídeos
+        run: python gta/repesca.py
+      - name: Guardar las voces
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: cache/voces
+          key: voces-${{ github.run_id }}
