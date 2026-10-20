@@ -5,7 +5,7 @@ nada de filtraciones, rumores como hechos ni destripes; sin enlaces para comprar
 import re, unicodedata
 import gemini
 from config import HASHTAGS_FIJOS, PIE_POST, OFICIALES
-from medios import GRUPOS
+from medios import GRUPOS, CAPTURAS, validas
 
 REGLAS = """Eres el guionista de «Leónida al Día», una cuenta de fans de GTA 6 en español de España.
 Escribes vídeos verticales de 15 a 30 segundos (unas 45-75 palabras en total) que lee una voz sintética.
@@ -17,6 +17,8 @@ Reglas que no se pueden saltar:
 - No invites a comprar ni a reservar, y no pongas enlaces.
 - Frases cortas y claras, tono cercano y con energía, sin exagerar ni engañar. Nada de mayúsculas sostenidas ni emojis.
 - Escribe los números como se dicen si es raro leerlos («GTA 6», «19 de noviembre», «30 euros»).
+- Usa bien los signos del español: «¿…?» y «¡…!». La pregunta final siempre entre «¿» y «?».
+- No hagas predicciones ni especules sobre lo que pasará en el juego o en la historia.
 """
 
 FORMATO = """Devuelve SOLO un JSON con estos campos:
@@ -26,9 +28,10 @@ FORMATO = """Devuelve SOLO un JSON con estos campos:
   "es_personaje": true o false (si la etiqueta es un personaje),
   "grupo_capturas": "uno de: %s",
   "gancho": "primera frase, que enganche y diga de qué va, máximo 80 caracteres",
-  "cuerpo": ["3 a 6 trozos de máximo 45 caracteres cada uno, que se leen seguidos"],
+  "cuerpo": ["3 a 6 trozos de máximo 45 caracteres cada uno, que se leen seguidos, con su puntuación (comas y punto al acabar cada frase)"],
   "cierre": "pregunta final para comentar, máximo 60 caracteres",
   "texto_post": "2 o 3 frases para el texto de la publicación (sin hashtags)",
+  "capturas": ["2 o 3 nombres EXACTOS del CATÁLOGO DE CAPTURAS que enseñen lo que se cuenta (el mismo personaje o lugar)"],
   "hashtags": ["1 o 2 hashtags del tema, sin tildes, p. ej. #ViceCity o #Lucia"],
   "titulo_youtube": "título para YouTube de menos de 90 caracteres, que diga lo que cuenta el vídeo, sin engañar"
 }""" % ", ".join(GRUPOS)
@@ -37,6 +40,23 @@ AYUDA_GRUPOS = """Grupos de capturas oficiales (elige el que mejor case con lo q
 Jason_and_Lucia (los dos protagonistas), Jason_Duval, Lucia_Caminos, Vice_City (la ciudad), Leonida_Keys (los cayos),
 Grassrivers (humedales), Port_Gellhorn, Ambrosia, Mount_Kalaga_National_Park, y personajes: Boobie_Ike, Brian_Heder,
 Cal_Hampton, DreQuan_Priest, Raul_Bautista, Real_Dimez."""
+
+
+def catalogo(grupo=None):
+    """Lista «Nombre: qué se ve» de las capturas que se pueden usar (todas o las de un grupo)."""
+    filas = [f"{n}: {c['que']}" for n, c in sorted(CAPTURAS.items())
+             if c["uso"] == "principal" or (grupo and c["uso"] == "secundaria")
+             if grupo is None or c["grupo"] == grupo]
+    return "CATÁLOGO DE CAPTURAS (nombre: qué se ve):\n" + "\n".join(filas)
+
+
+def pregunta(t):
+    t = t.strip().rstrip(".")
+    if not t.endswith("?"):
+        t += "?"
+    if "¿" not in t:
+        t = "¿" + t[:1].upper() + t[1:]
+    return t
 
 
 def _limpiar(t, maximo):
@@ -67,7 +87,8 @@ def validar(j):
         "etiqueta": _limpiar(j.get("etiqueta"), 18).upper().rstrip("…") or "GTA 6",
         "personaje": bool(j.get("es_personaje")),
         "grupo": grupo,
-        "trozos": [_limpiar(j["gancho"], 95)] + cuerpo[:6] + [_limpiar(j["cierre"], 75)],
+        "trozos": [_limpiar(j["gancho"], 95)] + cuerpo[:6] + [pregunta(_limpiar(j["cierre"], 75))],
+        "capturas": validas(", ".join(str(c) for c in (j.get("capturas") or []))),
         "texto_post": _limpiar(j.get("texto_post"), 600),
         "hashtags": hashtags(j.get("hashtags")),
         "titulo": _limpiar(j.get("titulo_youtube"), 95),
@@ -83,12 +104,16 @@ def caption(g, fuente, oficial, voz_reserva=False):
 def de_dato(dato):
     """Guion a partir de un dato del banco (columnas del CSV / tabla Datos)."""
     oficial = dato.get("Estado") == "Oficial"
-    prompt = (REGLAS + "\n" + AYUDA_GRUPOS + "\n\nVas a contar un DATO o CURIOSIDAD de GTA 6.\n"
+    grupo = dato.get("Imagen sugerida") if dato.get("Imagen sugerida") in GRUPOS else None
+    prompt = (REGLAS + "\n" + AYUDA_GRUPOS + "\n\nVas a contar un DATO o CURIOSIDAD de GTA 6. Es algo ya conocido, "
+              "no una novedad: no digas que es nuevo, que se acaba de anunciar ni que Rockstar «comparte» o «revela» nada hoy.\n"
               f"Tema: {dato.get('Tema')}\nFuente: {dato.get('Fuente')} ({'oficial' if oficial else 'no oficial: atribúyelo'})\n"
-              f"Grupo de capturas recomendado: {dato.get('Imagen sugerida')}\n\nTEXTO DE LA FUENTE:\n{dato.get('Dato')}\n\n" + FORMATO)
+              f"Grupo de capturas: {grupo or 'el que mejor case'}\n\n{catalogo(grupo)}\n\n"
+              f"TEXTO DE LA FUENTE:\n{dato.get('Dato')}\n\n" + FORMATO)
     g = validar(gemini.texto_json(prompt))
-    if dato.get("Imagen sugerida") in GRUPOS:
-        g["grupo"] = dato["Imagen sugerida"]  # la imagen la decide el banco (regla de G2)
+    if grupo:
+        g["grupo"] = grupo  # la imagen la decide el banco (regla de G2)
+        g["capturas"] = [c for c in g["capturas"] if CAPTURAS[c]["grupo"] == grupo]
     return g
 
 
@@ -96,8 +121,11 @@ def de_noticia(medio, titulo, texto):
     oficial = medio in OFICIALES
     prompt = (REGLAS + "\n" + AYUDA_GRUPOS + "\n\nVas a contar una NOTICIA de hoy sobre GTA 6.\n"
               f"Medio: {medio} ({'oficial' if oficial else 'no oficial: di «Según ' + medio + '»'})\n"
-              f"Titular original: {titulo}\n\nTEXTO DE LA FUENTE:\n{texto[:7000]}\n\n" + FORMATO)
-    return validar(gemini.texto_json(prompt))
+              f"Titular original: {titulo}\n\n{catalogo()}\n\nTEXTO DE LA FUENTE:\n{texto[:7000]}\n\n" + FORMATO)
+    g = validar(gemini.texto_json(prompt))
+    if g["capturas"]:  # el grupo, el de la primera captura elegida
+        g["grupo"] = CAPTURAS[g["capturas"][0]]["grupo"]
+    return g
 
 
 def guion_a_texto(trozos):
