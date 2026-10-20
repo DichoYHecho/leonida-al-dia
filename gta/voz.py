@@ -65,8 +65,12 @@ def por_pausas(x, trozos):
 
 def por_whisper(ruta, trozos):
     from faster_whisper import WhisperModel
+    x, sr = sf.read(ruta, dtype="float32")
+    if x.ndim > 1:
+        x = x.mean(1)
+    x16 = np.interp(np.linspace(0, len(x) - 1, int(len(x) * 16000 / sr)), np.arange(len(x)), x).astype(np.float32)
     modelo = WhisperModel("base", device="cpu", compute_type="int8")
-    segs, _ = modelo.transcribe(ruta, language="es", word_timestamps=True, vad_filter=False)
+    segs, _ = modelo.transcribe(x16, language="es", word_timestamps=True, vad_filter=False)
     palabras = [(w.word, w.start, w.end) for s in segs for w in (s.words or [])]
     oidas, t_oidas = [], []
     for w, a, b in palabras:
