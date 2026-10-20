@@ -1,0 +1,70 @@
+"""Configuración del proyecto «Leónida al Día» (GTA 6). Sin claves: las claves van como secrets de GitHub."""
+import os
+from datetime import date
+from zoneinfo import ZoneInfo
+
+AQUI = os.path.dirname(os.path.abspath(__file__))
+RAIZ = os.path.dirname(AQUI)
+MADRID = ZoneInfo("Europe/Madrid")
+
+# Airtable (cuenta de adria.sanandreas, base «Panel GTA 6»)
+BASE = "appLYUwqO5EjDfQtX"
+T_PUB = "Publicaciones"
+T_DATOS = "Datos"
+
+# Buffer (segunda cuenta Free, la de adria.sanandreas)
+CANAL_IG = "6ad768d7778b240e2f697abc"
+CANAL_TT = "6ad7696b778b240e2f69823a"
+CANAL_YT = "6ad769e0778b240e2f6987d8"
+YT_CATEGORIA = "20"  # Videojuegos
+
+# Gemini
+MODELOS_TEXTO = ["gemini-3.5-flash-lite", "gemini-3.1-flash-lite"]
+MODELOS_VOZ = ["gemini-3.8-flash-tts", "gemini-3.8-flash-lite-tts"]
+VOZ = "Mako"
+ESTILO_VOZ = "High energy, elongated vowels"  # estilo «Promote» de AI Studio (elegido el 20 oct)
+
+# Calendario
+LANZAMIENTO = date(2026, 11, 19)
+ARRANQUE = date(2026, 10, 26)
+
+# Contenido
+HASHTAGS_FIJOS = ["#GTA6", "#GTAVI", "#Videojuegos"]
+PIE_POST = "Imágenes: Rockstar Games. Cuenta de fans, sin relación con Rockstar Games."
+CADUCA_HORAS = 36            # una noticia sin publicar en 36 h pasa a «Caducada»
+MAX_NOTICIAS_MANANA = 3
+MAX_NOTICIAS_TARDE = 2
+DATOS_EN_COLA = 2            # datos pendientes (por revisar o aprobados) que tiene que haber siempre
+
+UA = "LeonidaAlDiaBot/1.0 (cuenta de fans de GTA 6; https://www.youtube.com/@leonidaaldia) GitHubActions"
+
+FUENTES_RSS = [
+    ("Vandal", "https://vandal.elespanol.com/xml.cgi"),
+    ("3DJuegos", "https://www.3djuegos.com/feedburner.xml"),
+    ("VGC", "https://www.videogameschronicle.com/feed/"),
+    ("Push Square", "https://www.pushsquare.com/feeds/latest"),
+    ("Take-Two", "https://ir.take2games.com/rss/news-releases.xml"),
+]
+OFICIALES = {"Rockstar Games", "Take-Two"}
+
+# Rockstar Newswire: la web carga las noticias de su API pública con consultas guardadas.
+# Si Rockstar cambia estas huellas, el paso avisa y se sigue con el resto de fuentes.
+GRAPH = "https://graph.rockstargames.com/"
+HASH_LISTA = "7ec00215aecc70de257b0719a1dfcfa84fe57fdc7bf5c10ec2e8f377defede58"
+HASH_POST = "555658813abe5acc8010de1a1feddd6fd8fddffbdc35d3723d4dc0fe4ded6810"
+
+# Material oficial
+ZIP_CAPTURAS = "https://media-rockstargames-com.akamaized.net/VI/downloads/screenshots/GTAVI_Screenshots.zip"
+CACHE = os.path.join(RAIZ, "cache")
+
+
+def cuenta_atras(dia):
+    """Texto de la pastilla rosa según el día de publicación."""
+    n = (LANZAMIENTO - dia).days
+    if n > 1:
+        return f"FALTAN {n} DÍAS"
+    if n == 1:
+        return "¡MAÑANA SALE!"
+    if n == 0:
+        return "¡HOY SALE GTA 6!"
+    return f"DÍA {-n + 1} DE GTA 6"
