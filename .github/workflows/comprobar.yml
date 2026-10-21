@@ -2,9 +2,12 @@ name: Comprobar publicaciones
 
 on:
   schedule:
-    - cron: "40 13 * * *"
-    - cron: "40 20 * * *"
-    - cron: "40 17 16-22 11 *"
+    # Hora UTC: una para verano y otra para invierno (la tarea «hora» elige la buena)
+    - cron: "40 12 * * *"        # 14:40 en verano
+    - cron: "40 13 * * *"        # 14:40 en invierno
+    - cron: "40 19 * * *"        # 21:40 en verano
+    - cron: "40 20 * * *"        # 21:40 en invierno
+    - cron: "40 17 16-22 11 *"   # 18:40, solo en la semana del lanzamiento (16-22 nov)
   workflow_dispatch:
     inputs:
       dias:
@@ -15,8 +18,32 @@ permissions:
   contents: read
 
 jobs:
+  hora:
+    # Las horas de arriba están en UTC y hay una para verano y otra para invierno.
+    # Esta tarea mira la hora de Madrid de hoy y solo deja seguir la que toca (14:40 y 21:40, y 18:40 del 16 al 22 nov).
+    if: github.event_name == 'schedule' && vars.ACTIVO == 'si'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 2
+    outputs:
+      toca: ${{ steps.h.outputs.toca }}
+    steps:
+      - id: h
+        env:
+          CRON: ${{ github.event.schedule }}
+          HORAS: "14 21 18"
+        run: |
+          h=$(echo "$CRON" | awk '{print $2}')
+          off=$(TZ=Europe/Madrid date +%z | cut -c2-3)
+          local=$(( (10#$h + 10#$off) % 24 ))
+          if [[ " $HORAS " == *" $local "* ]]; then
+            echo "toca=si" >> "$GITHUB_OUTPUT"; echo "Toca: en Madrid son las $local h"
+          else
+            echo "toca=no" >> "$GITHUB_OUTPUT"; echo "No toca: en Madrid serían las $local h"
+          fi
+
   comprobar:
-    if: github.event_name == 'workflow_dispatch' || vars.ACTIVO == 'si'
+    needs: hora
+    if: ${{ !cancelled() && (github.event_name == 'workflow_dispatch' || needs.hora.outputs.toca == 'si') }}
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     env:
