@@ -3,11 +3,13 @@ name: Publicar la aprobada
 on:
   schedule:
     # Hora UTC: una para verano y otra para invierno (la tarea «hora» elige la buena)
-    - cron: "0 12 * * *"         # 14:00 en verano
-    - cron: "0 13 * * *"         # 14:00 en invierno
+    - cron: "0 10 * * *"         # 12:00 en verano
+    - cron: "0 11 * * *"         # 12:00 en invierno
+    - cron: "0 15 * * *"         # 17:00 en verano
+    - cron: "0 16 * * *"         # 17:00 en invierno
     - cron: "0 19 * * *"         # 21:00 en verano
     - cron: "0 20 * * *"         # 21:00 en invierno
-    - cron: "0 17 16-22 11 *"    # 18:00, solo en la semana del lanzamiento (16-22 nov)
+    - cron: "30 18 16-22 11 *"   # 19:30, solo en la semana del lanzamiento (16-22 nov)
   workflow_dispatch:
     inputs:
       prueba:
@@ -25,7 +27,7 @@ permissions:
 jobs:
   hora:
     # Las horas de arriba están en UTC y hay una para verano y otra para invierno.
-    # Esta tarea mira la hora de Madrid de hoy y solo deja seguir la que toca (14:00 y 21:00, y 18:00 del 16 al 22 nov).
+    # Esta tarea mira la hora de Madrid de hoy y solo deja seguir la que toca (12:00, 17:00 y 21:00, y 19:30 del 16 al 22 nov).
     if: github.event_name == 'schedule' && vars.ACTIVO == 'si'
     runs-on: ubuntu-24.04
     timeout-minutes: 2
@@ -35,15 +37,16 @@ jobs:
       - id: h
         env:
           CRON: ${{ github.event.schedule }}
-          HORAS: "14 21 18"
+          HORAS: "12:00 17:00 21:00 19:30"
         run: |
+          m=$(echo "$CRON" | awk '{print $1}')
           h=$(echo "$CRON" | awk '{print $2}')
           off=$(TZ=Europe/Madrid date +%z | cut -c2-3)
-          local=$(( (10#$h + 10#$off) % 24 ))
+          local=$(printf "%02d:%02d" $(( (10#$h + 10#$off) % 24 )) $((10#$m)))
           if [[ " $HORAS " == *" $local "* ]]; then
-            echo "toca=si" >> "$GITHUB_OUTPUT"; echo "Toca: en Madrid son las $local h"
+            echo "toca=si" >> "$GITHUB_OUTPUT"; echo "Toca: en Madrid son las $local"
           else
-            echo "toca=no" >> "$GITHUB_OUTPUT"; echo "No toca: en Madrid serían las $local h"
+            echo "toca=no" >> "$GITHUB_OUTPUT"; echo "No toca: en Madrid serían las $local"
           fi
 
   publicar:
