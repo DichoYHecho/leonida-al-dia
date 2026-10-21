@@ -25,8 +25,8 @@ def huella_video(f, dia):
                   (f.get("Fuente") or "").strip(), bool(f.get("Personaje")), f.get("Tipo"), dia.isoformat())
 
 
-def pie(f, reserva):
-    p = f"Fuente: {f.get('Fuente') or 'Rockstar Games'} · Imágenes: Rockstar Games"
+def pie(f, reserva, con_trozos=False):
+    p = f"Fuente: {f.get('Fuente') or 'Rockstar Games'} · Imágenes{' y sonido' if con_trozos else ''}: Rockstar Games"
     return p + (" · Voz: sharvard (CC BY 3.0)" if reserva else "")
 
 
@@ -53,6 +53,7 @@ def montar(f, dia, semilla, salida_dir):
     if not caps:
         raise RuntimeError("no hay capturas válidas en «Capturas»")
     medios.preparar()
+    caps = [c for c in caps if os.path.exists(medios.ruta_sin_comprobar(c))] or caps  # un trozo que no se pudo cortar se salta
     rutas = [medios.ruta(c) for c in caps]  # antes de gastar voz: que existan las imágenes
     wav, tiempos, nombre, aviso, cambios = preparar_voz(f)
     trozos = trozos_de(f)
@@ -66,7 +67,7 @@ def montar(f, dia, semilla, salida_dir):
             "trozos": trozos, "tiempos": tiempos, "voz": wav,
             "capturas": [(r, medios.CAPTURAS[c]["foco"], medios.CAPTURAS[c]["plano"]) for r, c in zip(rutas, caps)],
             "etiqueta": f.get("Etiqueta"), "tipo": f.get("Tipo"), "personaje": f.get("Personaje"),
-            "cuenta": cuenta_atras(dia), "pie": pie(f, reserva), "salida": salida,
+            "cuenta": cuenta_atras(dia), "pie": pie(f, reserva, any(medios.es_trozo(c) for c in caps)), "salida": salida,
             "semilla": int(huella((f.get("Guion") or "").strip())[:6], 16) % 1000, "tmp": tmp})
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
