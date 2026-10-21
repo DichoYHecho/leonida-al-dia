@@ -48,6 +48,8 @@ def fila(g, tipo, fuente, oficial, enlace, texto_fuente, dia, orden=None):
     if len(caps) < 2:
         caps = (caps + [c for c in medios.elegir(g["grupo"], g["titular"] + str(orden or ""), 3) if c not in caps])[:cuantas]
     caps = caps[:3]
+    if caps and all(medios.es_trozo(c) for c in caps):  # al menos una captura (los trozos son cortos)
+        caps = caps[:2] + [c for c in medios.elegir(g["grupo"], g["titular"], 2) if c not in caps][:1]
     texto = guion.caption(g, fuente, oficial)
     if any(medios.con_sonido(c) for c in caps):
         texto = texto.replace("Imágenes: Rockstar Games.", "Imágenes y sonido: Rockstar Games.")
