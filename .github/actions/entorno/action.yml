@@ -24,6 +24,12 @@ runs:
         path: cache/capturas
         key: capturas-v1
 
+    - name: Caché de los trozos de vídeo oficiales (se cortan de nuevo si cambia trozos.csv)
+      uses: actions/cache@v4
+      with:
+        path: cache/trozos
+        key: trozos-${{ hashFiles('gta/trozos.csv') }}
+
     - name: Caché del modelo de Whisper
       uses: actions/cache@v4
       with:
