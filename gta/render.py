@@ -181,10 +181,81 @@ def recorte(im, p):
     return im.crop((x, y, x + W, y + H))
 
 
+# ---------------------------------------------------------------- trozos de vídeo oficiales
+def es_video(ruta):
+    return ruta.lower().endswith(".mp4")
+
+
+def duracion_video(ruta):
+    return float(subprocess.check_output(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of",
+                                          "csv=p=0", ruta]).decode().strip())
+
+
+def sonido_video(ruta, msr):
+    out = subprocess.run(["ffmpeg", "-loglevel", "error", "-i", ruta, "-vn", "-f", "f32le", "-ac", "2", "-ar", str(msr), "-"],
+                         capture_output=True).stdout
+    return np.frombuffer(out, np.float32).reshape(-1, 2).copy()
+
+
+class Lector:
+    """Lee los fotogramas de un trozo (ya en 1080 × 1920); si se acaba, repite el último."""
+    def __init__(self, ruta):
+        self.p = subprocess.Popen(["ffmpeg", "-loglevel", "error", "-i", ruta, "-f", "rawvideo", "-pix_fmt", "rgb24",
+                                   "-s", f"{W}x{H}", "-r", str(FPS), "-"], stdout=subprocess.PIPE)
+        self.ultimo = bytes(W * H * 3)
+
+    def fotograma(self):
+        raw = self.p.stdout.read(W * H * 3)
+        if len(raw) == W * H * 3:
+            self.ultimo = raw
+        return Image.frombytes("RGB", (W, H), self.ultimo)
+
+    def cerrar(self):
+        self.p.kill()
+        self.p.wait()
+
+
+def plan_fondos(fondos, dur, tiempos):
+    """Tramos [(fondo, inicio, fin)]. Solo capturas: todas duran lo mismo y el cambio cae en el principio de un
+    subtítulo si está cerca. Con trozos: cada trozo dura lo que dura (como mucho 1,5 veces lo que le toca) y las
+    capturas se reparten el resto (al menos 2,5 s cada una); si solo hay trozos, se repiten hasta llenar."""
+    n = len(fondos)
+    if not any(f["video"] for f in fondos):
+        cortes = [0.0]
+        for k in range(1, n):
+            ideal = dur * k / n
+            cerca = min((t0 for t0, _ in tiempos), key=lambda t0: abs(t0 - ideal))
+            cortes.append(cerca if abs(cerca - ideal) < 2 else ideal)
+        cortes.append(dur)
+        return [(k, cortes[k], cortes[k + 1]) for k in range(n)]
+    fotos = [k for k in range(n) if not fondos[k]["video"]]
+    if not fotos:
+        tramos, t, k = [], 0.0, 0
+        while t < dur - 0.05:
+            largo = min(fondos[k % n]["dur"], dur - t)
+            tramos.append((k % n, t, t + largo))
+            t += largo
+            k += 1
+        return tramos
+    largos = [min(f["dur"], dur / n * 1.5) if f["video"] else 0.0 for f in fondos]
+    resto = dur - sum(largos)
+    if resto / len(fotos) < 2.5:
+        sobra = sum(largos) - (dur - 2.5 * len(fotos))
+        factor = max(0.2, (sum(largos) - sobra) / max(sum(largos), 1e-3))
+        largos = [x * factor for x in largos]
+        resto = dur - sum(largos)
+    largos = [x if fondos[k]["video"] else resto / len(fotos) for k, x in enumerate(largos)]
+    tramos, t = [], 0.0
+    for k, x in enumerate(largos):
+        tramos.append((k, t, dur if k == n - 1 else t + x))
+        t += x
+    return tramos
+
+
 # ---------------------------------------------------------------- montaje
 def montar(cfg):
-    """cfg: trozos, tiempos [(ini, fin)], voz (wav), capturas [(ruta, foco, plano)], etiqueta, tipo,
-    personaje, cuenta, pie, salida, semilla, tmp. Devuelve {duracion, mb}."""
+    """cfg: trozos, tiempos [(ini, fin)], voz (wav), capturas [(ruta, foco, plano)] (una ruta .mp4 es un trozo de
+    vídeo oficial), etiqueta, tipo, personaje, cuenta, pie, salida, semilla, tmp. Devuelve {duracion, mb}."""
     tmp = cfg["tmp"]
     trozos, tiempos = cfg["trozos"], cfg["tiempos"]
     voz, sr = sf.read(cfg["voz"], dtype="float32")
@@ -194,23 +265,42 @@ def montar(cfg):
     dur = len(voz) / sr + 1.2
     m, msr = musica(dur, cfg.get("semilla", 3))
     v = np.interp(np.linspace(0, len(voz) - 1, int(len(voz) * msr / sr)), np.arange(len(voz)), voz)
-    mezcla = m * 0.16
+
+    fondos = []
+    for r, f, p in cfg["capturas"]:
+        if es_video(r):
+            fondos.append({"video": True, "ruta": r, "dur": duracion_video(r)})
+        else:
+            im = cargar_foto(r)
+            fondos.append({"video": False, "im": im, "pan": pan_de_foco(im, f, p)})
+    tramos = plan_fondos(fondos, dur, tiempos)
+
+    # Sonido de fondo: nuestra música con las capturas y el sonido oficial (bajo) con los trozos
+    n = len(m)
+    peso = np.ones(n, np.float32)
+    oficial = np.zeros((n, 2), np.float32)
+    for k, a, b in tramos:
+        if fondos[k]["video"]:
+            i0, i1 = int(a * msr), min(int(b * msr), n)
+            peso[i0:i1] = 0
+            s = sonido_video(fondos[k]["ruta"], msr)[:i1 - i0]
+            if len(s):
+                s = s / (np.max(np.abs(s)) + 1e-6) * 0.30
+                fade = min(int(0.02 * msr), len(s) // 2)
+                if fade:
+                    rampa = np.linspace(0, 1, fade, dtype=np.float32)[:, None]
+                    s[:fade] *= rampa
+                    s[-fade:] *= rampa[::-1]
+                oficial[i0:i0 + len(s)] = s
+    if peso.min() < 1:
+        ventana = int(0.25 * msr)
+        peso = np.convolve(peso, np.ones(ventana, np.float32) / ventana, mode="same").astype(np.float32)
+    mezcla = m * 0.16 * peso[:, None] + oficial * (1 - peso[:, None])
     mezcla[:len(v)] += v[:, None] * 0.95
     mezcla = mezcla / max(1.0, np.max(np.abs(mezcla)) / 0.95)
     sf.write(os.path.join(tmp, "mezcla.wav"), mezcla.astype(np.float32), msr)
 
     fija = capa_fija(cfg)
-    fotos = [(cargar_foto(r), f, p) for r, f, p in cfg["capturas"]]
-    # Cada captura dura lo mismo; el cambio coincide con el principio de un subtítulo si cae cerca
-    n_f = len(fotos)
-    cortes = [0.0]
-    for k in range(1, n_f):
-        ideal = dur * k / n_f
-        cerca = min((t0 for t0, _ in tiempos), key=lambda t0: abs(t0 - ideal))
-        cortes.append(cerca if abs(cerca - ideal) < 2 else ideal)
-    cortes.append(dur)
-    pans = [pan_de_foco(im, f, p) for im, f, p in fotos]
-
     fg, fs, fc = fuente(FB, 74), fuente(FB, 64), fuente(FB, 66)
     nframes = int(dur * FPS)
     salida = cfg["salida"]
@@ -222,13 +312,23 @@ def montar(cfg):
              "-preset", "medium", "-crf", "24", "-maxrate", f"{maxrate}k", "-bufsize", f"{2 * maxrate}k",
              "-pix_fmt", "yuv420p", "-c:a", "aac", "-b:a", "128k", "-shortest", "-movflags", "+faststart", salida],
             stdin=subprocess.PIPE)
+        actual, lector = None, None
         for i in range(nframes):
             t = i / FPS
-            k = max(j for j in range(n_f) if cortes[j] <= t)
-            a, b = pans[k]
-            p = a + (b - a) * (t - cortes[k]) / max(cortes[k + 1] - cortes[k], 1e-3)
-            img = Image.alpha_composite(recorte(fotos[k][0], p).convert("RGBA"), fija)
-            j = next((q for q, (x0, x1) in enumerate(tiempos) if x0 - 0.05 <= t < x1 + 0.25), None)
+            q = max(j for j in range(len(tramos)) if tramos[j][1] <= t + 1e-6)
+            k, a, b = tramos[q]
+            if q != actual:
+                if lector:
+                    lector.cerrar()
+                lector = Lector(fondos[k]["ruta"]) if fondos[k]["video"] else None
+                actual = q
+            if lector:
+                base = lector.fotograma()
+            else:
+                pa, pb = fondos[k]["pan"]
+                base = recorte(fondos[k]["im"], pa + (pb - pa) * (t - a) / max(b - a, 1e-3))
+            img = Image.alpha_composite(base.convert("RGBA"), fija)
+            j = next((q2 for q2, (x0, x1) in enumerate(tiempos) if x0 - 0.05 <= t < x1 + 0.25), None)
             if j == 0 or t < tiempos[0][0]:
                 texto_centrado(img, trozos[0], 430, fg, WHITE, caja=(10, 14, 38, 200), borde=0)
             elif (j is not None and j == len(trozos) - 1) or t >= tiempos[-1][0]:
@@ -236,6 +336,8 @@ def montar(cfg):
             elif j is not None:
                 texto_centrado(img, trozos[j], 1300, fs, WHITE, borde=7)
             proc.stdin.write(img.convert("RGB").tobytes())
+        if lector:
+            lector.cerrar()
         proc.stdin.close()
         proc.wait()
         if proc.returncode:
