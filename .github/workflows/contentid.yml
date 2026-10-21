@@ -1,0 +1,32 @@
+name: Prueba de Content ID (vídeos privados en YouTube)
+
+on:
+  workflow_dispatch:
+    inputs:
+      subir:
+        description: "Subir los 2 vídeos EN PRIVADO a YouTube (si no, solo se montan)"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  contentid:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      AIRTABLE_TOKEN: ${{ secrets.AIRTABLE_TOKEN }}
+      BUFFER_API_KEY: ${{ secrets.BUFFER_API_KEY }}
+      SUBIR: ${{ inputs.subir && 'true' || 'false' }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: ./.github/actions/entorno
+      - name: Montar (y, si se pide, subir en privado) los 2 vídeos de prueba
+        run: python gta/contentid.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: prueba-contentid
+          path: salida_contentid/
+          retention-days: 7
