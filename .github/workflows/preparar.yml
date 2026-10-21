@@ -39,15 +39,16 @@ jobs:
       - id: h
         env:
           CRON: ${{ github.event.schedule }}
-          HORAS: "8 19"
+          HORAS: "08:00 19:00"
         run: |
+          m=$(echo "$CRON" | awk '{print $1}')
           h=$(echo "$CRON" | awk '{print $2}')
           off=$(TZ=Europe/Madrid date +%z | cut -c2-3)
-          local=$(( (10#$h + 10#$off) % 24 ))
+          local=$(printf "%02d:%02d" $(( (10#$h + 10#$off) % 24 )) $((10#$m)))
           if [[ " $HORAS " == *" $local "* ]]; then
-            echo "toca=si" >> "$GITHUB_OUTPUT"; echo "Toca: en Madrid son las $local h"
+            echo "toca=si" >> "$GITHUB_OUTPUT"; echo "Toca: en Madrid son las $local"
           else
-            echo "toca=no" >> "$GITHUB_OUTPUT"; echo "No toca: en Madrid serían las $local h"
+            echo "toca=no" >> "$GITHUB_OUTPUT"; echo "No toca: en Madrid serían las $local"
           fi
 
   preparar:
