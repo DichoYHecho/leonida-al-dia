@@ -26,7 +26,7 @@ ESTILO_VOZ = "High energy, elongated vowels"  # estilo «Promote» de AI Studio 
 
 # Calendario
 LANZAMIENTO = date(2026, 11, 19)
-ARRANQUE = date(2026, 10, 26)
+ARRANQUE = date(2026, 10, 21)   # primera publicación (adelantada el 21 oct; antes, el 26)
 
 # Contenido
 HASHTAGS_FIJOS = ["#GTA6", "#GTAVI", "#Videojuegos"]
@@ -55,6 +55,8 @@ HASH_POST = "555658813abe5acc8010de1a1feddd6fd8fddffbdc35d3723d4dc0fe4ded6810"
 
 # Material oficial
 ZIP_CAPTURAS = "https://media-rockstargames-com.akamaized.net/VI/downloads/screenshots/GTAVI_Screenshots.zip"
+# «Una mirada extendida» (27 ago 2026), el único vídeo largo de Rockstar en MP4: de ahí salen los trozos (trozos.csv)
+VIDEO_OFICIAL = "https://videos-rockstargames-com.akamaized.net/v4/rk721912/flv/es-es-1080p.mp4"
 CACHE = os.path.join(RAIZ, "cache")
 
 
