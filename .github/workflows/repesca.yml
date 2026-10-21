@@ -2,7 +2,9 @@ name: Repesca de vídeos
 
 on:
   schedule:
-    - cron: "30 11 * * *"   # 12:30 en invierno: rehace los vídeos que he cambiado en Airtable
+    # Hora UTC: una para verano y otra para invierno (la tarea «hora» elige la buena)
+    - cron: "30 10 * * *"   # 12:30 en verano: rehace los vídeos que he cambiado en Airtable
+    - cron: "30 11 * * *"   # 12:30 en invierno
   workflow_dispatch:
     inputs:
       limite:
@@ -21,8 +23,32 @@ permissions:
   contents: read
 
 jobs:
+  hora:
+    # Las horas de arriba están en UTC y hay una para verano y otra para invierno.
+    # Esta tarea mira la hora de Madrid de hoy y solo deja seguir la que toca (12:30).
+    if: github.event_name == 'schedule' && vars.ACTIVO == 'si'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 2
+    outputs:
+      toca: ${{ steps.h.outputs.toca }}
+    steps:
+      - id: h
+        env:
+          CRON: ${{ github.event.schedule }}
+          HORAS: "12"
+        run: |
+          h=$(echo "$CRON" | awk '{print $2}')
+          off=$(TZ=Europe/Madrid date +%z | cut -c2-3)
+          local=$(( (10#$h + 10#$off) % 24 ))
+          if [[ " $HORAS " == *" $local "* ]]; then
+            echo "toca=si" >> "$GITHUB_OUTPUT"; echo "Toca: en Madrid son las $local h"
+          else
+            echo "toca=no" >> "$GITHUB_OUTPUT"; echo "No toca: en Madrid serían las $local h"
+          fi
+
   repesca:
-    if: github.event_name == 'workflow_dispatch' || vars.ACTIVO == 'si'
+    needs: hora
+    if: ${{ !cancelled() && (github.event_name == 'workflow_dispatch' || needs.hora.outputs.toca == 'si') }}
     runs-on: ubuntu-24.04
     timeout-minutes: 40
     env:
