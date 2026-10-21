@@ -48,9 +48,12 @@ def fila(g, tipo, fuente, oficial, enlace, texto_fuente, dia, orden=None):
     if len(caps) < 2:
         caps = (caps + [c for c in medios.elegir(g["grupo"], g["titular"] + str(orden or ""), 3) if c not in caps])[:cuantas]
     caps = caps[:3]
+    texto = guion.caption(g, fuente, oficial)
+    if any(medios.es_trozo(c) for c in caps):
+        texto = texto.replace("Imágenes: Rockstar Games.", "Imágenes y sonido: Rockstar Games.")
     f = {"Titular": g["titular"], "Estado": "Por Revisar", "Tipo": tipo, "Info": "Oficial" if oficial else "Según medios",
          "Guion": guion.guion_a_texto(g["trozos"]), "Etiqueta": g["etiqueta"], "Personaje": g["personaje"],
-         "Capturas": ", ".join(caps), "Caption": guion.caption(g, fuente, oficial), "Título YouTube": g["titulo"],
+         "Capturas": ", ".join(caps), "Caption": texto, "Título YouTube": g["titulo"],
          "Fuente": fuente, "Enlace": enlace, "Texto de la fuente": (texto_fuente or "")[:3000],
          "Creada": datetime.now(timezone.utc).isoformat(timespec="seconds")}
     if orden is not None:
