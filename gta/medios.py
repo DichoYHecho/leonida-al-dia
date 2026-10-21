@@ -4,7 +4,8 @@
   (0 = izquierda, 1 = derecha) para el recorte vertical y si se usa. Se descargan del archivo oficial
   «Descargar todo» y se guardan reducidas en la caché de GitHub (no se suben al repositorio).
 - Trozos de vídeo de «Una mirada extendida» (`trozos.csv`, revisados uno a uno el 21 oct, sin destripes):
-  se cortan del MP4 oficial ya en vertical (con su sonido) y se guardan en la caché de GitHub.
+  se cortan del MP4 oficial ya en vertical y se guardan en la caché de GitHub. Se usan SIN su sonido (con nuestra
+  música), porque es diálogo de misiones con tacos o canciones con derechos (decidido el 21 oct).
   Para dejar de usarlos (por ejemplo, si llega una reclamación), basta con poner «no usar» en `trozos.csv`."""
 import csv, hashlib, io, os, re, subprocess, zipfile
 import requests
@@ -23,14 +24,19 @@ def tabla():
                            "plano": r["Plano"], "uso": r["Uso"], "notas": r["Notas"], "tipo": "captura"} for r in filas}
 
 
-def tabla_trozos():
-    p = os.path.join(AQUI, "trozos.csv")
+def con_sonido_csv(r):
+    return (r.get("Sonido") or "no").strip().lower() in ("si", "sí")
+
+
+def tabla_trozos(archivo="trozos.csv"):
+    p = os.path.join(AQUI, archivo)
     if not os.path.exists(p):
         return {}
     with open(p, encoding="utf-8") as f:
         filas = list(csv.DictReader(f))
     return {r["Trozo"]: {"grupo": r["Grupo"], "que": r["Qué se ve"], "foco": float(r["Foco (0 izquierda - 1 derecha)"]),
-                         "plano": "vídeo", "uso": r["Uso"], "notas": r["Notas"], "tipo": "trozo",
+                         "plano": "vídeo con sonido" if con_sonido_csv(r) else "vídeo", "uso": r["Uso"],
+                         "notas": r["Notas"], "tipo": "trozo", "sonido": con_sonido_csv(r),
                          "inicio": float(r["Inicio (s)"]), "dur": float(r["Duración (s)"])} for r in filas}
 
 
@@ -42,6 +48,11 @@ CAPTURAS.update(TROZOS)  # para Airtable, un trozo es una «captura» más (con 
 
 def es_trozo(nombre):
     return CAPTURAS.get(nombre, {}).get("tipo") == "trozo"
+
+
+def con_sonido(nombre):
+    """Trozo que se usa con su sonido oficial (columna «Sonido» = si). Por ahora, ninguno (decidido el 21 oct)."""
+    return bool(CAPTURAS.get(nombre, {}).get("sonido"))
 
 
 def preparar():
