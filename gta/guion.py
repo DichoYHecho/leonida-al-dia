@@ -43,10 +43,13 @@ Cal_Hampton, DreQuan_Priest, Raul_Bautista, Real_Dimez."""
 
 
 def catalogo(grupo=None):
-    """Lista «Nombre: qué se ve» de las capturas que se pueden usar (todas o las de un grupo)."""
-    filas = [f"{n}: {c['que']}" for n, c in sorted(CAPTURAS.items())
-             if c["uso"] == "principal" or (grupo and c["uso"] == "secundaria")
-             if grupo is None or c["grupo"] == grupo]
+    """Lista «Nombre: qué se ve» de las capturas que se pueden usar (todas o las de un grupo).
+    Solo las principales; las secundarias entran únicamente si el grupo tiene menos de 3 principales."""
+    del_grupo = [(n, c) for n, c in sorted(CAPTURAS.items()) if grupo is None or c["grupo"] == grupo]
+    principales = [(n, c) for n, c in del_grupo if c["uso"] == "principal"]
+    if grupo and len(principales) < 3:
+        principales = [(n, c) for n, c in del_grupo if c["uso"] in ("principal", "secundaria")]
+    filas = [f"{n}: {c['que']}" for n, c in principales]
     return "CATÁLOGO DE CAPTURAS (nombre: qué se ve):\n" + "\n".join(filas)
 
 
