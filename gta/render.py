@@ -70,9 +70,20 @@ def musica(dur, seed=3):
 
 
 # ---------------------------------------------------------------- dibujo
+def palabras(txt):
+    """Palabras para partir líneas sin separar «GTA 6» ni dejar «y», «a» u «o» al final de una línea."""
+    out = []
+    for p in txt.split():
+        if out and (out[-1].endswith("GTA") or (len(out[-1]) == 1 and out[-1].isalpha())):
+            out[-1] += " " + p
+        else:
+            out.append(p)
+    return out
+
+
 def envolver(txt, f, ancho, d):
     lineas, cur = [], ""
-    for p in txt.split():
+    for p in palabras(txt):
         prueba = (cur + " " + p).strip()
         if d.textlength(prueba, font=f) <= ancho:
             cur = prueba
