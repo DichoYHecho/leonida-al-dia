@@ -269,18 +269,18 @@ def montar(cfg):
     fondos = []
     for r, f, p in cfg["capturas"]:
         if es_video(r):
-            fondos.append({"video": True, "ruta": r, "dur": duracion_video(r)})
+            fondos.append({"video": True, "ruta": r, "dur": duracion_video(r), "sonido": p == "vídeo con sonido"})
         else:
             im = cargar_foto(r)
             fondos.append({"video": False, "im": im, "pan": pan_de_foco(im, f, p)})
     tramos = plan_fondos(fondos, dur, tiempos)
 
-    # Sonido de fondo: nuestra música con las capturas y el sonido oficial (bajo) con los trozos
+    # Sonido de fondo: nuestra música; solo los trozos marcados «con sonido» llevan el suyo (bajo) en su tramo
     n = len(m)
     peso = np.ones(n, np.float32)
     oficial = np.zeros((n, 2), np.float32)
     for k, a, b in tramos:
-        if fondos[k]["video"]:
+        if fondos[k]["video"] and fondos[k]["sonido"]:
             i0, i1 = int(a * msr), min(int(b * msr), n)
             peso[i0:i1] = 0
             s = sonido_video(fondos[k]["ruta"], msr)[:i1 - i0]
