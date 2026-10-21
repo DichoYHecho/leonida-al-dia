@@ -1,14 +1,18 @@
-"""Capturas oficiales de rockstargames.com/VI/media (99 en 15 grupos), revisadas una a una el 20 oct.
+"""Material oficial de rockstargames.com/VI/media para el fondo de los vídeos.
 
-- `capturas.csv`: qué se ve, el foco (0 = izquierda, 1 = derecha) para el recorte vertical y si se usa.
-- Las imágenes se descargan del archivo oficial «Descargar todo» y se guardan reducidas en la caché
-  de GitHub (no se suben al repositorio)."""
-import csv, hashlib, io, os, re, zipfile
+- Capturas (99 en 15 grupos), revisadas una a una el 20 oct. `capturas.csv`: qué se ve, el foco
+  (0 = izquierda, 1 = derecha) para el recorte vertical y si se usa. Se descargan del archivo oficial
+  «Descargar todo» y se guardan reducidas en la caché de GitHub (no se suben al repositorio).
+- Trozos de vídeo de «Una mirada extendida» (`trozos.csv`, revisados uno a uno el 21 oct, sin destripes):
+  se cortan del MP4 oficial ya en vertical (con su sonido) y se guardan en la caché de GitHub.
+  Para dejar de usarlos (por ejemplo, si llega una reclamación), basta con poner «no usar» en `trozos.csv`."""
+import csv, hashlib, io, os, re, subprocess, zipfile
 import requests
 from PIL import Image
-from config import AQUI, CACHE, ZIP_CAPTURAS, UA
+from config import AQUI, CACHE, ZIP_CAPTURAS, UA, VIDEO_OFICIAL
 
 DIR = os.path.join(CACHE, "capturas")
+DIR_TROZOS = os.path.join(CACHE, "trozos")
 ALTO = 2048  # el vídeo usa 1920 × 1,06
 
 
@@ -16,16 +20,34 @@ def tabla():
     with open(os.path.join(AQUI, "capturas.csv"), encoding="utf-8") as f:
         filas = list(csv.DictReader(f))
     return {r["Captura"]: {"grupo": r["Grupo"], "que": r["Qué se ve"], "foco": float(r["Foco (0 izquierda - 1 derecha)"]),
-                           "plano": r["Plano"], "uso": r["Uso"], "notas": r["Notas"]} for r in filas}
+                           "plano": r["Plano"], "uso": r["Uso"], "notas": r["Notas"], "tipo": "captura"} for r in filas}
+
+
+def tabla_trozos():
+    p = os.path.join(AQUI, "trozos.csv")
+    if not os.path.exists(p):
+        return {}
+    with open(p, encoding="utf-8") as f:
+        filas = list(csv.DictReader(f))
+    return {r["Trozo"]: {"grupo": r["Grupo"], "que": r["Qué se ve"], "foco": float(r["Foco (0 izquierda - 1 derecha)"]),
+                         "plano": "vídeo", "uso": r["Uso"], "notas": r["Notas"], "tipo": "trozo",
+                         "inicio": float(r["Inicio (s)"]), "dur": float(r["Duración (s)"])} for r in filas}
 
 
 CAPTURAS = tabla()
 GRUPOS = sorted({c["grupo"] for c in CAPTURAS.values()})
+TROZOS = {n: t for n, t in tabla_trozos().items() if t["grupo"] in GRUPOS}
+CAPTURAS.update(TROZOS)  # para Airtable, un trozo es una «captura» más (con nombre propio)
+
+
+def es_trozo(nombre):
+    return CAPTURAS.get(nombre, {}).get("tipo") == "trozo"
 
 
 def preparar():
-    """Deja las 99 capturas en la caché (solo descarga si falta alguna)."""
-    faltan = [n for n in CAPTURAS if not os.path.exists(os.path.join(DIR, n + ".jpg"))]
+    """Deja las capturas y los trozos en la caché (solo descarga lo que falte)."""
+    preparar_trozos()
+    faltan = [n for n, c in CAPTURAS.items() if c["tipo"] == "captura" and not os.path.exists(os.path.join(DIR, n + ".jpg"))]
     if not faltan:
         return 0
     os.makedirs(DIR, exist_ok=True)
@@ -38,7 +60,8 @@ def preparar():
             m = re.search(r"([A-Za-z_]+?_\d\d)\.(jpe?g|png)$", os.path.basename(info.filename), re.I)
             if not m:
                 continue
-            nombre = next((n for n in CAPTURAS if m.group(1).endswith(n) or n.endswith(m.group(1))), None)
+            nombre = next((n for n, c in CAPTURAS.items() if c["tipo"] == "captura"
+                           and (m.group(1).endswith(n) or n.endswith(m.group(1)))), None)
             if not nombre:
                 continue
             im = Image.open(io.BytesIO(z.read(info))).convert("RGB")
@@ -50,8 +73,42 @@ def preparar():
     return hechas
 
 
+def cortar(nombre, t, destino):
+    """Corta un trozo del MP4 oficial (solo descarga ese trozo) en vertical, centrado en su foco, con sonido."""
+    x = f"min(max(0\\,{t['foco']:.3f}*iw-540)\\,iw-1080)"
+    tmp = destino + ".tmp.mp4"
+    for _ in range(3):
+        r = subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-ss", f"{t['inicio']:.2f}", "-t", f"{t['dur']:.2f}",
+                            "-user_agent", UA, "-reconnect", "1", "-reconnect_on_network_error", "1",
+                            "-reconnect_delay_max", "10", "-i", VIDEO_OFICIAL,
+                            "-vf", f"scale=-2:1920,crop=1080:1920:{x}:0,fps=30", "-c:v", "libx264", "-crf", "18",
+                            "-preset", "veryfast", "-pix_fmt", "yuv420p", "-c:a", "aac", "-b:a", "160k", "-ar", "44100",
+                            "-ac", "2", tmp])
+        if r.returncode == 0 and os.path.getsize(tmp) > 10000:
+            os.replace(tmp, destino)
+            return True
+    print(f"  ⚠️ No se pudo cortar el trozo {nombre}", flush=True)
+    return False
+
+
+def preparar_trozos():
+    faltan = [n for n, t in TROZOS.items() if t["uso"] != "no usar"
+              and not os.path.exists(os.path.join(DIR_TROZOS, n + ".mp4"))]
+    if not faltan:
+        return 0
+    os.makedirs(DIR_TROZOS, exist_ok=True)
+    print(f"Cortando los trozos del vídeo oficial (faltan {len(faltan)})…", flush=True)
+    hechos = sum(cortar(n, TROZOS[n], os.path.join(DIR_TROZOS, n + ".mp4")) for n in faltan)
+    print(f"Trozos preparados: {hechos}", flush=True)
+    return hechos
+
+
+def ruta_sin_comprobar(nombre):
+    return os.path.join(DIR_TROZOS, nombre + ".mp4") if es_trozo(nombre) else os.path.join(DIR, nombre + ".jpg")
+
+
 def ruta(nombre):
-    p = os.path.join(DIR, nombre + ".jpg")
+    p = ruta_sin_comprobar(nombre)
     if not os.path.exists(p):
         raise RuntimeError(f"no tengo la captura {nombre}")
     return p
@@ -62,8 +119,8 @@ def elegir(grupo, semilla, cuantas=2):
     rotando según la semilla para no repetir siempre las mismas."""
     if grupo not in GRUPOS:
         grupo = "Vice_City"
-    principales = sorted(n for n, c in CAPTURAS.items() if c["grupo"] == grupo and c["uso"] == "principal")
-    secundarias = sorted(n for n, c in CAPTURAS.items() if c["grupo"] == grupo and c["uso"] == "secundaria")
+    principales = sorted(n for n, c in CAPTURAS.items() if c["grupo"] == grupo and c["uso"] == "principal" and c["tipo"] == "captura")
+    secundarias = sorted(n for n, c in CAPTURAS.items() if c["grupo"] == grupo and c["uso"] == "secundaria" and c["tipo"] == "captura")
     lista = principales or secundarias
     k = int(hashlib.sha256(str(semilla).encode()).hexdigest(), 16) % len(lista)
     orden = lista[k:] + lista[:k]
