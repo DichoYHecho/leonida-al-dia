@@ -2,9 +2,11 @@ name: Preparar propuestas (noticias y datos)
 
 on:
   schedule:
-    # Hora UTC. En horario de invierno de Madrid (desde el 25 de octubre): 08:00 y 19:00
-    - cron: "0 7 * * *"
-    - cron: "0 18 * * *"
+    # Hora UTC: una para verano y otra para invierno (la tarea «hora» elige la buena)
+    - cron: "0 6 * * *"     # 08:00 en verano
+    - cron: "0 7 * * *"     # 08:00 en invierno
+    - cron: "0 17 * * *"    # 19:00 en verano
+    - cron: "0 18 * * *"    # 19:00 en invierno
   workflow_dispatch:
     inputs:
       que:
@@ -25,9 +27,32 @@ permissions:
   contents: read
 
 jobs:
+  hora:
+    # Las horas de arriba están en UTC y hay una para verano y otra para invierno.
+    # Esta tarea mira la hora de Madrid de hoy y solo deja seguir la que toca (08:00 y 19:00).
+    if: github.event_name == 'schedule' && vars.ACTIVO == 'si'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 2
+    outputs:
+      toca: ${{ steps.h.outputs.toca }}
+    steps:
+      - id: h
+        env:
+          CRON: ${{ github.event.schedule }}
+          HORAS: "8 19"
+        run: |
+          h=$(echo "$CRON" | awk '{print $2}')
+          off=$(TZ=Europe/Madrid date +%z | cut -c2-3)
+          local=$(( (10#$h + 10#$off) % 24 ))
+          if [[ " $HORAS " == *" $local "* ]]; then
+            echo "toca=si" >> "$GITHUB_OUTPUT"; echo "Toca: en Madrid son las $local h"
+          else
+            echo "toca=no" >> "$GITHUB_OUTPUT"; echo "No toca: en Madrid serían las $local h"
+          fi
+
   preparar:
-    # Las ejecuciones programadas solo funcionan cuando el proyecto está activado (variable ACTIVO = si)
-    if: github.event_name == 'workflow_dispatch' || vars.ACTIVO == 'si'
+    needs: hora
+    if: ${{ !cancelled() && (github.event_name == 'workflow_dispatch' || needs.hora.outputs.toca == 'si') }}
     runs-on: ubuntu-24.04
     timeout-minutes: 45
     env:
