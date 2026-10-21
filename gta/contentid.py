@@ -20,18 +20,19 @@ SALIDA = "salida_contentid"
 W, H, FPS = render.W, render.H, render.FPS
 
 
-def bajar(url, ruta):
-    with requests.get(url, headers={"User-Agent": UA}, stream=True, timeout=120) as r:
-        r.raise_for_status()
-        with open(ruta, "wb") as f:
-            for b in r.iter_content(1 << 20):
-                f.write(b)
-    print(f"Vídeo oficial descargado: {os.path.getsize(ruta) / 1e6:.0f} MB", flush=True)
+def entrada(src):
+    """Opciones de FFmpeg para leer el vídeo oficial: si es una URL, solo se descargan los trozos que hacen falta
+    (el archivo entero pesa unos 2 GB) y se reintenta si se corta la conexión."""
+    if src.startswith("http"):
+        return ["-user_agent", UA, "-reconnect", "1", "-reconnect_on_network_error", "1",
+                "-reconnect_delay_max", "10", "-i", src]
+    return ["-i", src]
 
 
 def duracion(ruta):
-    return float(subprocess.check_output(["ffprobe", "-v", "error", "-show_entries", "format=duration",
-                                          "-of", "csv=p=0", ruta]).decode().strip())
+    opciones = ["-user_agent", UA] if ruta.startswith("http") else []
+    return float(subprocess.check_output(["ffprobe", "-v", "error", *opciones, "-show_entries", "format=duration",
+                                          "-of", "csv=p=0", "-i", ruta]).decode().strip())
 
 
 def fondo(src, dur, tmp):
@@ -42,7 +43,7 @@ def fondo(src, dur, tmp):
     for k, frac in enumerate((0.30, 0.50, 0.70)):
         p = os.path.join(tmp, f"trozo{k}.mkv")
         subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-ss", f"{total * frac:.2f}", "-t", f"{largo + 0.1:.2f}",
-                        "-i", src, "-vf", f"scale=-2:{H},crop={W}:{H},fps={FPS}", "-c:v", "libx264", "-crf", "18",
+                        *entrada(src), "-vf", f"scale=-2:{H},crop={W}:{H},fps={FPS}", "-c:v", "libx264", "-crf", "18",
                         "-preset", "veryfast", "-c:a", "pcm_s16le", "-ar", "44100", "-ac", "2", p],
                        check=True)
         partes.append(p)
@@ -181,15 +182,18 @@ def subir(videos):
 def main():
     os.makedirs(SALIDA, exist_ok=True)
     tmp = tempfile.mkdtemp()
-    src = os.path.join(tmp, "oficial.mp4")
-    if FUENTE.startswith("http"):
-        bajar(FUENTE, src)
-    else:
-        src = FUENTE
+    src = FUENTE
     voz_wav = os.path.join(tmp, "voz.wav")
     tiempos = voz.piper(TROZOS, voz_wav)
     dur = len(sf.read(voz_wav)[0]) / voz.SR + 1.2
-    bg, oficial = fondo(src, dur, tmp)
+    for intento in range(3):
+        try:
+            bg, oficial = fondo(src, dur, tmp)
+            break
+        except subprocess.CalledProcessError:
+            if intento == 2:
+                raise
+            print("  La lectura del vídeo oficial falló; se reintenta…", flush=True)
     pie = "Fuente: Rockstar Games · Imágenes y sonido: Rockstar Games · Voz: sharvard (CC BY 3.0)"
     videos = []
     for v, txt, con in (("A", "con el sonido del vídeo oficial", True), ("B", "con nuestra música", False)):
