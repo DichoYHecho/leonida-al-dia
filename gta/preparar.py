@@ -2,7 +2,7 @@
 
 - Noticias (08:00 y 19:00): lee las fuentes, Gemini elige las que merecen vídeo (sin repetir lo ya
   propuesto) y escribe el guion solo con lo que dice la fuente. Como mucho 3 por la mañana y 2 por la tarde.
-- Datos (08:00): mantiene siempre 2 datos del banco pendientes de publicar.
+- Datos (08:00): mantiene siempre 3 datos del banco pendientes de publicar (DATOS_EN_COLA).
 - Además pasa a «Caducada» las noticias que llevan más de 36 horas sin publicarse.
 
 Variables: QUE (noticias, datos o todo), MAX (máximo de noticias; por defecto según la hora)."""
@@ -118,7 +118,7 @@ def noticias(regs, maximo, carpeta):
         return []
     elegidas = elegir(cands, ya, maximo)
     nota(f"Elegidas por Gemini: {len(elegidas)}")
-    dia = HOY  # la de la mañana sale a las 14:00 y la de la tarde a las 21:00
+    dia = HOY  # las de la mañana salen a las 12:00 o a las 17:00 y las de la tarde a las 21:00
     out = []
     for c in elegidas:
         try:
@@ -143,7 +143,7 @@ def datos(regs_todas, carpeta):
     regs = airtable.listar(T_PUB, ["Estado", "Orden dato"], formula="{Tipo}='Dato'")
     usados = {int(r["fields"]["Orden dato"]) for r in regs if r["fields"].get("Orden dato") is not None}
     pendientes = sum(1 for r in regs if r["fields"].get("Estado") in ("Por Revisar", "Aprobado"))
-    falta = min(2, DATOS_EN_COLA - pendientes)
+    falta = DATOS_EN_COLA - pendientes
     nota(f"Datos pendientes de publicar: {pendientes}; se preparan {max(falta, 0)}")
     if falta <= 0:
         return []
