@@ -1,0 +1,41 @@
+name: Hojas de contacto de un vídeo oficial
+
+on:
+  workflow_dispatch:
+    inputs:
+      video:
+        description: "MP4 oficial de Rockstar"
+        default: "https://videos-rockstargames-com.akamaized.net/v4/rk721912/flv/es-es-1080p.mp4"
+      cada:
+        description: "Un fotograma cada N segundos"
+        default: "4"
+
+permissions:
+  contents: read
+
+jobs:
+  hojas:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    env:
+      CADA: ${{ inputs.cada }}
+      VIDEO: ${{ inputs.video }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: ./.github/actions/entorno
+      - name: Descargar el vídeo oficial (se reanuda si se corta)
+        run: |
+          case "$VIDEO" in https://*.rockstargames.com/*|https://*.akamaized.net/*) ;; *) echo "Solo vídeos oficiales de Rockstar"; exit 1;; esac
+          for i in 1 2 3 4 5 6 7 8; do
+            curl -sSfL -A "LeonidaAlDiaBot/1.0 (cuenta de fans de GTA 6) GitHubActions" -C - -o oficial.mp4 "$VIDEO" && break
+            echo "Cortado; se reanuda ($i)"; sleep 5
+          done
+          ls -l oficial.mp4
+      - name: Hojas y transcripción
+        run: python gta/hojas.py oficial.mp4
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hojas-de-contacto
+          path: salida_hojas/
+          retention-days: 7
