@@ -34,7 +34,7 @@ PIE_POST = "Imágenes: Rockstar Games. Cuenta de fans, sin relación con Rocksta
 CADUCA_HORAS = 36            # una noticia sin publicar en 36 h pasa a «Caducada»
 MAX_NOTICIAS_MANANA = 3
 MAX_NOTICIAS_TARDE = 2
-DATOS_EN_COLA = 2            # datos pendientes (por revisar o aprobados) que tiene que haber siempre
+DATOS_EN_COLA = 3            # datos pendientes (por revisar o aprobados) que tiene que haber siempre (3 publicaciones al día)
 
 UA = "LeonidaAlDiaBot/1.0 (cuenta de fans de GTA 6; https://www.youtube.com/@leonidaaldia) GitHubActions"
 
