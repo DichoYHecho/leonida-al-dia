@@ -67,7 +67,7 @@ def montar(f, dia, semilla, salida_dir):
             "trozos": trozos, "tiempos": tiempos, "voz": wav,
             "capturas": [(r, medios.CAPTURAS[c]["foco"], medios.CAPTURAS[c]["plano"]) for r, c in zip(rutas, caps)],
             "etiqueta": f.get("Etiqueta"), "tipo": f.get("Tipo"), "personaje": f.get("Personaje"),
-            "cuenta": cuenta_atras(dia), "pie": pie(f, reserva, any(medios.es_trozo(c) for c in caps)), "salida": salida,
+            "cuenta": cuenta_atras(dia), "pie": pie(f, reserva, any(medios.con_sonido(c) for c in caps)), "salida": salida,
             "semilla": int(huella((f.get("Guion") or "").strip())[:6], 16) % 1000, "tmp": tmp})
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
