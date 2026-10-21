@@ -49,7 +49,7 @@ def fila(g, tipo, fuente, oficial, enlace, texto_fuente, dia, orden=None):
         caps = (caps + [c for c in medios.elegir(g["grupo"], g["titular"] + str(orden or ""), 3) if c not in caps])[:cuantas]
     caps = caps[:3]
     texto = guion.caption(g, fuente, oficial)
-    if any(medios.es_trozo(c) for c in caps):
+    if any(medios.con_sonido(c) for c in caps):
         texto = texto.replace("Imágenes: Rockstar Games.", "Imágenes y sonido: Rockstar Games.")
     f = {"Titular": g["titular"], "Estado": "Por Revisar", "Tipo": tipo, "Info": "Oficial" if oficial else "Según medios",
          "Guion": guion.guion_a_texto(g["trozos"]), "Etiqueta": g["etiqueta"], "Personaje": g["personaje"],
