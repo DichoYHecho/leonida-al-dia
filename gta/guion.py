@@ -18,7 +18,11 @@ Reglas que no se pueden saltar:
 - Frases cortas y claras, tono cercano y con energía, sin exagerar ni engañar. Nada de mayúsculas sostenidas ni emojis.
 - Escribe los números como se dicen si es raro leerlos («GTA 6», «19 de noviembre», «30 euros»).
 - Usa bien los signos del español: «¿…?» y «¡…!». La pregunta final siempre entre «¿» y «?».
-- No hagas predicciones ni especules sobre lo que pasará en el juego o en la historia.
+- No hagas predicciones ni especules sobre lo que pasará en el juego, en la historia ni en las ventas.
+- Si la fuente cita a otro (una empresa de análisis, un periodista, un desarrollador), dilo: «Según 3DJuegos, Sensor Tower calcula…».
+  Una estimación se cuenta como estimación («calcula», «estima»), nunca como un hecho.
+- Da el dato concreto (cifras, nombres, fechas de la fuente) en vez de frases vagas como «millones» o «muchos».
+- La pregunta final pide la opinión del público; no puede ser una apuesta ni una predicción («¿Llegará a…?»).
 """
 
 FORMATO = """Devuelve SOLO un JSON con estos campos:
@@ -28,10 +32,10 @@ FORMATO = """Devuelve SOLO un JSON con estos campos:
   "es_personaje": true o false (si la etiqueta es un personaje),
   "grupo_capturas": "uno de: %s",
   "gancho": "primera frase, que enganche y diga de qué va, máximo 80 caracteres",
-  "cuerpo": ["3 a 6 trozos de máximo 45 caracteres cada uno, que se leen seguidos, con su puntuación (comas y punto al acabar cada frase)"],
+  "cuerpo": ["3 a 6 trozos de máximo 45 caracteres cada uno, que se leen seguidos. Punto al acabar cada frase; si la frase sigue en el trozo siguiente, no pongas coma al final salvo que la gramática la pida"],
   "cierre": "pregunta final para comentar, máximo 60 caracteres",
   "texto_post": "2 o 3 frases para el texto de la publicación (sin hashtags)",
-  "capturas": ["2 o 3 nombres EXACTOS del CATÁLOGO DE CAPTURAS que enseñen lo que se cuenta (el mismo personaje o lugar)"],
+  "capturas": ["2 o 3 nombres EXACTOS del CATÁLOGO DE CAPTURAS que enseñen lo que se cuenta (el mismo personaje o lugar); si hay un trozo de VÍDEO que encaje, pon uno (como mucho dos)"],
   "hashtags": ["1 o 2 hashtags del tema, sin tildes, p. ej. #ViceCity o #Lucia"],
   "titulo_youtube": "título para YouTube de menos de 90 caracteres, que diga lo que cuenta el vídeo, sin engañar"
 }""" % ", ".join(GRUPOS)
@@ -49,7 +53,8 @@ def catalogo(grupo=None):
     principales = [(n, c) for n, c in del_grupo if c["uso"] == "principal"]
     if grupo and len(principales) < 3:
         principales = [(n, c) for n, c in del_grupo if c["uso"] in ("principal", "secundaria")]
-    filas = [f"{n}: {c['que']}" for n, c in principales]
+    filas = [f"{n} (VÍDEO, {c['dur']:.0f} s): {c['que']}" if c.get("tipo") == "trozo" else f"{n}: {c['que']}"
+             for n, c in principales]
     return "CATÁLOGO DE CAPTURAS (nombre: qué se ve):\n" + "\n".join(filas)
 
 
