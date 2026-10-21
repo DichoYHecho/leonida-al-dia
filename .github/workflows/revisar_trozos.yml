@@ -1,0 +1,23 @@
+name: Revisar los trozos de vídeo
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  revisar:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v5
+      - uses: ./.github/actions/entorno
+      - name: Hojas de los trozos y vídeo vertical de prueba
+        run: python gta/revisar_trozos.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: revisar-trozos
+          path: salida_trozos/
+          retention-days: 7
