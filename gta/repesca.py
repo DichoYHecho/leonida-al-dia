@@ -41,8 +41,8 @@ def main():
             else:
                 print(f"⚠️ No se encontró imagen para «{f.get('Titular')}»", flush=True)
         guardado = date.fromisoformat(f["Para el día"]) if f.get("Para el día") else None
-        if f.get("Vídeo") and guardado and f.get("Huella vídeo") == video.huella_video(f, guardado):
-            continue  # nada ha cambiado desde que se hizo
+        if not nuevos and f.get("Vídeo") and guardado and f.get("Huella vídeo") == video.huella_video(f, guardado):
+            continue  # nada ha cambiado desde que se hizo (si se ha buscado su imagen, se rehace siempre)
         dia = max(guardado or hoy, hoy)
         if hechos >= LIMITE:
             break
