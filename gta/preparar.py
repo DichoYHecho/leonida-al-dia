@@ -8,7 +8,7 @@
 Variables: QUE (noticias, datos o todo), MAX (máximo de noticias; por defecto según la hora)."""
 import csv, json, os, sys, tempfile, time
 from datetime import datetime, timedelta, timezone, date
-import airtable, fuentes, guion, medios, video
+import airtable, fuentes, guion, imagenes, medios, video
 from config import (AQUI, MADRID, T_PUB, CADUCA_HORAS, MAX_NOTICIAS_MANANA, MAX_NOTICIAS_TARDE, DATOS_EN_COLA,
                     OFICIALES, ARRANQUE)
 import gemini
@@ -109,6 +109,23 @@ Devuelve SOLO un JSON: {{"elegidas": [{{"n": número, "motivo": "frase corta"}}]
     return out
 
 
+def imagen_real(g, c, f):
+    """Si la noticia trata de algo real que no sale en el juego (un producto, una persona…), busca su imagen
+    (primero la oficial y, si no hay, la del medio) y la pone en «Capturas» (decidido el 22 oct).
+    Si no la encuentra, se quedan las capturas del juego. Devuelve el aviso para la revisión (o \"\")."""
+    if g.get("imagen_juego", True):
+        return ""
+    r = imagenes.buscar(c)
+    if not r:
+        nota(f"  Sin imagen de lo que se cuenta en «{g['titular']}»: sale con capturas del juego")
+        return "Las imágenes son del juego, no de lo que cuenta la noticia (no se encontró su imagen)"
+    url, credito, origen = r
+    f["Capturas"] = imagenes.token(url, credito)
+    f["Caption"] = f["Caption"].replace("Imágenes: Rockstar Games.", f"Imagen: {credito}.")
+    nota(f"  Imagen {'oficial' if origen == 'oficial' else 'del medio'} ({credito}) para «{g['titular']}»")
+    return "" if origen == "oficial" else f"Imagen de {credito} (no oficial): revisa que encaje con la noticia"
+
+
 def noticias(regs, maximo, carpeta):
     enlaces = {(r["fields"].get("Enlace") or "").split("?")[0] for r in regs}
     ya = [r["fields"].get("Titular", "") for r in regs if r["fields"].get("Tipo") == "Noticia"]
@@ -125,7 +142,10 @@ def noticias(regs, maximo, carpeta):
             texto = fuentes.texto_de(c)
             g = guion.de_noticia(c["medio"], c["titulo"], texto)
             f = fila(g, "Noticia", c["medio"], c["medio"] in OFICIALES, c["enlace"], texto, dia)
+            aviso_img = imagen_real(g, c, f)
             ruta, info = con_video(f, dia, carpeta)
+            if aviso_img:
+                f["Avisos"] = "\n".join(a for a in (f.get("Avisos"), aviso_img) if a)
             out.append((f, ruta))
         except Exception as e:
             nota(f"⚠️ No se pudo preparar «{c['titulo'][:80]}»: {str(e)[:200]}")
