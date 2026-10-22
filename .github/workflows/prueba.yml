@@ -10,6 +10,10 @@ on:
         description: "Probar también la lectura de noticias"
         type: boolean
         default: true
+      noticia:
+        description: "Enlace de una noticia para probar su imagen (opcional)"
+        required: false
+        default: ""
 
 permissions:
   contents: read
@@ -22,6 +26,7 @@ jobs:
       GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
       ORDEN: ${{ inputs.orden }}
       NOTICIAS: ${{ inputs.noticias }}
+      NOTICIA: ${{ inputs.noticia }}
     steps:
       - uses: actions/checkout@v5
       - uses: ./.github/actions/entorno
