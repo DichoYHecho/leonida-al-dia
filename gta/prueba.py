@@ -23,6 +23,10 @@ if os.environ.get("NOTICIAS") == "true":
             texto = fuentes.texto_de(eleg[0])
             informe.append(f"Texto leído de la primera ({len(texto)} caracteres): {texto[:400]}")
 
+import prensa  # «La prensa opina» (22 oct): ¿se pueden leer las notas desde GitHub?
+oc, mc, av = prensa.notas()
+informe += [f"OpenCritic: {oc}", f"Metacritic: {mc}"] + [f"Aviso: {a}" for a in av]
+
 orden = os.environ.get("ORDEN") or "5"
 d = next(x for x in preparar.banco() if x["Orden"] == orden)
 g = guion.de_dato(d)

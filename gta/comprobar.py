@@ -3,7 +3,7 @@ y lo escribe en «Comprobación»: ✅ todo bien, ⚠️ con el error de Buffer,
 import json, os, re, unicodedata
 from datetime import datetime, timedelta, timezone
 import requests
-import airtable
+import airtable, aviso
 from config import MADRID, T_PUB, CANAL_IG, CANAL_TT, CANAL_YT
 
 RED = {CANAL_IG: "Reel", CANAL_TT: "TikTok", CANAL_YT: "YouTube"}
@@ -86,13 +86,18 @@ def main():
         return
     desde = (datetime.now(timezone.utc) - timedelta(days=DIAS)).strftime("%Y-%m-%dT%H:%M:%SZ")
     ps = posts(desde)
-    cambios = []
+    cambios, malas = [], []
     for p in pubs:
         txt = resultado(p["fields"], ps)
         print(f"- {p['fields'].get('Titular')}: {txt or 'no encontrada en Buffer'}")
         if txt and txt != p["fields"].get("Comprobación"):
             cambios.append((p["id"], {"Comprobación": txt}))
+            if txt.startswith("⚠") and "⚠" not in (p["fields"].get("Comprobación") or ""):
+                malas.append(f"- {p['fields'].get('Titular')}: {txt}")
     airtable.actualizar(T_PUB, cambios)
+    if malas:  # aviso en «Por Revisar» (decidido el 22 oct)
+        aviso.avisar("Una publicación no ha salido en todas las redes",
+                     "Lo ha visto la comprobación en Buffer:\n" + "\n".join(malas), repetir_horas=1)
 
 
 if __name__ == "__main__":

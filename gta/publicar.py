@@ -6,26 +6,49 @@ montar antes (sin gastar voz). Si no hay nada aprobado, no publica nada."""
 import json, os, re, sys, tempfile
 from datetime import datetime, timedelta, timezone
 import requests
-import airtable, video
+import airtable, aviso, video
 from config import MADRID, T_PUB, CANAL_IG, CANAL_TT, CANAL_YT, YT_CATEGORIA, CADUCA_HORAS
 
 CAMPOS = ["Titular", "Estado", "Tipo", "Guion", "Etiqueta", "Personaje", "Capturas", "Caption", "Título YouTube",
           "Fuente", "Creada", "Orden dato", "Vídeo", "Para el día", "Huella vídeo", "Voz", "Avisos"]
 
-MUTACION = """mutation Publicar($text: String!, $video: String!, $titulo: String!) {
- reel: createPost(input: { text: $text, channelId: "%s", schedulingType: automatic, mode: shareNow,
+def mutacion(cuando=None):
+    """La publicación en las 3 redes. cuando = None publica ya; si no, la deja programada en Buffer a esa hora
+    (ISO en UTC, p. ej. «2026-11-18T23:00:00.000Z»). La pregunta del final va como primer comentario en Instagram
+    y dentro del texto en TikTok y YouTube (Buffer no deja comentar en esas dos; decidido el 22 oct)."""
+    modo = f'mode: customScheduled, dueAt: "{cuando}"' if cuando else "mode: shareNow"
+    return """mutation Publicar($text: String!, $textq: String!, $video: String!, $titulo: String!, $comentario: String) {
+ reel: createPost(input: { text: $text, channelId: "%s", schedulingType: automatic, %s,
    assets: [ { video: { url: $video, metadata: { thumbnailOffset: 1000 } } } ],
-   metadata: { instagram: { type: reel, shouldShareToFeed: true, isAiGenerated: true } } })
+   metadata: { instagram: { type: reel, shouldShareToFeed: true, isAiGenerated: true, firstComment: $comentario } } })
    { ... on PostActionSuccess { post { id status } } ... on MutationError { message } }
- tiktok: createPost(input: { text: $text, channelId: "%s", schedulingType: automatic, mode: shareNow,
+ tiktok: createPost(input: { text: $textq, channelId: "%s", schedulingType: automatic, %s,
    assets: [ { video: { url: $video, metadata: { thumbnailOffset: 1000 } } } ],
    metadata: { tiktok: { isAiGenerated: true } } })
    { ... on PostActionSuccess { post { id status } } ... on MutationError { message } }
- youtube: createPost(input: { text: $text, channelId: "%s", schedulingType: automatic, mode: shareNow,
+ youtube: createPost(input: { text: $textq, channelId: "%s", schedulingType: automatic, %s,
    assets: [ { video: { url: $video } } ],
    metadata: { youtube: { title: $titulo, categoryId: "%s", isAiGenerated: true } } })
    { ... on PostActionSuccess { post { id status } } ... on MutationError { message } }
-}""" % (CANAL_IG, CANAL_TT, CANAL_YT, YT_CATEGORIA)
+}""" % (CANAL_IG, modo, CANAL_TT, modo, CANAL_YT, modo, YT_CATEGORIA)
+
+
+MUTACION = mutacion()
+
+
+def variables(caption, guion, titulo, video_url):
+    """Variables de la mutación. La pregunta es la última línea del guion que acaba en «?»."""
+    caption = caption or ""
+    preg = next((l.strip() for l in reversed((guion or "").splitlines()) if l.strip().endswith("?")), "")
+    textq = caption
+    if preg and preg not in caption:
+        partes = caption.split("\n\n")
+        # Detrás del primer párrafo si es largo (comprobar.py reconoce la publicación por su principio);
+        # si no, justo antes de los hashtags
+        donde = 1 if len(partes[0]) >= 90 or len(partes) < 3 else len(partes) - 1
+        textq = "\n\n".join(partes[:donde] + [preg] + partes[donde:])
+    return {"text": caption, "textq": textq, "video": video_url, "titulo": (titulo or "GTA 6")[:100],
+            "comentario": preg or None}
 
 
 def buffer(query, variables):
@@ -57,6 +80,9 @@ def main():
     elegida = elegir(regs, ahora)
     if not elegida:
         print("No hay ninguna propuesta aprobada: no se publica nada.")
+        if not prueba and os.environ.get("GITHUB_EVENT_NAME") == "schedule":
+            aviso.avisar(f"No se ha publicado nada a las {ahora.astimezone(MADRID):%H:%M}",
+                         "No había ninguna propuesta aprobada. Aprueba alguna en «Por Revisar» para la próxima hora.")
         return
     r = elegida[0]
     f, rid = r["fields"], r["id"]
@@ -76,7 +102,7 @@ def main():
         print("PRUEBA: no se manda a Buffer.")
         return
     titulo = (f.get("Título YouTube") or f.get("Titular") or "GTA 6")[:100]
-    d = buffer(MUTACION, {"text": f.get("Caption", ""), "video": adj["url"], "titulo": titulo})
+    d = buffer(MUTACION, variables(f.get("Caption", ""), f.get("Guion"), titulo, adj["url"]))
     res = d.get("data") or {}
     bien = [k for k in ("reel", "tiktok", "youtube") if (res.get(k) or {}).get("post")]
     mal = {k: (res.get(k) or {}).get("message") or json.dumps(d.get("errors"))[:200]

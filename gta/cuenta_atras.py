@@ -124,8 +124,7 @@ def main():
         adj = video.subir(rec["id"], ruta)
         if not adj or not adj.get("url"):
             raise RuntimeError("No se pudo subir el vídeo a Airtable")
-        datos = publicar.buffer(publicar.MUTACION, {"text": f["Caption"], "video": adj["url"],
-                                                    "titulo": f["Título YouTube"][:100]})
+        datos = publicar.buffer(publicar.MUTACION, publicar.variables(f["Caption"], f["Guion"], f["Título YouTube"], adj["url"]))
         res = datos.get("data") or {}
         bien = [k for k in ("reel", "tiktok", "youtube") if (res.get(k) or {}).get("post")]
         mal = {k: (res.get(k) or {}).get("message") or str(datos.get("errors"))[:200]

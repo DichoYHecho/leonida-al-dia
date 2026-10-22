@@ -8,7 +8,7 @@
 Variables: QUE (noticias, datos o todo), MAX (máximo de noticias; por defecto según la hora)."""
 import csv, json, os, sys, tempfile, time
 from datetime import datetime, timedelta, timezone, date
-import airtable, fuentes, guion, imagenes, medios, video
+import airtable, fuentes, guion, imagenes, medios, prensa, video
 from config import (AQUI, MADRID, T_PUB, CADUCA_HORAS, MAX_NOTICIAS_MANANA, MAX_NOTICIAS_TARDE, DATOS_EN_COLA,
                     OFICIALES, ARRANQUE)
 import gemini
@@ -34,7 +34,7 @@ def caducar(regs):
     cambios = []
     for r in regs:
         f = r["fields"]
-        if f.get("Tipo") == "Noticia" and f.get("Estado") in ("Por Revisar", "Aprobado") and f.get("Creada"):
+        if f.get("Tipo") in ("Noticia", "Prensa") and f.get("Estado") in ("Por Revisar", "Aprobado") and f.get("Creada"):
             if datetime.fromisoformat(f["Creada"].replace("Z", "+00:00")) < limite:
                 cambios.append((r["id"], {"Estado": "Caducada"}))
     if cambios:
@@ -152,6 +152,30 @@ def noticias(regs, maximo, carpeta):
     return out
 
 
+# ---------------------------------------------------------------- la prensa opina
+def la_prensa(regs, carpeta):
+    """Notas de OpenCritic y Metacritic (prensa.py): una propuesta de Tipo «Prensa» cuando hay notas nuevas."""
+    try:
+        c = prensa.propuesta(regs)
+    except Exception as e:
+        nota(f"⚠️ La prensa opina: {str(e)[:200]}")
+        return []
+    if not c:
+        return []
+    try:
+        g = guion.de_noticia(c["medio"], c["titulo"], c["texto"])
+        g["etiqueta"] = "LA PRENSA OPINA"
+        f = fila(g, "Prensa", c["medio"], False, c["enlace"], c["texto"], HOY)
+        ruta, info = con_video(f, HOY, carpeta)
+        f["Avisos"] = "\n".join(a for a in (f.get("Avisos"), "La prensa opina: antes de aprobar, mira que las notas sigan "
+                                "igual en Metacritic y OpenCritic (cambian con cada análisis nuevo)") if a)
+        nota(f"La prensa opina: notas nuevas ({c['clave']})")
+        return [(f, ruta)]
+    except Exception as e:
+        nota(f"⚠️ No se pudo preparar «La prensa opina»: {str(e)[:200]}")
+        return []
+
+
 # ---------------------------------------------------------------- datos
 def banco():
     with open(os.path.join(AQUI, "banco_datos.csv"), encoding="utf-8") as f:
@@ -199,6 +223,8 @@ def main():
     caducar(regs)
     carpeta = tempfile.mkdtemp()
     lista = []
+    if que in ("noticias", "todo", "prensa"):
+        lista += la_prensa(regs, carpeta)
     if que in ("noticias", "todo"):
         lista += noticias(regs, maximo, carpeta)
     if que == "datos" or (que == "todo" and not tarde):
