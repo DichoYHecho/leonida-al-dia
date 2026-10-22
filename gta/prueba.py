@@ -28,6 +28,15 @@ d = next(x for x in preparar.banco() if x["Orden"] == orden)
 g = guion.de_dato(d)
 f = preparar.fila(g, "Dato", d["Fuente"], d["Estado"] == "Oficial", d["Enlace"], d["Dato"], max(hoy, ARRANQUE), int(orden))
 ruta, info, cambios = video.montar(f, max(hoy, ARRANQUE), video.huella(f["Titular"]), SALIDA)
+url = os.environ.get("NOTICIA")
+if url:  # prueba de la imagen de una noticia (22 oct): el mismo vídeo, con la imagen que encuentre
+    import imagenes
+    r = imagenes.buscar({"medio": imagenes.credito_medio(url, "medio"), "enlace": url})
+    informe.append(f"Imagen encontrada en {url}: {r}")
+    if r:
+        f2 = dict(f, Capturas=imagenes.token(r[0], r[1]), Etiqueta="PRUEBA IMAGEN")
+        ruta2, info2, _ = video.montar(f2, max(hoy, ARRANQUE), "prueba-imagen", SALIDA)
+        informe.append(f"Vídeo con la imagen: {info2} · pie: {video.pie(f2, False, False, [f2['Capturas']])}")
 informe += [f"Dato {orden}: {d['Dato']}", "", "GUION:", f["Guion"], "", f"Etiqueta: {f['Etiqueta']} · Capturas: {f['Capturas']}",
             "", "CAPTION:", f["Caption"], "", f"Título YouTube: {f['Título YouTube']}", f"Vídeo: {info}",
             f"Tiempos: {cambios.get('Tiempos')}"]
