@@ -16,6 +16,11 @@ on:
         description: "Prueba: montar el vídeo pero NO publicar"
         type: boolean
         default: true
+      que:
+        description: "Qué publicar"
+        type: choice
+        options: [aprobada, cuenta_atras]
+        default: aprobada
 
 concurrency:
   group: publicar
@@ -28,11 +33,13 @@ jobs:
   hora:
     # Las horas de arriba están en UTC y hay una para verano y otra para invierno.
     # Esta tarea mira la hora de Madrid de hoy y solo deja seguir la que toca (12:00, 17:00 y 21:00, y 19:30 del 16 al 22 nov).
+    # A las 17:00 se publica la cuenta atrás (decidido el 22 oct) hasta el 18 de noviembre.
     if: github.event_name == 'schedule' && vars.ACTIVO == 'si'
     runs-on: ubuntu-24.04
     timeout-minutes: 2
     outputs:
       toca: ${{ steps.h.outputs.toca }}
+      hora: ${{ steps.h.outputs.hora }}
     steps:
       - id: h
         env:
@@ -43,6 +50,7 @@ jobs:
           h=$(echo "$CRON" | awk '{print $2}')
           off=$(TZ=Europe/Madrid date +%z | cut -c2-3)
           local=$(printf "%02d:%02d" $(( (10#$h + 10#$off) % 24 )) $((10#$m)))
+          echo "hora=$local" >> "$GITHUB_OUTPUT"
           if [[ " $HORAS " == *" $local "* ]]; then
             echo "toca=si" >> "$GITHUB_OUTPUT"; echo "Toca: en Madrid son las $local"
           else
@@ -62,8 +70,22 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - uses: ./.github/actions/entorno
-      - name: Publicar
-        run: python gta/publicar.py
+      - name: Publicar (a las 17:00, la cuenta atrás; a las demás horas, la aprobada)
+        env:
+          HORA: ${{ needs.hora.outputs.hora }}
+          QUE: ${{ inputs.que }}
+        run: |
+          if [ "$HORA" = "17:00" ] || [ "$QUE" = "cuenta_atras" ]; then
+            python gta/cuenta_atras.py
+          else
+            python gta/publicar.py
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always() && hashFiles('salida_cuenta/*') != ''
+        with:
+          name: cuenta-atras-prueba
+          path: salida_cuenta/
+          retention-days: 7
       - name: Guardar las voces
         if: always()
         uses: actions/cache/save@v4
