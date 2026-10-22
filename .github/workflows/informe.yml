@@ -1,0 +1,37 @@
+name: Informe semanal
+
+on:
+  schedule:
+    - cron: "30 20 * * 0"   # domingos a las 21:30 en invierno (22:30 en verano)
+  workflow_dispatch:
+    inputs:
+      prueba:
+        description: "Prueba: enseñar el informe pero NO crearlo en Airtable"
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+jobs:
+  informe:
+    if: github.event_name == 'workflow_dispatch' || vars.ACTIVO == 'si'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      AIRTABLE_TOKEN: ${{ secrets.AIRTABLE_TOKEN }}
+      BUFFER_API_KEY: ${{ secrets.BUFFER_API_KEY }}
+      PRUEBA: ${{ github.event_name == 'workflow_dispatch' && inputs.prueba && 'true' || 'false' }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+      - run: pip install -q requests==2.34.2
+      - name: Informe de la semana
+        run: python gta/informe.py
+      - name: Avisar en Airtable si algo ha fallado
+        if: failure() && github.event_name == 'schedule'
+        env:
+          TAREA: ${{ github.workflow }}
+        run: python gta/aviso.py

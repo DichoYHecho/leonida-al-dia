@@ -67,6 +67,11 @@ jobs:
       - uses: ./.github/actions/entorno
       - name: Rehacer vídeos
         run: python gta/repesca.py
+      - name: Avisar en Airtable si algo ha fallado
+        if: failure() && github.event_name == 'schedule'
+        env:
+          TAREA: ${{ github.workflow }}
+        run: python gta/aviso.py
       - name: Guardar las voces
         if: always()
         uses: actions/cache/save@v4

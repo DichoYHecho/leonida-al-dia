@@ -9,7 +9,7 @@ on:
     - cron: "40 16 * * *"        # 17:40 en invierno
     - cron: "40 19 * * *"        # 21:40 en verano
     - cron: "40 20 * * *"        # 21:40 en invierno
-    - cron: "10 19 16-22 11 *"   # 20:10, solo en la semana del lanzamiento (16-22 nov)
+    - cron: "10 19 16-30 11 *"   # 20:10, solo del 16 al 30 nov (lanzamiento)
   workflow_dispatch:
     inputs:
       dias:
@@ -61,3 +61,8 @@ jobs:
       - run: pip install -q requests==2.34.2
       - name: Comprobar en Buffer
         run: python gta/comprobar.py
+      - name: Avisar en Airtable si algo ha fallado
+        if: failure() && github.event_name == 'schedule'
+        env:
+          TAREA: ${{ github.workflow }}
+        run: python gta/aviso.py

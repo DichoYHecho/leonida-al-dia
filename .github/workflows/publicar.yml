@@ -9,7 +9,8 @@ on:
     - cron: "0 16 * * *"         # 17:00 en invierno
     - cron: "0 19 * * *"         # 21:00 en verano
     - cron: "0 20 * * *"         # 21:00 en invierno
-    - cron: "30 18 16-22 11 *"   # 19:30, solo en la semana del lanzamiento (16-22 nov)
+    - cron: "30 18 16-30 11 *"   # 19:30, solo del 16 al 30 nov (lanzamiento)
+    - cron: "17 22 18 11 *"      # 23:17 del 18 nov: deja programado en Buffer el especial de las 00:00 del 19
   workflow_dispatch:
     inputs:
       prueba:
@@ -19,7 +20,7 @@ on:
       que:
         description: "Qué publicar"
         type: choice
-        options: [aprobada, cuenta_atras]
+        options: [aprobada, cuenta_atras, lanzamiento]
         default: aprobada
 
 concurrency:
@@ -32,7 +33,8 @@ permissions:
 jobs:
   hora:
     # Las horas de arriba están en UTC y hay una para verano y otra para invierno.
-    # Esta tarea mira la hora de Madrid de hoy y solo deja seguir la que toca (12:00, 17:00 y 21:00, y 19:30 del 16 al 22 nov).
+    # Esta tarea mira la hora de Madrid de hoy y solo deja seguir la que toca (12:00, 17:00 y 21:00, y 19:30 del 16 al 30 nov).
+    # El 18 de noviembre a las 23:17 se prepara el especial de lanzamiento (sale a las 00:00 del 19).
     # A las 17:00 se publica la cuenta atrás (decidido el 22 oct) hasta el 18 de noviembre.
     if: github.event_name == 'schedule' && vars.ACTIVO == 'si'
     runs-on: ubuntu-24.04
@@ -44,7 +46,7 @@ jobs:
       - id: h
         env:
           CRON: ${{ github.event.schedule }}
-          HORAS: "12:00 17:00 21:00 19:30"
+          HORAS: "12:00 17:00 21:00 19:30 23:17"
         run: |
           m=$(echo "$CRON" | awk '{print $1}')
           h=$(echo "$CRON" | awk '{print $2}')
@@ -70,16 +72,23 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - uses: ./.github/actions/entorno
-      - name: Publicar (a las 17:00, la cuenta atrás; a las demás horas, la aprobada)
+      - name: Publicar (a las 17:00, la cuenta atrás; a las 23:17 del 18 nov, el especial; a las demás horas, la aprobada)
         env:
           HORA: ${{ needs.hora.outputs.hora }}
           QUE: ${{ inputs.que }}
         run: |
-          if [ "$HORA" = "17:00" ] || [ "$QUE" = "cuenta_atras" ]; then
+          if [ "$HORA" = "23:17" ] || [ "$QUE" = "lanzamiento" ]; then
+            python gta/lanzamiento.py
+          elif [ "$HORA" = "17:00" ] || [ "$QUE" = "cuenta_atras" ]; then
             python gta/cuenta_atras.py
           else
             python gta/publicar.py
           fi
+      - name: Avisar en Airtable si algo ha fallado
+        if: failure() && github.event_name == 'schedule'
+        env:
+          TAREA: ${{ github.workflow }}
+        run: python gta/aviso.py
       - uses: actions/upload-artifact@v4
         if: always() && hashFiles('salida_cuenta/*') != ''
         with:
