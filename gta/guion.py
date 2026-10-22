@@ -31,14 +31,14 @@ FORMATO = """Devuelve SOLO un JSON con estos campos:
   "etiqueta": "tema en mayúsculas, máximo 16 caracteres (un personaje como LUCÍA, un lugar como VICE CITY, o el asunto: PRECIO, TRÁILER, FECHA, MÚSICA, VENTAS…)",
   "es_personaje": true o false (si la etiqueta es un personaje),
   "grupo_capturas": "uno de: %s",
-  "gancho": "primera frase, que enganche y diga de qué va, máximo 80 caracteres",
+  "gancho": "primera frase, máximo 80 caracteres: el dato concreto con la palabra clave (GTA 6, Vice City, Lucía…). Varía la forma (una afirmación directa, una cifra, un contraste, una cita corta…). NUNCA empieces por «¿Sabías que» ni hagas una pregunta, y no prometas ni exageres nada que no diga la fuente",
   "cuerpo": ["3 a 6 trozos de máximo 45 caracteres cada uno, que se leen seguidos. Punto al acabar cada frase; si la frase sigue en el trozo siguiente, no pongas coma al final salvo que la gramática la pida"],
   "cierre": "pregunta final para comentar, máximo 60 caracteres",
-  "texto_post": "2 o 3 frases para el texto de la publicación (sin hashtags)",
+  "texto_post": "2 o 3 frases para el texto de la publicación (sin hashtags); la primera, con «GTA 6» y el tema concreto, porque es lo que se busca",
   "imagen_del_juego": true o false (false si lo que se cuenta es algo real que NO sale en el juego y tiene su propia imagen: un producto o aparato, una persona, una portada, un evento, un anuncio, una tienda…; true si se puede enseñar con capturas del juego),
   "capturas": ["2 o 3 nombres EXACTOS del CATÁLOGO DE CAPTURAS que enseñen lo que se cuenta (el mismo personaje o lugar); si hay un trozo de VÍDEO que encaje, pon uno (como mucho dos)"],
   "hashtags": ["1 o 2 hashtags del tema, sin tildes, p. ej. #ViceCity o #Lucia"],
-  "titulo_youtube": "título para YouTube de menos de 90 caracteres, que diga lo que cuenta el vídeo, sin engañar"
+  "titulo_youtube": "título para YouTube de menos de 70 caracteres que empiece por «GTA 6» o por el nombre concreto (Vice City, Lucía, Jason…) y diga el dato; sin preguntas, sin exagerar y sin engañar"
 }""" % ", ".join(GRUPOS)
 
 AYUDA_GRUPOS = """Grupos de capturas oficiales (elige el que mejor case con lo que se cuenta; si es algo general como fechas, precio, ventas o tráileres, usa Jason_and_Lucia o Vice_City):
