@@ -52,6 +52,9 @@ jobs:
     env:
       AIRTABLE_TOKEN: ${{ secrets.AIRTABLE_TOKEN }}
       BUFFER_API_KEY: ${{ secrets.BUFFER_API_KEY }}
+      GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+      GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+      GOOGLE_REFRESH_TOKEN: ${{ secrets.GOOGLE_REFRESH_TOKEN }}
       DIAS: ${{ inputs.dias || '4' }}
     steps:
       - uses: actions/checkout@v5

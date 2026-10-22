@@ -2,14 +2,16 @@ name: Publicar la aprobada
 
 on:
   schedule:
-    # Hora UTC: una para verano y otra para invierno (la tarea «hora» elige la buena)
-    - cron: "0 10 * * *"         # 12:00 en verano
-    - cron: "0 11 * * *"         # 12:00 en invierno
-    - cron: "0 15 * * *"         # 17:00 en verano
-    - cron: "0 16 * * *"         # 17:00 en invierno
-    - cron: "0 19 * * *"         # 21:00 en verano
-    - cron: "0 20 * * *"         # 21:00 en invierno
-    - cron: "30 18 16-30 11 *"   # 19:30, solo del 16 al 30 nov (lanzamiento)
+    # Hora UTC: una para verano y otra para invierno (la tarea «hora» elige la buena).
+    # Se lanza 45 minutos antes de la hora de publicar y deja la publicación programada en Buffer a la hora exacta
+    # (GitHub suele ir con retraso; decidido el 22 oct). Hay que aprobar antes de esa hora de preparación.
+    - cron: "15 9 * * *"         # 11:15 en verano  → sale a las 12:00
+    - cron: "15 10 * * *"        # 11:15 en invierno → sale a las 12:00
+    - cron: "15 14 * * *"        # 16:15 en verano  → sale a las 17:00
+    - cron: "15 15 * * *"        # 16:15 en invierno → sale a las 17:00
+    - cron: "15 18 * * *"        # 20:15 en verano  → sale a las 21:00
+    - cron: "15 19 * * *"        # 20:15 en invierno → sale a las 21:00
+    - cron: "45 17 16-30 11 *"   # 18:45 → sale a las 19:30, solo del 16 al 30 nov (lanzamiento)
     - cron: "17 22 18 11 *"      # 23:17 del 18 nov: deja programado en Buffer el especial de las 00:00 del 19
   workflow_dispatch:
     inputs:
@@ -33,7 +35,8 @@ permissions:
 jobs:
   hora:
     # Las horas de arriba están en UTC y hay una para verano y otra para invierno.
-    # Esta tarea mira la hora de Madrid de hoy y solo deja seguir la que toca (12:00, 17:00 y 21:00, y 19:30 del 16 al 30 nov).
+    # Esta tarea mira la hora de Madrid de hoy y solo deja seguir la que toca: 11:15, 16:15 y 20:15 (salen a las 12:00, 17:00
+    # y 21:00) y 18:45 del 16 al 30 nov (sale a las 19:30).
     # El 18 de noviembre a las 23:17 se prepara el especial de lanzamiento (sale a las 00:00 del 19).
     # A las 17:00 se publica la cuenta atrás (decidido el 22 oct) hasta el 18 de noviembre.
     if: github.event_name == 'schedule' && vars.ACTIVO == 'si'
@@ -46,7 +49,7 @@ jobs:
       - id: h
         env:
           CRON: ${{ github.event.schedule }}
-          HORAS: "12:00 17:00 21:00 19:30 23:17"
+          HORAS: "11:15 16:15 20:15 18:45 23:17"
         run: |
           m=$(echo "$CRON" | awk '{print $1}')
           h=$(echo "$CRON" | awk '{print $2}')
@@ -77,9 +80,15 @@ jobs:
           HORA: ${{ needs.hora.outputs.hora }}
           QUE: ${{ inputs.que }}
         run: |
+          case "$HORA" in
+            11:15) export PARA=12:00 ;;
+            16:15) export PARA=17:00 ;;
+            20:15) export PARA=21:00 ;;
+            18:45) export PARA=19:30 ;;
+          esac
           if [ "$HORA" = "23:17" ] || [ "$QUE" = "lanzamiento" ]; then
             python gta/lanzamiento.py
-          elif [ "$HORA" = "17:00" ] || [ "$QUE" = "cuenta_atras" ]; then
+          elif [ "$HORA" = "16:15" ] || [ "$QUE" = "cuenta_atras" ]; then
             python gta/cuenta_atras.py
           else
             python gta/publicar.py

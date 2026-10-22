@@ -7,9 +7,9 @@ on:
     - cron: "0 7 * * *"     # 08:00 en invierno
     - cron: "0 17 * * *"    # 19:00 en verano
     - cron: "0 18 * * *"    # 19:00 en invierno
-    # Del 16 al 30 de noviembre (lanzamiento), además a las 13:00, 16:00 y 23:00 (horario de invierno)
+    # Del 16 al 30 de noviembre (lanzamiento), además a las 13:00, 15:00 y 23:00 (horario de invierno)
     - cron: "0 12 16-30 11 *"
-    - cron: "0 15 16-30 11 *"
+    - cron: "0 14 16-30 11 *"
     - cron: "0 22 16-30 11 *"
   workflow_dispatch:
     inputs:
@@ -33,7 +33,7 @@ permissions:
 jobs:
   hora:
     # Las horas de arriba están en UTC y hay una para verano y otra para invierno.
-    # Esta tarea mira la hora de Madrid de hoy y solo deja seguir la que toca (08:00 y 19:00; y del 16 al 30 nov, también 13:00, 16:00 y 23:00).
+    # Esta tarea mira la hora de Madrid de hoy y solo deja seguir la que toca (08:00 y 19:00; y del 16 al 30 nov, también 13:00, 15:00 y 23:00).
     if: github.event_name == 'schedule' && vars.ACTIVO == 'si'
     runs-on: ubuntu-24.04
     timeout-minutes: 2
@@ -43,7 +43,7 @@ jobs:
       - id: h
         env:
           CRON: ${{ github.event.schedule }}
-          HORAS: "08:00 19:00 13:00 16:00 23:00"
+          HORAS: "08:00 19:00 13:00 15:00 23:00"
         run: |
           m=$(echo "$CRON" | awk '{print $1}')
           h=$(echo "$CRON" | awk '{print $2}')
