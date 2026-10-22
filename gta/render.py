@@ -269,6 +269,45 @@ def plan_fondos(fondos, dur, tiempos):
     return tramos
 
 
+# ---------------------------------------------------------------- cuenta atrás
+_FUENTES = {}
+
+
+def f_(p, s):
+    if (p, s) not in _FUENTES:
+        _FUENTES[(p, s)] = fuente(p, s)
+    return _FUENTES[(p, s)]
+
+
+def reloj(img, cfg, t):
+    """Cuenta atrás (vídeo de las 17:00, decidido el 22 oct): los días en grande y las horas, minutos y segundos
+    bajando en directo, con la fecha de salida, la precarga y el aviso de que la hora no está confirmada."""
+    r = cfg["reloj"]
+    resto = max(0.0, r["segundos"] - t)
+    d, x = divmod(int(resto), 86400)
+    h, x = divmod(x, 3600)
+    m, s = divmod(x, 60)
+    capa = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    dr = ImageDraw.Draw(capa)
+    dr.rounded_rectangle([80, 740, W - 80, 1215], 40, fill=(10, 14, 38, 200))
+    dias = "¡ESTA NOCHE!" if d == 0 else ("1 DÍA" if d == 1 else f"{d} DÍAS")
+    dr.text((W / 2, 765), dias, font=f_(FB, 150 if d else 112), fill=AMBER, anchor="ma")
+    f = f_(FB, 104)
+    celda = max(dr.textlength(c, font=f) for c in "0123456789")
+    texto = f"{h:02d}:{m:02d}:{s:02d}"
+    anchos = [celda if c.isdigit() else dr.textlength(c, font=f) for c in texto]
+    x0 = W / 2 - sum(anchos) / 2
+    for c, a in zip(texto, anchos):
+        dr.text((x0 + a / 2, 940), c, font=f, fill=WHITE, anchor="ma")
+        x0 += a
+    dr.text((W / 2, 1062), r["linea"], font=f_(FSB, 36), fill=(225, 225, 235), anchor="ma")
+    if r.get("precarga"):
+        dr.text((W / 2, 1110), r["precarga"], font=f_(FB, 38), fill=TEAL, anchor="ma")
+    aviso = "Hora de salida sin confirmar por Rockstar: contamos hasta las 00:00 (España)"
+    dr.text((W / 2, 1168), aviso, font=ajustar(aviso, FSB, 24, W - 220, dr, 16), fill=(175, 175, 190), anchor="ma")
+    return Image.alpha_composite(img, capa)
+
+
 # ---------------------------------------------------------------- montaje
 def montar(cfg):
     """cfg: trozos, tiempos [(ini, fin)], voz (wav), capturas [(ruta, foco, plano)] (una ruta .mp4 es un trozo de
@@ -347,6 +386,8 @@ def montar(cfg):
                 pa, pb = fondos[k]["pan"]
                 base = recorte(fondos[k]["im"], pa + (pb - pa) * (t - a) / max(b - a, 1e-3))
             img = Image.alpha_composite(base.convert("RGBA"), fija)
+            if cfg.get("reloj"):
+                img = reloj(img, cfg, t)
             j = next((q2 for q2, (x0, x1) in enumerate(tiempos) if x0 - 0.05 <= t < x1 + 0.25), None)
             if j == 0 or t < tiempos[0][0]:
                 texto_centrado(img, trozos[0], 430, fg, WHITE, caja=(10, 14, 38, 200), borde=0)
