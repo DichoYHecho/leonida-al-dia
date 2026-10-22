@@ -25,8 +25,11 @@ def huella_video(f, dia):
                   (f.get("Fuente") or "").strip(), bool(f.get("Personaje")), f.get("Tipo"), dia.isoformat())
 
 
-def pie(f, reserva, con_trozos=False):
-    p = f"Fuente: {f.get('Fuente') or 'Rockstar Games'} · Imágenes{' y sonido' if con_trozos else ''}: Rockstar Games"
+def pie(f, reserva, con_trozos=False, caps=()):
+    juego = not caps or any(not medios.es_imagen(c) for c in caps)
+    quien = list(dict.fromkeys([medios.credito(c) for c in caps if medios.es_imagen(c)] + (["Rockstar Games"] if juego else [])))
+    rotulo = "Imagen" if len(quien) == 1 and not juego else "Imágenes"
+    p = f"Fuente: {f.get('Fuente') or 'Rockstar Games'} · {rotulo}{' y sonido' if con_trozos else ''}: {' y '.join(quien)}"
     return p + (" · Voz: sharvard (CC BY 3.0)" if reserva else "")
 
 
@@ -53,7 +56,12 @@ def montar(f, dia, semilla, salida_dir):
     if not caps:
         raise RuntimeError("no hay capturas válidas en «Capturas»")
     medios.preparar()
-    caps = [c for c in caps if os.path.exists(medios.ruta_sin_comprobar(c))] or caps  # un trozo que no se pudo cortar se salta
+    buenas = [c for c in caps if os.path.exists(medios.ruta_sin_comprobar(c))]  # un trozo o una imagen que falla se salta
+    aviso_img = ""
+    if not buenas and any(medios.es_imagen(c) for c in caps):
+        buenas = medios.elegir("Jason_and_Lucia", f.get("Titular"), 2)
+        aviso_img = "No se pudo descargar la imagen de la noticia: salen capturas del juego"
+    caps = buenas or caps
     rutas = [medios.ruta(c) for c in caps]  # antes de gastar voz: que existan las imágenes
     wav, tiempos, nombre, aviso, cambios = preparar_voz(f)
     trozos = trozos_de(f)
@@ -65,13 +73,14 @@ def montar(f, dia, semilla, salida_dir):
         salida = os.path.join(salida_dir, f"leonida-{dia.isoformat()}-{etiqueta}.mp4")
         info = render.montar({
             "trozos": trozos, "tiempos": tiempos, "voz": wav,
-            "capturas": [(r, medios.CAPTURAS[c]["foco"], medios.CAPTURAS[c]["plano"]) for r, c in zip(rutas, caps)],
+            "capturas": [(r, *medios.foco_plano(c)) for r, c in zip(rutas, caps)],
             "etiqueta": f.get("Etiqueta"), "tipo": f.get("Tipo"), "personaje": f.get("Personaje"),
-            "cuenta": cuenta_atras(dia), "pie": pie(f, reserva, any(medios.con_sonido(c) for c in caps)), "salida": salida,
+            "cuenta": cuenta_atras(dia), "pie": pie(f, reserva, any(medios.con_sonido(c) for c in caps), caps), "salida": salida,
             "semilla": int(huella((f.get("Guion") or "").strip())[:6], 16) % 1000, "tmp": tmp})
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
     cambios.update({"Para el día": dia.isoformat(), "Huella vídeo": huella_video(f, dia)})
+    aviso = "\n".join(a for a in (aviso, aviso_img) if a)
     if aviso:
         cambios["Avisos"] = aviso
     info["voz"] = nombre
