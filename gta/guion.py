@@ -35,6 +35,7 @@ FORMATO = """Devuelve SOLO un JSON con estos campos:
   "cuerpo": ["3 a 6 trozos de máximo 45 caracteres cada uno, que se leen seguidos. Punto al acabar cada frase; si la frase sigue en el trozo siguiente, no pongas coma al final salvo que la gramática la pida"],
   "cierre": "pregunta final para comentar, máximo 60 caracteres",
   "texto_post": "2 o 3 frases para el texto de la publicación (sin hashtags)",
+  "imagen_del_juego": true o false (false si lo que se cuenta es algo real que NO sale en el juego y tiene su propia imagen: un producto o aparato, una persona, una portada, un evento, un anuncio, una tienda…; true si se puede enseñar con capturas del juego),
   "capturas": ["2 o 3 nombres EXACTOS del CATÁLOGO DE CAPTURAS que enseñen lo que se cuenta (el mismo personaje o lugar); si hay un trozo de VÍDEO que encaje, pon uno (como mucho dos)"],
   "hashtags": ["1 o 2 hashtags del tema, sin tildes, p. ej. #ViceCity o #Lucia"],
   "titulo_youtube": "título para YouTube de menos de 90 caracteres, que diga lo que cuenta el vídeo, sin engañar"
@@ -100,6 +101,7 @@ def validar(j):
         "texto_post": _limpiar(j.get("texto_post"), 600),
         "hashtags": hashtags(j.get("hashtags")),
         "titulo": _limpiar(j.get("titulo_youtube"), 95),
+        "imagen_juego": j.get("imagen_del_juego") is not False,
     }
 
 
