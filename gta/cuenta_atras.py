@@ -78,7 +78,8 @@ def textos(hoy, ahora, d):
 
 
 def main():
-    ahora = datetime.now(MADRID)
+    cuando = publicar.momento()  # la hora a la que sale (se prepara unos 45 min antes y se programa en Buffer)
+    ahora = cuando or datetime.now(MADRID)
     hoy = ahora.date()
     if ahora >= SALIDA:
         print("GTA 6 ya ha salido: ya no hay cuenta atrás. A las 17:00 se publica la aprobada.")
@@ -107,7 +108,7 @@ def main():
          "Avisos": "Cuenta atrás de las 17:00: se publica sola"}
     print(f"Cuenta atrás: faltan {n} días · dato {d['Orden']} · capturas {caps}", flush=True)
     carpeta = tempfile.mkdtemp()
-    extra = {"reloj": {"segundos": (SALIDA - datetime.now(MADRID)).total_seconds(),
+    extra = {"reloj": {"segundos": (SALIDA - ahora).total_seconds(),
                        "linea": "para GTA 6 · jueves 19 de noviembre", "precarga": corta}}
     ruta, info, cambios = video.montar(f, hoy, "cuenta-atras", carpeta, extra)
     if info["voz"].startswith("Piper"):
@@ -124,7 +125,7 @@ def main():
         adj = video.subir(rec["id"], ruta)
         if not adj or not adj.get("url"):
             raise RuntimeError("No se pudo subir el vídeo a Airtable")
-        datos = publicar.buffer(publicar.MUTACION, publicar.variables(f["Caption"], f["Guion"], f["Título YouTube"], adj["url"]))
+        datos = publicar.buffer(publicar.mutacion(publicar.iso(cuando)) if cuando else publicar.MUTACION, publicar.variables(f["Caption"], f["Guion"], f["Título YouTube"], adj["url"]))
         res = datos.get("data") or {}
         bien = [k for k in ("reel", "tiktok", "youtube") if (res.get(k) or {}).get("post")]
         mal = {k: (res.get(k) or {}).get("message") or str(datos.get("errors"))[:200]
@@ -135,7 +136,7 @@ def main():
     except Exception as e:
         airtable.actualizar(T_PUB, [(rec["id"], {"Estado": "Descartado", "Avisos": f"Cuenta atrás no publicada: {str(e)[:300]}"})])
         raise
-    cambios.update({"Estado": "Publicado", "Publicada": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+    cambios.update({"Estado": "Publicado", "Publicada": (cuando or datetime.now(MADRID)).astimezone(timezone.utc).isoformat(timespec="seconds"),
                     "Vídeo": [{"id": adj["id"]}] if adj.get("id") else [],
                     "Avisos": ("Cuenta atrás de las 17:00: se publica sola" + (f" · Buffer no aceptó: {mal}" if mal else ""))[:400]})
     airtable.actualizar(T_PUB, [(rec["id"], cambios)])

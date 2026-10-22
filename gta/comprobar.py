@@ -78,7 +78,7 @@ def resultado(f, ps):
     return txt[:250]
 
 
-def main():
+def buffer_ok():
     formula = "AND({Estado}='Publicado', OR({Comprobación}='', FIND('⏳', {Comprobación}), FIND('⚠', {Comprobación})))"
     pubs = airtable.listar(T_PUB, ["Titular", "Caption", "Comprobación"], formula=formula)
     print(f"Publicaciones por comprobar: {len(pubs)}")
@@ -98,6 +98,28 @@ def main():
     if malas:  # aviso en «Por Revisar» (decidido el 22 oct)
         aviso.avisar("Una publicación no ha salido en todas las redes",
                      "Lo ha visto la comprobación en Buffer:\n" + "\n".join(malas), repetir_horas=1)
+
+
+def youtube_extra():
+    """Pregunta como primer comentario e idioma español en los vídeos de YouTube de los últimos 2 días (youtube.py)."""
+    try:
+        import youtube
+        regs = airtable.listar(T_PUB, ["Título YouTube", "Titular", "Guion"],
+                               formula="AND({Estado}='Publicado', IS_AFTER({Publicada}, DATEADD(NOW(), -2, 'days')))")
+        pubs = []
+        for r in regs:
+            f = r["fields"]
+            preg = next((l.strip() for l in reversed((f.get("Guion") or "").splitlines()) if l.strip().endswith("?")), "")
+            pubs.append(((f.get("Título YouTube") or f.get("Titular") or "")[:100], preg))
+        for linea in youtube.repasar(pubs):
+            print(linea)
+    except Exception as e:
+        print(f"⚠️ YouTube: {str(e)[:300]}")
+
+
+def main():
+    buffer_ok()
+    youtube_extra()
 
 
 if __name__ == "__main__":

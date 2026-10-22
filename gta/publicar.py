@@ -51,6 +51,23 @@ def variables(caption, guion, titulo, video_url):
             "comentario": preg or None}
 
 
+def momento():
+    """Hora a la que tiene que salir la publicación: PARA = «HH:MM» de Madrid (la pone el workflow, que se lanza
+    unos 45 minutos antes y la deja programada en Buffer; decidido el 22 oct). None = publicar ya (si no hay PARA
+    o ya ha pasado esa hora porque GitHub ha ido con retraso)."""
+    para = os.environ.get("PARA")
+    if not para:
+        return None
+    h, m = map(int, para.split(":"))
+    ahora = datetime.now(MADRID)
+    t = ahora.replace(hour=h, minute=m, second=0, microsecond=0)
+    return t if t > ahora + timedelta(minutes=2) else None
+
+
+def iso(t):
+    return t.astimezone(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.000Z")
+
+
 def buffer(query, variables):
     clave = os.environ.get("BUFFER_API_KEY")
     if not clave:
@@ -81,7 +98,7 @@ def main():
     if not elegida:
         print("No hay ninguna propuesta aprobada: no se publica nada.")
         if not prueba and os.environ.get("GITHUB_EVENT_NAME") == "schedule":
-            aviso.avisar(f"No se ha publicado nada a las {ahora.astimezone(MADRID):%H:%M}",
+            aviso.avisar(f"No se ha publicado nada a las {os.environ.get('PARA') or ahora.astimezone(MADRID).strftime('%H:%M')}",
                          "No había ninguna propuesta aprobada. Aprueba alguna en «Por Revisar» para la próxima hora.")
         return
     r = elegida[0]
@@ -102,16 +119,17 @@ def main():
         print("PRUEBA: no se manda a Buffer.")
         return
     titulo = (f.get("Título YouTube") or f.get("Titular") or "GTA 6")[:100]
-    d = buffer(MUTACION, variables(f.get("Caption", ""), f.get("Guion"), titulo, adj["url"]))
+    cuando = momento()
+    d = buffer(mutacion(iso(cuando)) if cuando else MUTACION, variables(f.get("Caption", ""), f.get("Guion"), titulo, adj["url"]))
     res = d.get("data") or {}
     bien = [k for k in ("reel", "tiktok", "youtube") if (res.get(k) or {}).get("post")]
     mal = {k: (res.get(k) or {}).get("message") or json.dumps(d.get("errors"))[:200]
            for k in ("reel", "tiktok", "youtube") if k not in bien}
-    print(f"Buffer: bien {bien}; fallos {mal}", flush=True)
+    print(f"Buffer ({'programada para las ' + cuando.strftime('%H:%M') if cuando else 'publicada ya'}): bien {bien}; fallos {mal}", flush=True)
     if not bien:
         airtable.actualizar(T_PUB, [(rid, {"Avisos": f"Buffer rechazó la publicación: {json.dumps(mal, ensure_ascii=False)[:400]}"})])
         raise SystemExit("Buffer no aceptó la publicación en ninguna red")
-    cambios.update({"Estado": "Publicado", "Publicada": ahora.isoformat(timespec="seconds"),
+    cambios.update({"Estado": "Publicado", "Publicada": (cuando or ahora).astimezone(timezone.utc).isoformat(timespec="seconds"),
                     "Vídeo": [{"id": adj["id"]}] if adj.get("id") else f.get("Vídeo")})
     if mal:
         cambios["Avisos"] = f"Buffer no aceptó: {json.dumps(mal, ensure_ascii=False)[:400]}"
