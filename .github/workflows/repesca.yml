@@ -59,6 +59,9 @@ jobs:
     env:
       AIRTABLE_TOKEN: ${{ secrets.AIRTABLE_TOKEN }}
       GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+      GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+      GOOGLE_REFRESH_TOKEN: ${{ secrets.GOOGLE_REFRESH_TOKEN }}
       LIMITE: ${{ inputs.limite || '5' }}
       LIMPIAR: ${{ inputs.limpiar }}
       BUSCAR_IMAGEN: ${{ inputs.buscar_imagen }}
