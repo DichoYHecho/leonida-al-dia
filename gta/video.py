@@ -49,7 +49,7 @@ def preparar_voz(f):
     return wav, tiempos, nombre, aviso, {"Huella": h, "Voz": nombre, "Tiempos": json.dumps(tiempos)}
 
 
-def montar(f, dia, semilla, salida_dir):
+def montar(f, dia, semilla, salida_dir, extra=None):
     """Monta el vídeo en salida_dir. Devuelve (ruta, info, cambios para Airtable).
     (La música sale siempre igual para el mismo guion; «semilla» se deja por compatibilidad.)"""
     caps = medios.validas(f.get("Capturas"))
@@ -76,7 +76,8 @@ def montar(f, dia, semilla, salida_dir):
             "capturas": [(r, *medios.foco_plano(c)) for r, c in zip(rutas, caps)],
             "etiqueta": f.get("Etiqueta"), "tipo": f.get("Tipo"), "personaje": f.get("Personaje"),
             "cuenta": cuenta_atras(dia), "pie": pie(f, reserva, any(medios.con_sonido(c) for c in caps), caps), "salida": salida,
-            "semilla": int(huella((f.get("Guion") or "").strip())[:6], 16) % 1000, "tmp": tmp})
+            "semilla": int(huella((f.get("Guion") or "").strip())[:6], 16) % 1000, "tmp": tmp,
+            **(extra or {})})  # extra: p. ej. el reloj de la cuenta atrás
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
     cambios.update({"Para el día": dia.isoformat(), "Huella vídeo": huella_video(f, dia)})
