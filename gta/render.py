@@ -4,7 +4,7 @@ gancho grande arriba, subtítulos abajo, pregunta final en amarillo, pie con la 
 «Imágenes: Rockstar Games». Fondo: capturas oficiales con un paneo suave centrado en su foco."""
 import os, subprocess
 import numpy as np, soundfile as sf
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw, ImageFilter, ImageFont
 from scipy.signal import butter, lfilter
 
 W, H, FPS = 1080, 1920, 30
@@ -161,6 +161,23 @@ def cargar_foto(path):
     return im.resize((int(im.width * s), int(im.height * s)), Image.LANCZOS)
 
 
+def componer_imagen(path):
+    """Imagen que no es una captura del juego (un producto, una persona, una portada…), decidido el 22 oct:
+    entera, sin recortar, centrada sobre un fondo desenfocado de la propia imagen. Un poco más grande que la
+    pantalla para el paneo suave."""
+    W2, H2 = int(W * 1.06), int(H * 1.06)
+    im = Image.open(path).convert("RGB")
+    s = max(W2 / im.width, H2 / im.height)
+    grande = im.resize((int(im.width * s) + 1, int(im.height * s) + 1), Image.LANCZOS)
+    x0, y0 = (grande.width - W2) // 2, (grande.height - H2) // 2
+    fondo = grande.crop((x0, y0, x0 + W2, y0 + H2)).filter(ImageFilter.GaussianBlur(45))
+    fondo = Image.blend(fondo, Image.new("RGB", fondo.size, NOCHE), 0.5)
+    k = min(980 / im.width, 700 / im.height)
+    fg = im.resize((max(1, int(im.width * k)), max(1, int(im.height * k))), Image.LANCZOS)
+    fondo.paste(fg, ((W2 - fg.width) // 2, int(H2 * 0.475) - fg.height // 2))
+    return fondo
+
+
 def pan_de_foco(im, foco, plano):
     """Del foco (centro del sujeto, 0-1) a la posición del recorte (0-1), con un paneo suave."""
     maxx = im.width - W
@@ -270,6 +287,8 @@ def montar(cfg):
     for r, f, p in cfg["capturas"]:
         if es_video(r):
             fondos.append({"video": True, "ruta": r, "dur": duracion_video(r), "sonido": p == "vídeo con sonido"})
+        elif p == "imagen":  # imagen de lo que cuenta la noticia: entera, sin recortar
+            fondos.append({"video": False, "im": componer_imagen(r), "pan": (0.3, 0.7)})
         else:
             im = cargar_foto(r)
             fondos.append({"video": False, "im": im, "pan": pan_de_foco(im, f, p)})
