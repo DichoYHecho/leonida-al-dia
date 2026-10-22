@@ -14,6 +14,10 @@ on:
         description: "Quitar también los vídeos de publicaciones de hace más de 30 días"
         type: boolean
         default: false
+      buscar_imagen:
+        description: "Buscar la imagen de la noticia cuyo titular contenga este texto (y rehacer su vídeo)"
+        required: false
+        default: ""
 
 concurrency:
   group: videos
@@ -57,6 +61,7 @@ jobs:
       GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
       LIMITE: ${{ inputs.limite || '5' }}
       LIMPIAR: ${{ inputs.limpiar }}
+      BUSCAR_IMAGEN: ${{ inputs.buscar_imagen }}
     steps:
       - uses: actions/checkout@v5
       - uses: ./.github/actions/entorno
