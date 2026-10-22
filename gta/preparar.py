@@ -8,9 +8,9 @@
 Variables: QUE (noticias, datos o todo), MAX (máximo de noticias; por defecto según la hora)."""
 import csv, json, os, sys, tempfile, time
 from datetime import datetime, timedelta, timezone, date
-import airtable, fuentes, guion, imagenes, medios, prensa, video
+import airtable, clips, fuentes, guion, imagenes, medios, prensa, video
 from config import (AQUI, MADRID, T_PUB, CADUCA_HORAS, MAX_NOTICIAS_MANANA, MAX_NOTICIAS_TARDE, DATOS_EN_COLA,
-                    OFICIALES, ARRANQUE)
+                    OFICIALES, ARRANQUE, LANZAMIENTO)
 import gemini
 
 AHORA = datetime.now(MADRID)
@@ -48,6 +48,10 @@ def fila(g, tipo, fuente, oficial, enlace, texto_fuente, dia, orden=None):
     if len(caps) < 2:
         caps = (caps + [c for c in medios.elegir(g["grupo"], g["titular"] + str(orden or ""), 3) if c not in caps])[:cuantas]
     caps = caps[:3]
+    if dia >= LANZAMIENTO:  # desde el 19 nov, el primer fondo es un clip de tus partidas (clips.py), si hay
+        clip = clips.elegir(g["titular"] + str(orden or ""))
+        if clip:
+            caps = [clip] + caps[:2]
     if caps and all(medios.es_trozo(c) for c in caps):  # al menos una captura (los trozos son cortos)
         caps = caps[:2] + [c for c in medios.elegir(g["grupo"], g["titular"], 2) if c not in caps][:1]
     texto = guion.caption(g, fuente, oficial)

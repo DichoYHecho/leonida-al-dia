@@ -11,7 +11,7 @@ import csv, hashlib, io, os, re, subprocess, zipfile
 import requests
 from PIL import Image
 from config import AQUI, CACHE, ZIP_CAPTURAS, UA, VIDEO_OFICIAL
-import imagenes
+import clips, imagenes
 
 DIR = os.path.join(CACHE, "capturas")
 DIR_TROZOS = os.path.join(CACHE, "trozos")
@@ -126,12 +126,16 @@ def credito(nombre):
 
 
 def foco_plano(nombre):
+    if clips.es_clip(nombre):  # tu partida (clips.py): ya está en vertical y sin sonido
+        return 0.5, "vídeo"
     if es_imagen(nombre):
         return 0.5, "imagen"
     return CAPTURAS[nombre]["foco"], CAPTURAS[nombre]["plano"]
 
 
 def ruta_sin_comprobar(nombre):
+    if clips.es_clip(nombre):
+        return clips.preparar(nombre) or clips.ruta(nombre)
     if es_imagen(nombre):
         url = imagenes.TOKEN.fullmatch(nombre).group(2)
         return imagenes.descargar(url) or imagenes.ruta(url)
@@ -163,8 +167,9 @@ def elegir(grupo, semilla, cuantas=2):
 
 def validas(nombres):
     """Limpia la lista escrita en Airtable: solo capturas que existen y no están marcadas «no usar»."""
-    out = [t for t, _, _ in imagenes.leer_tokens(nombres)]  # las imágenes de la noticia van tal cual
-    for n in re.split(r"[,\s]+", imagenes.TOKEN.sub(" ", nombres or "")):
+    out = [m.group(0) for m in clips.TOKEN.finditer(nombres or "")]  # los clips de tus partidas van tal cual
+    out += [t for t, _, _ in imagenes.leer_tokens(nombres)]  # las imágenes de la noticia van tal cual
+    for n in re.split(r"[,\s]+", imagenes.TOKEN.sub(" ", clips.TOKEN.sub(" ", nombres or ""))):
         n = n.strip()
         if n in CAPTURAS and CAPTURAS[n]["uso"] != "no usar" and n not in out:
             out.append(n)
