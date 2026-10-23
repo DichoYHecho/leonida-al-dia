@@ -129,10 +129,28 @@ def cosas_de(guion):
     return [str(c).strip()[:60] for c in j.get("cosas", []) if str(c).strip()][:3]
 
 
-def credito_web(url):
+def credito_commons(img):
+    """Autor y licencia de una imagen de Wikimedia Commons (lo pide su licencia): «Autor (CC BY 2.0), Wikimedia Commons»."""
+    from urllib.parse import unquote
+    m = re.search(r"/commons/(?:thumb/)?[0-9a-f]/[0-9a-f]{2}/([^/?]+)", img)
+    if not m:
+        return "Wikimedia Commons"
+    try:
+        r = requests.get("https://commons.wikimedia.org/w/api.php", headers={"User-Agent": UA}, timeout=30, params={
+            "action": "query", "titles": "File:" + unquote(m.group(1)), "prop": "imageinfo",
+            "iiprop": "extmetadata", "format": "json"})
+        meta = next(iter(r.json()["query"]["pages"].values()))["imageinfo"][0]["extmetadata"]
+        autor = re.sub(r"<[^>]+>", "", (meta.get("Artist") or {}).get("value", "")).strip()[:60]
+        licencia = (meta.get("LicenseShortName") or {}).get("value", "").strip()
+        return f"{autor} ({licencia}), Wikimedia Commons" if autor else "Wikimedia Commons"
+    except Exception:
+        return "Wikimedia Commons"
+
+
+def credito_web(url, img=None):
     h = urlparse(url).netloc.lower().replace("www.", "")
     if "wikipedia.org" in h or "wikimedia.org" in h:
-        return "Wikimedia Commons"
+        return credito_commons(img or url)
     return credito_oficial(url) or credito_medio(url, h)
 
 
@@ -144,7 +162,7 @@ def de_paginas(urls):
         if not u:
             continue
         if re.search(r"\.(jpe?g|png|webp)(\?|$)", u, re.I):
-            out.append((u, credito_web(u), "medio"))
+            out.append((u, credito_web(u, u), "medio"))
             continue
         try:
             p = _pagina(u)
@@ -152,7 +170,10 @@ def de_paginas(urls):
             print(f"  No se pudo leer {u[:80]}: {str(e)[:100]}", flush=True)
             continue
         for f in ([p.imagen] if p.imagen else []) + p.fotos[:15]:
-            out.append((urljoin(u, f), credito_web(u), "oficial" if credito_oficial(u) else "medio"))
+            f = urljoin(u, f)
+            if "wikimedia.org" in f and NO_FOTO.search(f.split("?")[0]):
+                continue
+            out.append((f, credito_web(u, f), "oficial" if credito_oficial(u) else "medio"))
     return out
 
 
@@ -209,6 +230,8 @@ def buscar_todas(c, cosas, extra=()):
     prompt = (f"Estas son imágenes de una noticia. Para cada una de estas cosas reales:\n{lista}\n"
               "di qué imagen la enseña de verdad y con claridad (una foto o imagen de ESA cosa concreta, no de otra "
               "parecida; ni logotipos sueltos, ni mapas, ni capturas de pantalla de webs, ni anuncios). "
+              "Si la cosa existe en la vida real (un lugar, un local, un edificio, un producto, una persona), tiene que "
+              "ser una FOTO REAL de ella: no vale una imagen del videojuego ni una recreación aunque se parezca. "
               "Una imagen distinta para cada cosa. Si ninguna la enseña, pon null.\n"
               f'Devuelve SOLO un JSON con una lista de {len(cosas)} elementos, en el mismo orden que las cosas: '
               '{"imagenes": [número de imagen o null, …]}')
