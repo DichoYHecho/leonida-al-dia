@@ -18,6 +18,10 @@ on:
         description: "Buscar la imagen de la noticia cuyo titular contenga este texto (y rehacer su vídeo)"
         required: false
         default: ""
+      paginas_extra:
+        description: "Webs o imágenes donde buscar también (separadas por espacios)"
+        required: false
+        default: ""
 
 concurrency:
   group: videos
@@ -65,6 +69,7 @@ jobs:
       LIMITE: ${{ inputs.limite || '5' }}
       LIMPIAR: ${{ inputs.limpiar }}
       BUSCAR_IMAGEN: ${{ inputs.buscar_imagen }}
+      PAGINAS_EXTRA: ${{ inputs.paginas_extra }}
     steps:
       - uses: actions/checkout@v5
       - uses: ./.github/actions/entorno
