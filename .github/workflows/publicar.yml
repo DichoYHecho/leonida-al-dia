@@ -24,6 +24,14 @@ on:
         type: choice
         options: [aprobada, cuenta_atras, lanzamiento]
         default: aprobada
+      reintentar:
+        description: "Volver a mandar una ya publicada: un trozo de su titular (vacío = no)"
+        required: false
+        default: ""
+      redes:
+        description: "Redes a las que volver a mandarla (reel, tiktok, youtube)"
+        required: false
+        default: "reel"
 
 concurrency:
   group: publicar
@@ -82,6 +90,8 @@ jobs:
         env:
           HORA: ${{ needs.hora.outputs.hora }}
           QUE: ${{ inputs.que }}
+          REINTENTAR: ${{ inputs.reintentar }}
+          REDES: ${{ inputs.redes }}
         run: |
           case "$HORA" in
             11:15) export PARA=12:00 ;;
