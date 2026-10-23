@@ -213,7 +213,8 @@ def buscar_todas(c, cosas, extra=()):
                 cands.append((oimg, nombre, "oficial" if credito_oficial(e) else "medio"))
     except Exception as e:
         print(f"  No se pudieron leer las fotos de la noticia: {str(e)[:120]}", flush=True)
-    cands += [x for x in de_paginas(extra) if all(x[0] != y[0] for y in cands)]  # las que se dan a mano
+    manuales = de_paginas(extra)  # las que se dan a mano van primero (si no, el límite de 20 las dejaría fuera)
+    cands = manuales + [x for x in cands if all(x[0] != y[0] for y in manuales)]
     # WordPress: «foto-320x320.jpg» es una miniatura; la original es «foto.jpg»
     cands = [(re.sub(r"-\d{2,4}x\d{2,4}(?=\.(?:jpe?g|png|webp)$)", "", u), cr, o) for u, cr, o in cands]
     cands = list(dict.fromkeys(cands))
