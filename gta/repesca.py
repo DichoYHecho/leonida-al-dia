@@ -1,7 +1,7 @@
 """Repesca (12:30): rehace los vídeos de las propuestas que he cambiado en Airtable (guion, etiqueta,
 capturas o fuente) o que se quedaron sin vídeo, para que pueda verlos antes de que se publiquen.
 El día 1 de cada mes, además, quita los vídeos de las publicaciones de hace más de 30 días."""
-import os, tempfile
+import os, re, tempfile
 from datetime import date, datetime, timedelta, timezone
 import airtable, imagenes, video
 from config import MADRID, T_PUB
@@ -31,15 +31,20 @@ def main():
         f = r["fields"]
         nuevos = {}
         if buscar and buscar in (f.get("Titular") or "").lower() and f.get("Enlace"):
-            res = imagenes.buscar({"medio": f.get("Fuente"), "enlace": f["Enlace"]})
-            if res:
-                url, credito, origen = res
-                nuevos = {"Capturas": imagenes.token(url, credito),
-                          "Caption": (f.get("Caption") or "").replace("Imágenes: Rockstar Games.", f"Imagen: {credito}.")}
+            # Desde el 23 oct: una imagen de CADA cosa real que nombra el guion (imagenes.buscar_todas)
+            cosas = imagenes.cosas_de(f.get("Guion") or f.get("Titular")) or [f.get("Titular")]
+            encontradas, faltan = imagenes.buscar_todas({"medio": f.get("Fuente"), "enlace": f["Enlace"]}, cosas)
+            if encontradas:
+                creditos = list(dict.fromkeys(cr for _, cr, _ in encontradas))
+                rotulo = "Imagen" if len(encontradas) == 1 else "Imágenes"
+                caption = re.sub(r"(?:Imagen|Imágenes): [^\n]*?\.(?= Cuenta de fans|\n)", f"{rotulo}: {' y '.join(creditos)}.",
+                                 f.get("Caption") or "", count=1)
+                nuevos = {"Capturas": ", ".join(imagenes.token(u, cr) for u, cr, _ in encontradas), "Caption": caption}
                 f.update(nuevos)
-                print(f"Imagen {origen} ({credito}) para «{f.get('Titular')}»: {url}", flush=True)
-            else:
-                print(f"⚠️ No se encontró imagen para «{f.get('Titular')}»", flush=True)
+                print(f"Imágenes para «{f.get('Titular')}»: " + "; ".join(f"{k} → {u}" for k, (u, _, _) in zip(cosas, encontradas)), flush=True)
+            if faltan:
+                nuevos["Avisos"] = f"⚠️ Falta la imagen de: {', '.join(faltan)}. No la apruebes así: descártala."
+                print(f"⚠️ «{f.get('Titular')}»: falta la imagen de {', '.join(faltan)}", flush=True)
         guardado = date.fromisoformat(f["Para el día"]) if f.get("Para el día") else None
         if not nuevos and f.get("Vídeo") and guardado and f.get("Huella vídeo") == video.huella_video(f, guardado):
             continue  # nada ha cambiado desde que se hizo (si se ha buscado su imagen, se rehace siempre)
@@ -50,8 +55,8 @@ def main():
             ruta, info, cambios = video.montar(f, dia, r["id"], tempfile.mkdtemp())
             nuevo = video.subir(r["id"], ruta)
             cambios["Vídeo"] = [{"id": nuevo["id"]}] if nuevo and nuevo.get("id") else []
-            cambios.update(nuevos)
-            cambios["Avisos"] = cambios.get("Avisos", "")
+            cambios["Avisos"] = "\n".join(a for a in (nuevos.get("Avisos"), cambios.get("Avisos")) if a)
+            cambios.update({k: v for k, v in nuevos.items() if k != "Avisos"})
             airtable.actualizar(T_PUB, [(r["id"], cambios)])
             hechos += 1
             print(f"✅ Rehecho: {f.get('Titular')} ({info})", flush=True)

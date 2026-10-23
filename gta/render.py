@@ -161,11 +161,26 @@ def cargar_foto(path):
     return im.resize((int(im.width * s), int(im.height * s)), Image.LANCZOS)
 
 
+def sin_bordes(im):
+    """Quita los márgenes lisos (blancos, negros o de un color) que traen algunas imágenes de las noticias, para que
+    la foto llene la pantalla de verdad y no quede pequeña en el centro (23 oct)."""
+    from PIL import ImageChops
+    for _ in range(2):
+        fondo = Image.new("RGB", im.size, im.getpixel((2, 2)))
+        caja = ImageChops.difference(im, fondo).convert("L").point(lambda v: 255 if v > 24 else 0).getbbox()
+        if not caja or caja == (0, 0, im.width, im.height):
+            break
+        if (caja[2] - caja[0]) < im.width * 0.3 or (caja[3] - caja[1]) < im.height * 0.3:
+            break  # casi todo es fondo (un logotipo): mejor no tocar
+        im = im.crop(caja)
+    return im
+
+
 def componer_imagen(path):
     """Imagen que no es una captura del juego (un producto, una persona, una portada…). Desde el 22 oct ocupa
     toda la pantalla (lo pedí yo): se amplía hasta cubrirla y el vídeo la recorre de lado a lado, para que se vea
     entera sin quedar pequeña en el centro."""
-    im = Image.open(path).convert("RGB")
+    im = sin_bordes(Image.open(path).convert("RGB"))
     s = max(H * 1.06 / im.height, W * 1.06 / im.width)
     return im.resize((int(im.width * s) + 1, int(im.height * s) + 1), Image.LANCZOS)
 

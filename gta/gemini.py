@@ -38,6 +38,31 @@ def texto_json(prompt, temperatura=0.4):
     raise RuntimeError("Gemini no contestó: " + " | ".join(errores))
 
 
+def imagenes_json(prompt, rutas, temperatura=0.1):
+    """Como texto_json, pero Gemini también ve las imágenes (rutas a JPG), numeradas desde 1 (23 oct)."""
+    from PIL import Image
+    partes = [{"text": prompt}]
+    for i, p in enumerate(rutas, 1):
+        im = Image.open(p).convert("RGB")
+        im.thumbnail((640, 640))
+        buf = io.BytesIO()
+        im.save(buf, "JPEG", quality=80)
+        partes += [{"text": f"Imagen {i}:"},
+                   {"inline_data": {"mime_type": "image/jpeg", "data": base64.b64encode(buf.getvalue()).decode()}}]
+    errores = []
+    for modelo in MODELOS_TEXTO:
+        for intento in range(2):
+            try:
+                d = _post(f"{API}/models/{modelo}:generateContent", {
+                    "contents": [{"role": "user", "parts": partes}],
+                    "generationConfig": {"responseMimeType": "application/json", "temperature": temperatura}})
+                return json.loads(d["candidates"][0]["content"]["parts"][0]["text"])
+            except Exception as e:
+                errores.append(f"{modelo}: {str(e)[:160]}")
+                time.sleep(8 * (intento + 1))
+    raise RuntimeError("Gemini no contestó: " + " | ".join(errores))
+
+
 def _esperar_cupo():
     """Como mucho 3 audios por minuto: deja 21 s entre uno y otro."""
     global _ultima_voz

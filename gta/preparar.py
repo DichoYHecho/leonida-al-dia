@@ -114,20 +114,22 @@ Devuelve SOLO un JSON: {{"elegidas": [{{"n": número, "motivo": "frase corta"}}]
 
 
 def imagen_real(g, c, f):
-    """Si la noticia trata de algo real que no sale en el juego (un producto, una persona…), busca su imagen
-    (primero la oficial y, si no hay, la del medio) y la pone en «Capturas» (decidido el 22 oct).
-    Si no la encuentra, se quedan las capturas del juego. Devuelve el aviso para la revisión (o \"\")."""
-    if g.get("imagen_juego", True):
+    """Si la noticia trata de cosas reales que no salen en el juego (un producto, una persona, un restaurante…),
+    pone en «Capturas» una imagen de CADA una, a pantalla completa (buscar_todas, decidido el 23 oct).
+    Si falta la imagen de alguna, la noticia NO se propone (lanza un error). Devuelve el aviso para la revisión."""
+    cosas = g.get("cosas") or ([] if g.get("imagen_juego", True) else [g["titular"]])
+    if not cosas:
         return ""
-    r = imagenes.buscar(c)
-    if not r:
-        nota(f"  Sin imagen de lo que se cuenta en «{g['titular']}»: sale con capturas del juego")
-        return "Las imágenes son del juego, no de lo que cuenta la noticia (no se encontró su imagen)"
-    url, credito, origen = r
-    f["Capturas"] = imagenes.token(url, credito)
-    f["Caption"] = f["Caption"].replace("Imágenes: Rockstar Games.", f"Imagen: {credito}.")
-    nota(f"  Imagen {'oficial' if origen == 'oficial' else 'del medio'} ({credito}) para «{g['titular']}»")
-    return "" if origen == "oficial" else f"Imagen de {credito} (no oficial): revisa que encaje con la noticia"
+    encontradas, faltan = imagenes.buscar_todas(c, cosas)
+    if faltan:
+        raise RuntimeError(f"no hay imagen de: {', '.join(faltan)} (no se propone para no enseñar una cosa por otra)")
+    f["Capturas"] = ", ".join(imagenes.token(u, cr) for u, cr, _ in encontradas)
+    creditos = list(dict.fromkeys(cr for _, cr, _ in encontradas))
+    rotulo = "Imagen" if len(encontradas) == 1 else "Imágenes"
+    f["Caption"] = f["Caption"].replace("Imágenes: Rockstar Games.", f"{rotulo}: {' y '.join(creditos)}.")
+    nota(f"  {len(encontradas)} imagen(es) para «{g['titular']}»: " + "; ".join(f"{k} → {cr}" for k, (_, cr, _) in zip(cosas, encontradas)))
+    medios_ = [cr for _, cr, o in encontradas if o != "oficial"]
+    return f"Imágenes de {', '.join(dict.fromkeys(medios_))} (no oficiales): revisa que encajen" if medios_ else ""
 
 
 def noticias(regs, maximo, carpeta):

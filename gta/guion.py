@@ -35,6 +35,7 @@ FORMATO = """Devuelve SOLO un JSON con estos campos:
   "cuerpo": ["3 a 6 trozos de máximo 45 caracteres cada uno, que se leen seguidos. Punto al acabar cada frase; si la frase sigue en el trozo siguiente, no pongas coma al final salvo que la gramática la pida"],
   "cierre": "pregunta final para comentar, máximo 60 caracteres",
   "texto_post": "2 o 3 frases para el texto de la publicación (sin hashtags); la primera, con «GTA 6» y el tema concreto, porque es lo que se busca",
+  "cosas_reales": ["cada cosa REAL y concreta que se nombra en el guion y que NO sale en el juego (un restaurante, un producto, una persona, una portada, una tienda, un evento…), con su nombre propio tal cual, una por elemento (si se nombran dos restaurantes, son dos); [] si todo se puede enseñar con capturas del juego"],
   "imagen_del_juego": true o false (false si lo que se cuenta es algo real que NO sale en el juego y tiene su propia imagen: un producto o aparato, una persona, una portada, un evento, un anuncio, una tienda…; true si se puede enseñar con capturas del juego),
   "capturas": ["2 o 3 nombres EXACTOS del CATÁLOGO DE CAPTURAS que enseñen lo que se cuenta (el mismo personaje o lugar); si hay un trozo de VÍDEO que encaje, pon uno (como mucho dos)"],
   "hashtags": ["1 o 2 hashtags del tema, sin tildes, p. ej. #ViceCity o #Lucia"],
@@ -101,7 +102,8 @@ def validar(j):
         "texto_post": _limpiar(j.get("texto_post"), 600),
         "hashtags": hashtags(j.get("hashtags")),
         "titulo": _limpiar(j.get("titulo_youtube"), 95),
-        "imagen_juego": j.get("imagen_del_juego") is not False,
+        "imagen_juego": j.get("imagen_del_juego") is not False and not j.get("cosas_reales"),
+        "cosas": [_limpiar(str(c), 60) for c in (j.get("cosas_reales") or []) if str(c).strip()][:3],
     }
 
 
