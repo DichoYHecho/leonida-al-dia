@@ -27,7 +27,8 @@ OFICIALES = [("rockstargames.com", "Rockstar Games"), ("take2games.com", "Take-T
 MEDIOS = {urlparse(u).netloc.replace("www.", "").split(".")[-2]: m for m, u in FUENTES_RSS}
 MEDIOS.update({"vandal": "Vandal", "3djuegos": "3DJuegos", "videogameschronicle": "VGC", "pushsquare": "Push Square"})
 MIN_ANCHO = 600
-NO_FOTO = re.compile(r"logo|avatar|icon|sprite|favicon|badge|banner-ad|/ads?/|pixel|1x1|placeholder|\.svg|\.gif", re.I)
+NO_FOTO = re.compile(r"logo|avatar|icon|sprite|favicon|badge|banner-ad|/ads?/|pixel|1x1|placeholder|\.svg|\.gif|"
+                     r"/themes?/|/promos?/|retailer|gravatar|author", re.I)
 NAVEGACION = re.compile(r"legal|privacy|privacidad|terms|support|soporte|store|tienda|login|account|cookies|/tag/|/category/", re.I)
 
 
@@ -144,11 +145,32 @@ def buscar_todas(c, cosas):
             u = urljoin(c["enlace"], u)
             if all(u != x[0] for x in cands):
                 cands.append((u, medio, origen))
+        # Las fuentes que cita la noticia (otras webs enlazadas): su imagen principal también vale, con su crédito
+        host = urlparse(c["enlace"]).netloc.replace("www.", "")
+        externas = []
+        for e in p.enlaces:
+            e = urljoin(c["enlace"], e).split("#")[0]
+            h = urlparse(e).netloc.replace("www.", "")
+            if (h and h != host and e not in externas and len([x for x in urlparse(e).path.split("/") if x]) >= 2
+                    and not NAVEGACION.search(e) and not re.search(r"twitter|x\.com|facebook|instagram|tiktok|youtube|"
+                                                                 r"reddit|amazon|amzn|google|apple\.com|discord", h)):
+                externas.append(e)
+        for e in externas[:6]:
+            try:
+                oimg, _ = _leer(e)
+            except Exception:
+                continue
+            if oimg and all(oimg != x[0] for x in cands):
+                nombre = credito_oficial(e) or urlparse(e).netloc.replace("www.", "")
+                cands.append((oimg, nombre, "oficial" if credito_oficial(e) else "medio"))
     except Exception as e:
         print(f"  No se pudieron leer las fotos de la noticia: {str(e)[:120]}", flush=True)
+    # WordPress: «foto-320x320.jpg» es una miniatura; la original es «foto.jpg»
+    cands = [(re.sub(r"-\d{2,4}x\d{2,4}(?=\.(?:jpe?g|png|webp)$)", "", u), cr, o) for u, cr, o in cands]
+    cands = list(dict.fromkeys(cands))
     buenas = []
     for u, cr, o in cands:
-        if len(buenas) >= 12:
+        if len(buenas) >= 14:
             break
         r = descargar(u)
         if r:
