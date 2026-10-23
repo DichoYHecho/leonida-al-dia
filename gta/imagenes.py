@@ -129,7 +129,34 @@ def cosas_de(guion):
     return [str(c).strip()[:60] for c in j.get("cosas", []) if str(c).strip()][:3]
 
 
-def buscar_todas(c, cosas):
+def credito_web(url):
+    h = urlparse(url).netloc.lower().replace("www.", "")
+    if "wikipedia.org" in h or "wikimedia.org" in h:
+        return "Wikimedia Commons"
+    return credito_oficial(url) or credito_medio(url, h)
+
+
+def de_paginas(urls):
+    """Candidatas de páginas o imágenes que se dan a mano (repesca): [(url, crédito, origen)]."""
+    out = []
+    for u in urls:
+        u = u.strip()
+        if not u:
+            continue
+        if re.search(r"\.(jpe?g|png|webp)(\?|$)", u, re.I):
+            out.append((u, credito_web(u), "medio"))
+            continue
+        try:
+            p = _pagina(u)
+        except Exception as e:
+            print(f"  No se pudo leer {u[:80]}: {str(e)[:100]}", flush=True)
+            continue
+        for f in ([p.imagen] if p.imagen else []) + p.fotos[:15]:
+            out.append((urljoin(u, f), credito_web(u), "oficial" if credito_oficial(u) else "medio"))
+    return out
+
+
+def buscar_todas(c, cosas, extra=()):
     """Una imagen para CADA cosa de «cosas» (decidido el 23 oct). c = noticia (medio, enlace).
     Devuelve ([(url, crédito, 'oficial'|'medio')] en el orden de «cosas», [cosas sin imagen])."""
     import gemini
@@ -165,12 +192,13 @@ def buscar_todas(c, cosas):
                 cands.append((oimg, nombre, "oficial" if credito_oficial(e) else "medio"))
     except Exception as e:
         print(f"  No se pudieron leer las fotos de la noticia: {str(e)[:120]}", flush=True)
+    cands += [x for x in de_paginas(extra) if all(x[0] != y[0] for y in cands)]  # las que se dan a mano
     # WordPress: «foto-320x320.jpg» es una miniatura; la original es «foto.jpg»
     cands = [(re.sub(r"-\d{2,4}x\d{2,4}(?=\.(?:jpe?g|png|webp)$)", "", u), cr, o) for u, cr, o in cands]
     cands = list(dict.fromkeys(cands))
     buenas = []
     for u, cr, o in cands:
-        if len(buenas) >= 14:
+        if len(buenas) >= 20:
             break
         r = descargar(u)
         if r:

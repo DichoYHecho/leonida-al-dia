@@ -33,7 +33,8 @@ def main():
         if buscar and buscar in (f.get("Titular") or "").lower() and f.get("Enlace"):
             # Desde el 23 oct: una imagen de CADA cosa real que nombra el guion (imagenes.buscar_todas)
             cosas = imagenes.cosas_de(f.get("Guion") or f.get("Titular")) or [f.get("Titular")]
-            encontradas, faltan = imagenes.buscar_todas({"medio": f.get("Fuente"), "enlace": f["Enlace"]}, cosas)
+            extra = (os.environ.get("PAGINAS_EXTRA") or "").split()  # webs o imágenes donde buscar, a mano
+            encontradas, faltan = imagenes.buscar_todas({"medio": f.get("Fuente"), "enlace": f["Enlace"]}, cosas, extra)
             if encontradas:
                 creditos = list(dict.fromkeys(cr for _, cr, _ in encontradas))
                 rotulo = "Imagen" if len(encontradas) == 1 else "Imágenes"
