@@ -12,31 +12,37 @@ from config import MADRID, T_PUB, CANAL_IG, CANAL_TT, CANAL_YT, YT_CATEGORIA, CA
 CAMPOS = ["Titular", "Estado", "Tipo", "Guion", "Etiqueta", "Personaje", "Capturas", "Caption", "Título YouTube",
           "Fuente", "Creada", "Orden dato", "Vídeo", "Para el día", "Huella vídeo", "Voz", "Avisos"]
 
-def mutacion(cuando=None):
-    """La publicación en las 3 redes. cuando = None publica ya; si no, la deja programada en Buffer a esa hora
-    (ISO en UTC, p. ej. «2026-11-18T23:00:00.000Z»). La pregunta del final va como primer comentario en Instagram
-    y dentro del texto en TikTok y YouTube (Buffer no deja comentar en esas dos; decidido el 22 oct)."""
-    modo = f'mode: customScheduled, dueAt: "{cuando}"' if cuando else "mode: shareNow"
-    return """mutation Publicar($text: String!, $textq: String!, $video: String!, $titulo: String!, $comentario: String) {
- reel: createPost(input: { text: $text, channelId: "%s", schedulingType: automatic, %s,
+BLOQUES = {
+    "reel": """ reel: createPost(input: { text: $textq, channelId: "%s", schedulingType: automatic, MODO,
    assets: [ { video: { url: $video, metadata: { thumbnailOffset: 1000 } } } ],
-   metadata: { instagram: { type: reel, shouldShareToFeed: true, isAiGenerated: true, firstComment: $comentario } } })
+   metadata: { instagram: { type: reel, shouldShareToFeed: true, isAiGenerated: true } } })
    { ... on PostActionSuccess { post { id status } } ... on MutationError { message } }
- tiktok: createPost(input: { text: $textq, channelId: "%s", schedulingType: automatic, %s,
+""" % CANAL_IG,
+    "tiktok": """ tiktok: createPost(input: { text: $textq, channelId: "%s", schedulingType: automatic, MODO,
    assets: [ { video: { url: $video, metadata: { thumbnailOffset: 1000 } } } ],
    metadata: { tiktok: { isAiGenerated: true } } })
    { ... on PostActionSuccess { post { id status } } ... on MutationError { message } }
- youtube: createPost(input: { text: $textq, channelId: "%s", schedulingType: automatic, %s,
+""" % CANAL_TT,
+    "youtube": """ youtube: createPost(input: { text: $textq, channelId: "%s", schedulingType: automatic, MODO,
    assets: [ { video: { url: $video } } ],
    metadata: { youtube: { title: $titulo, categoryId: "%s", isAiGenerated: true } } })
    { ... on PostActionSuccess { post { id status } } ... on MutationError { message } }
-}""" % (CANAL_IG, modo, CANAL_TT, modo, CANAL_YT, modo, YT_CATEGORIA)
+""" % (CANAL_YT, YT_CATEGORIA)}
+
+
+def mutacion(cuando=None, redes=("reel", "tiktok", "youtube")):
+    """La publicación en las redes indicadas. cuando = None publica ya; si no, la deja programada en Buffer a esa
+    hora (ISO en UTC, p. ej. «2026-11-18T23:00:00.000Z»). La pregunta del final va dentro del texto en las 3 redes:
+    el primer comentario de Instagram es de pago en Buffer (lo vimos el 23 oct) y en YouTube la comenta youtube.py."""
+    modo = f'mode: customScheduled, dueAt: "{cuando}"' if cuando else "mode: shareNow"
+    cab = "mutation Publicar($textq: String!, $video: String!" + (", $titulo: String!" if "youtube" in redes else "") + ") {\n"
+    return cab + "".join(BLOQUES[r].replace("MODO", modo) for r in redes) + "}"
 
 
 MUTACION = mutacion()
 
 
-def variables(caption, guion, titulo, video_url):
+def variables(caption, guion, titulo, video_url, redes=("reel", "tiktok", "youtube")):
     """Variables de la mutación. La pregunta es la última línea del guion que acaba en «?»."""
     caption = caption or ""
     preg = next((l.strip() for l in reversed((guion or "").splitlines()) if l.strip().endswith("?")), "")
@@ -47,8 +53,10 @@ def variables(caption, guion, titulo, video_url):
         # si no, justo antes de los hashtags
         donde = 1 if len(partes[0]) >= 90 or len(partes) < 3 else len(partes) - 1
         textq = "\n\n".join(partes[:donde] + [preg] + partes[donde:])
-    return {"text": caption, "textq": textq, "video": video_url, "titulo": (titulo or "GTA 6")[:100],
-            "comentario": preg or None}
+    v = {"textq": textq, "video": video_url}
+    if "youtube" in redes:
+        v["titulo"] = (titulo or "GTA 6")[:100]
+    return v
 
 
 def momento():
@@ -89,7 +97,33 @@ def elegir(regs, ahora):
     return (noticias + datos)[:1]
 
 
+def reintentar(trozo, redes):
+    """A mano (23 oct): vuelve a mandar a Buffer, ya mismo, una publicación ya «Publicado» solo a las redes que
+    fallaron. trozo = un trozo del titular; redes = p. ej. «reel» o «reel,tiktok»."""
+    regs = airtable.listar(T_PUB, CAMPOS, formula="{Estado}='Publicado'")
+    r = next((x for x in sorted(regs, key=lambda x: x["fields"].get("Creada") or "", reverse=True)
+              if trozo.lower() in (x["fields"].get("Titular") or "").lower()), None)
+    if not r:
+        raise SystemExit(f"No encuentro ninguna publicación «Publicado» con «{trozo}» en el titular")
+    f = r["fields"]
+    adj = (f.get("Vídeo") or [None])[-1]
+    if not adj:
+        raise SystemExit("Esa publicación no tiene vídeo")
+    redes = tuple(x for x in ("reel", "tiktok", "youtube") if x in redes)
+    titulo = (f.get("Título YouTube") or f.get("Titular") or "GTA 6")[:100]
+    d = buffer(mutacion(None, redes), variables(f.get("Caption", ""), f.get("Guion"), titulo, adj["url"], redes))
+    res = d.get("data") or {}
+    bien = [k for k in redes if (res.get(k) or {}).get("post")]
+    mal = {k: (res.get(k) or {}).get("message") or json.dumps(d.get("errors"))[:200] for k in redes if k not in bien}
+    print(f"Reintento de «{f.get('Titular')}»: bien {bien}; fallos {mal}", flush=True)
+    airtable.actualizar(T_PUB, [(r["id"], {"Comprobación": "", "Avisos": f"Reenviada a mano a {', '.join(bien)}" if bien else f"Reintento fallido: {mal}"})])
+    if not bien:
+        raise SystemExit("Buffer no aceptó el reintento")
+
+
 def main():
+    if os.environ.get("REINTENTAR"):
+        return reintentar(os.environ["REINTENTAR"], os.environ.get("REDES") or "reel")
     ahora = datetime.now(timezone.utc)
     hoy = ahora.astimezone(MADRID).date()
     prueba = os.environ.get("PRUEBA") == "true"   # monta el vídeo pero no publica
