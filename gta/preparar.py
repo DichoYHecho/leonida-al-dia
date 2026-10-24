@@ -113,11 +113,22 @@ Devuelve SOLO un JSON: {{"elegidas": [{{"n": número, "motivo": "frase corta"}}]
     return out
 
 
+QUIEN_INFORMA = {"rockstar", "rockstar games", "rockstar north", "take-two", "take-two interactive", "vandal", "3djuegos",
+                 "vgc", "videogameschronicle", "video games chronicle", "push square", "bloomberg", "jason schreier",
+                 "ign", "ign españa", "kotaku", "eurogamer", "gamespot", "meristation", "hobbyconsolas", "insider gaming"}
+
+
 def imagen_real(g, c, f):
     """Si la noticia trata de cosas reales que no salen en el juego (un producto, una persona, un restaurante…),
     pone en «Capturas» una imagen de CADA una, a pantalla completa (buscar_todas, decidido el 23 oct).
     Si falta la imagen de alguna, la noticia NO se propone (lanza un error). Devuelve el aviso para la revisión."""
-    cosas = g.get("cosas") or ([] if g.get("imagen_juego", True) else [g["titular"]])
+    # El medio que da la noticia, quien la firma y Rockstar/Take-Two no hacen falta enseñarlos (24 oct):
+    # si solo se nombraba a ellos, la noticia se enseña con capturas del juego.
+    nombradas = g.get("cosas") or []
+    cosas = [k for k in nombradas if k.strip().lower() not in QUIEN_INFORMA and k.strip().lower() != (c.get("medio") or "").strip().lower()]
+    if nombradas and not cosas:
+        return ""
+    cosas = cosas or ([] if g.get("imagen_juego", True) else [g["titular"]])
     if not cosas:
         return ""
     encontradas, faltan = imagenes.buscar_todas(c, cosas)
