@@ -10,7 +10,7 @@ import csv, json, os, sys, tempfile, time
 from datetime import datetime, timedelta, timezone, date
 import airtable, clips, fuentes, guion, imagenes, medios, prensa, video
 from config import (AQUI, MADRID, T_PUB, CADUCA_HORAS, MAX_NOTICIAS_MANANA, MAX_NOTICIAS_TARDE, DATOS_EN_COLA,
-                    OFICIALES, ARRANQUE, LANZAMIENTO)
+                    OFICIALES, ARRANQUE, LANZAMIENTO, CACHE)
 import gemini
 
 AHORA = datetime.now(MADRID)
@@ -132,18 +132,41 @@ def imagen_real(g, c, f):
     return f"Imágenes de {', '.join(dict.fromkeys(medios_))} (no oficiales): revisa que encajen" if medios_ else ""
 
 
+# Noticias que no se pudieron preparar (24 oct): se apuntan para no volver a elegirlas en cada lectura.
+# Valor = fallos; con 2 (o 1 si falta la imagen de lo que cuenta) ya no se vuelve a elegir.
+# Va en la caché de voces, que guardan todas las tareas.
+DESCARTADAS = os.path.join(CACHE, "voces", "noticias_descartadas.json")
+
+
+def leer_descartadas():
+    try:
+        return json.load(open(DESCARTADAS, encoding="utf-8"))
+    except Exception:
+        return {}
+
+
+def guardar_descartadas(d):
+    os.makedirs(os.path.dirname(DESCARTADAS), exist_ok=True)
+    json.dump(d, open(DESCARTADAS, "w", encoding="utf-8"), ensure_ascii=False, indent=0)
+
+
 def noticias(regs, maximo, carpeta):
     enlaces = {(r["fields"].get("Enlace") or "").split("?")[0] for r in regs}
     ya = [r["fields"].get("Titular", "") for r in regs if r["fields"].get("Tipo") == "Noticia"]
-    cands = [c for c in fuentes.candidatas() if c["enlace"].split("?")[0] not in enlaces][:25]
+    descartadas = leer_descartadas()
+    cands = [c for c in fuentes.candidatas() if c["enlace"].split("?")[0] not in enlaces
+             and descartadas.get(c["enlace"].split("?")[0], 0) < 2][:25]
     nota(f"Noticias nuevas sobre GTA 6 en las fuentes: {len(cands)}")
     if not cands or maximo <= 0:
         return []
-    elegidas = elegir(cands, ya, maximo)
-    nota(f"Elegidas por Gemini: {len(elegidas)}")
+    # Se piden 2 de reserva: si una no se puede preparar, se prueba con la siguiente (24 oct)
+    elegidas = elegir(cands, ya, min(maximo + 2, len(cands)))
+    nota(f"Elegidas por Gemini: {len(elegidas)} (se preparan como mucho {maximo})")
     dia = HOY  # las de la mañana salen a las 12:00 o a las 17:00 y las de la tarde a las 21:00
     out = []
     for c in elegidas:
+        if len(out) >= maximo:
+            break
         try:
             texto = fuentes.texto_de(c)
             g = guion.de_noticia(c["medio"], c["titulo"], texto)
@@ -154,7 +177,11 @@ def noticias(regs, maximo, carpeta):
                 f["Avisos"] = "\n".join(a for a in (f.get("Avisos"), aviso_img) if a)
             out.append((f, ruta))
         except Exception as e:
-            nota(f"⚠️ No se pudo preparar «{c['titulo'][:80]}»: {str(e)[:200]}")
+            clave = c["enlace"].split("?")[0]
+            descartadas[clave] = descartadas.get(clave, 0) + (2 if "no hay imagen" in str(e) else 1)
+            guardar_descartadas(descartadas)
+            luego = "no se volverá a elegir" if descartadas[clave] >= 2 else "se reintenta en la próxima lectura"
+            nota(f"⚠️ No se pudo preparar «{c['titulo'][:80]}»: {str(e)[:200]} ({luego})")
     return out
 
 
