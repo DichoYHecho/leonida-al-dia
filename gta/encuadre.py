@@ -6,12 +6,12 @@ de Jason en vez de las caras. Ahora Gemini mira la imagen y dice dónde están l
 vídeo encuadra eso: si cabe todo, se acerca a ello; si no cabe (Jason a un lado y Lucía al otro), la cámara va de
 uno a otro.
 
-- Se pregunta 1 vez por imagen y se guarda en la caché de GitHub (cache/encuadres/<huella del archivo>.json).
+- Se pregunta 1 vez por imagen y se guarda en la caché de GitHub (cache/voces/encuadres/<huella>.json).
 - Si Gemini falla, no se guarda nada y el vídeo usa el foco de siempre."""
 import hashlib, json, os
 from config import CACHE
 
-DIR = os.path.join(CACHE, "encuadres")
+DIR = os.path.join(CACHE, "voces", "encuadres")  # dentro de la caché de las voces, que guardan todas las tareas
 VERSION = "2"
 
 PROMPT = """Esta imagen va a salir de fondo en un vídeo vertical (9:16) que solo enseña una franja estrecha de ella.
