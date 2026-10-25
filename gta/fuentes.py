@@ -144,7 +144,7 @@ def texto_newswire(id_hash):
     return "\n".join(out)[:8000]
 
 
-def candidatas(horas=96):
+def candidatas(horas=30):
     desde = datetime.now(timezone.utc) - timedelta(hours=horas)
     todas = newswire(desde) + rss(desde)
     todas.sort(key=lambda x: x["fecha"], reverse=True)
