@@ -34,6 +34,12 @@ jobs:
           mkdir -p gta/fuentes
           curl -sSfL -o gta/fuentes/Anton-Regular.ttf https://raw.githubusercontent.com/google/fonts/main/ofl/anton/Anton-Regular.ttf
           curl -sSfL -o gta/fuentes/Anton-OFL.txt https://raw.githubusercontent.com/google/fonts/main/ofl/anton/OFL.txt
+      - name: Encuadres ya calculados (caché)
+        uses: actions/cache/restore@v4
+        with:
+          path: cache/encuadres
+          key: encuadres-${{ github.run_id }}
+          restore-keys: encuadres-
       - name: Montar los 3 vídeos de prueba (solo lee Airtable)
         run: python gta/prueba_edicion.py
       - uses: actions/upload-artifact@v4
@@ -44,20 +50,25 @@ jobs:
           retention-days: 7
       - name: Dejar los vídeos en la rama prueba-edicion (para verlos sin descargar)
         if: always() && hashFiles('salida_edicion/*') != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
+          rm -rf /tmp/rama && mkdir /tmp/rama && cp salida_edicion/* /tmp/rama/ && cd /tmp/rama
+          git init -q -b prueba-edicion
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          mkdir -p /tmp/salida && cp salida_edicion/* /tmp/salida/
-          git checkout --orphan prueba-edicion
-          git rm -rq --cached .
-          git clean -fdq -e cache
-          cp /tmp/salida/* .
-          (cd /tmp/salida && ls) | xargs git add --
+          git add -A
           git commit -qm "Prueba de la edición V2 (run ${{ github.run_number }})"
-          git push -fq origin prueba-edicion
+          git push -fq "https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git" prueba-edicion
       - name: Guardar las voces
         if: always()
         uses: actions/cache/save@v4
         with:
           path: cache/voces
           key: voces-${{ github.run_id }}
+      - name: Guardar los encuadres
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: cache/encuadres
+          key: encuadres-${{ github.run_id }}
