@@ -12,11 +12,12 @@ import hashlib, json, os
 from config import CACHE
 
 DIR = os.path.join(CACHE, "encuadres")
-VERSION = "1"
+VERSION = "2"
 
 PROMPT = """Esta imagen va a salir de fondo en un vídeo vertical (9:16) que solo enseña una franja estrecha de ella.
 Dime qué tiene que verse para que la imagen se entienda y sea interesante:
-- Si hay personas o personajes, sus CARAS (la cabeza, con algo de cuello y hombros). Todas las que se vean bien.
+- Si hay personas o personajes, sus CARAS: la caja de cada persona es SOLO su cabeza (de la coronilla a la barbilla),
+  aunque se vea el cuerpo entero. Todas las caras que se vean bien.
 - Si no hay caras, el objeto, vehículo, edificio, animal o cartel principal.
 {contexto}
 Devuelve SOLO este JSON, como mucho 4 sujetos, el más importante primero:
