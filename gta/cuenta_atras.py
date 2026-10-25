@@ -7,8 +7,10 @@
 - El dato del día se coge empezando por el final del banco, para no pisar a los datos de cada día (que van por
   orden desde el principio). Queda en Airtable como «Publicado» (Tipo Dato, etiqueta CUENTA ATRÁS).
 - Desde el 19 de noviembre ya no hay cuenta atrás: a las 17:00 se publica la aprobada, como a las otras horas.
+- Desde el 25 oct (edición V2): vídeo corto con el número gigante, la precarga, «DATO DEL DÍA» y el dato, y de fondo
+  una captura distinta cada día (foto_del_dia), sin repetir hasta el lanzamiento.
 - Con PRUEBA = true monta el vídeo en salida_cuenta/ y no toca Airtable (solo lee) ni publica."""
-import csv, os, shutil, tempfile
+import csv, os, random, shutil, tempfile
 from datetime import date, datetime, timezone
 import airtable, medios, publicar, video
 from config import AQUI, MADRID, T_PUB, HASHTAGS_FIJOS, PIE_POST
@@ -44,6 +46,16 @@ def banco():
         return list(csv.DictReader(f))
 
 
+INICIO_FOTOS = date(2026, 10, 21)
+
+
+def foto_del_dia(dia):
+    """Una captura principal distinta cada día (hay 73: no se repite hasta después del lanzamiento)."""
+    lista = sorted(n for n, c in medios.CAPTURAS.items() if c["tipo"] == "captura" and c["uso"] == "principal")
+    random.Random(6).shuffle(lista)
+    return lista[(dia - INICIO_FOTOS).days % len(lista)]
+
+
 def elegir_dato(usados, hoy):
     """El dato sin usar con el número más alto que siga siendo válido hoy."""
     for d in sorted(banco(), key=lambda x: -int(x["Orden"])):
@@ -69,11 +81,9 @@ def textos(hoy, ahora, d):
         precarga, corta = "¡Hoy empieza la precarga digital!", "¡Hoy empieza la precarga!"
     else:
         precarga, corta = "La precarga digital ya está abierta.", "Precarga abierta desde el 12 de noviembre"
-    h = "1 hora" if horas == 1 else f"{horas} horas"
-    exacto = (f"Si sale a medianoche, quedan {dias} días y {h}." if dias > 1 else
-              f"Si sale a medianoche, queda 1 día y {h}." if dias == 1 else f"Si sale a medianoche, quedan {h}.")
-    cuerpo = partir(precarga) + partir(exacto)
-    trozos = [gancho] + cuerpo + ["Y el dato del día:"] + partir(d["Dato"]) + [PREGUNTAS[hoy.toordinal() % len(PREGUNTAS)]]
+    voz_precarga = ("La precarga digital, el 12 de noviembre." if p > 1 else "¡La precarga digital empieza mañana!" if p == 1
+                    else "¡Hoy empieza la precarga digital!" if p == 0 else "La precarga digital ya está abierta.")
+    trozos = [gancho, voz_precarga, "Y el dato del día:"] + partir(d["Dato"]) + [PREGUNTAS[hoy.toordinal() % len(PREGUNTAS)]]
     return n, trozos, precarga, corta
 
 
@@ -93,7 +103,7 @@ def main():
     n, trozos, precarga, corta = textos(hoy, ahora, d)
     oficial = d["Estado"] == "Oficial"
     grupo = d.get("Imagen sugerida") if d.get("Imagen sugerida") in medios.GRUPOS else "Vice_City"
-    caps = medios.elegir("Jason_and_Lucia", hoy.isoformat(), 1) + medios.elegir(grupo, d["Orden"], 2)
+    caps = medios.elegir(grupo, d["Orden"], 1)
     caption = (f"Faltan {n} días para GTA 6: sale el jueves 19 de noviembre en PS5 y Xbox Series X|S. {precarga}\n"
                f"Dato del día: {d['Dato']}\n\n"
                "Cuenta atrás hasta las 00:00 (hora de España): Rockstar no ha confirmado la hora de salida.\n"
@@ -108,8 +118,14 @@ def main():
          "Avisos": "Cuenta atrás de las 17:00: se publica sola"}
     print(f"Cuenta atrás: faltan {n} días · dato {d['Orden']} · capturas {caps}", flush=True)
     carpeta = tempfile.mkdtemp()
-    extra = {"reloj": {"segundos": (SALIDA - ahora).total_seconds(),
-                       "linea": "para GTA 6 · jueves 19 de noviembre", "precarga": corta}}
+    medios.preparar()
+    intro = foto_del_dia(hoy)
+    extra = {"cuenta_atras": {"de": n + 1, "a": n, "abajo": "DÍA PARA GTA 6" if n == 1 else "DÍAS PARA GTA 6",
+                              "fecha": "JUEVES 19 DE NOVIEMBRE",
+                              "precarga": "PRECARGA: 12 DE NOVIEMBRE" if (PRECARGA.date() - hoy).days >= 0 else "PRECARGA ABIERTA",
+                              "trozos_intro": 2, "trozo_dato": 2, "fondo_intro": medios.ruta(intro),
+                              "foco_intro": medios.CAPTURAS[intro]["foco"]}}
+    print(f"Foto del día: {intro}", flush=True)
     ruta, info, cambios = video.montar(f, hoy, "cuenta-atras", carpeta, extra)
     if info["voz"].startswith("Piper"):
         f["Caption"] = f["Caption"].replace("\n\n#", "\nVoz: sharvard (CC BY 3.0)\n\n#", 1)
