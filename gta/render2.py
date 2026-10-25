@@ -31,7 +31,23 @@ MAX_MB = 4.7
 TRANS = 0.30          # duración de una transición (s)
 CUENTA_IMPACTO = 0.80 # momento en que el número de hoy «cae»
 
+URL_ANTON = "https://raw.githubusercontent.com/google/fonts/main/ofl/anton/Anton-Regular.ttf"  # licencia OFL
 _fuentes = {}
+
+
+def asegurar_anton():
+    """Baja la tipografía Anton la primera vez (Google Fonts, gratis). Si no se puede, se usa Inter Display Black."""
+    global FA
+    if os.path.exists(FA):
+        return
+    try:
+        import urllib.request
+        os.makedirs(os.path.dirname(FA), exist_ok=True)
+        urllib.request.urlretrieve(URL_ANTON, FA + ".tmp")
+        os.replace(FA + ".tmp", FA)
+    except Exception as e:
+        print(f"  (sin Anton, se usa Inter: {str(e)[:120]})", flush=True)
+        FA = FB
 
 
 def fuente(p, s):
@@ -148,6 +164,81 @@ def tiempos_palabras(trozos, tiempos, palabras=None):
             for o, (_, i, f) in zip(out, palabras):
                 o[2], o[3] = i, f
     return [tuple(o) for o in out]
+
+
+def palabras_whisper(wav, trozos):
+    """Tiempos de cada palabra del guion (como las cuenta tokens), con Whisper. None si no se puede.
+    Se guardan junto a la voz (<voz>.palabras.json) para no volver a calcularlos al rehacer el vídeo."""
+    import json
+    palabras = [p for t in trozos for p in tokens(t)]
+    cache = wav + ".palabras.json"
+    try:
+        if os.path.exists(cache):
+            d = json.load(open(cache))
+            if [x[0] for x in d] == palabras:
+                return [tuple(x) for x in d]
+    except Exception:
+        pass
+    try:
+        import difflib
+        import voz
+        from faster_whisper import WhisperModel
+        x, sr = sf.read(wav, dtype="float32")
+        if x.ndim > 1:
+            x = x.mean(1)
+        x16 = np.interp(np.linspace(0, len(x) - 1, int(len(x) * 16000 / sr)), np.arange(len(x)), x).astype(np.float32)
+        segs, _ = WhisperModel("base", device="cpu", compute_type="int8").transcribe(x16, language="es", word_timestamps=True)
+        oidas, t_oidas = [], []
+        for s in segs:
+            for w in s.words or []:
+                for tok in voz.norm(w.word):
+                    oidas.append(tok)
+                    t_oidas.append((w.start, w.end))
+        guion, de_pal = [], []
+        for i, p in enumerate(palabras):
+            for tok in voz.norm(p):
+                guion.append(tok)
+                de_pal.append(i)
+        tiempos = [None] * len(guion)
+        for blk in difflib.SequenceMatcher(None, guion, oidas, autojunk=False).get_matching_blocks():
+            for q in range(blk.size):
+                tiempos[blk.a + q] = t_oidas[blk.b + q]
+        if sum(t is not None for t in tiempos) < len(guion) * 0.6:
+            return None
+        conocidos = [i for i, t in enumerate(tiempos) if t]
+        for i in range(len(guion)):
+            if tiempos[i] is None:
+                a = max((j for j in conocidos if j < i), default=None)
+                b = min((j for j in conocidos if j > i), default=None)
+                ta = tiempos[a][1] if a is not None else tiempos[b][0]
+                tb = tiempos[b][0] if b is not None else ta
+                tiempos[i] = (ta, tb)
+        out = []
+        for i, p in enumerate(palabras):
+            idx = [k for k, d in enumerate(de_pal) if d == i]
+            if idx:
+                out.append((p, tiempos[idx[0]][0], tiempos[idx[-1]][1]))
+            else:
+                prev = out[-1][2] if out else 0.0
+                out.append((p, prev, prev))
+        try:
+            json.dump(out, open(cache, "w"), ensure_ascii=False)
+        except Exception:
+            pass
+        return out
+    except Exception as e:
+        print(f"  (subtítulos sin tiempos por palabra: {str(e)[:150]})", flush=True)
+        return None
+
+
+def sujetos_de(ruta, contexto=""):
+    """Cajas de lo que hay que enseñar de una imagen (encuadre.py, con Gemini). [] si no se puede."""
+    try:
+        import encuadre
+        return [s["caja"] for s in encuadre.sujetos(ruta, contexto)]
+    except Exception as e:
+        print(f"  (encuadre no disponible: {str(e)[:120]})", flush=True)
+        return []
 
 
 def grupos_subtitulos(pals, trozos_sub, f, ancho=860, maximo=3):
@@ -276,6 +367,81 @@ class Fondo:
         return self.im.transform((W, H), Image.AFFINE, (sw / W, 0, x0, 0, sh / H, y0), resample=Image.BILINEAR)
 
 
+class VideoFondo:
+    """Trozo de vídeo ya vertical (trozo oficial o clip de partida): se ve tal cual desde su principio."""
+
+    def __init__(self, ruta):
+        self.ruta = ruta
+        self.dur = float(subprocess.check_output(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of",
+                                                  "csv=p=0", ruta]).decode().strip() or 0)
+        self.cajas, self.tramo, self.p, self.n, self.ultimo = [], 1.0, None, 0, None
+
+    def _abrir(self):
+        if self.p:
+            self.p.kill()
+            self.p.wait()
+        self.p = subprocess.Popen(["ffmpeg", "-loglevel", "error", "-i", self.ruta, "-f", "rawvideo", "-pix_fmt", "rgb24",
+                                   "-s", f"{W}x{H}", "-r", str(FPS), "-"], stdout=subprocess.PIPE,
+                                  stderr=subprocess.DEVNULL)
+        self.n, self.ultimo = 0, Image.new("RGB", (W, H))
+
+    def cerrar(self):
+        if self.p:
+            self.p.kill()
+            self.p.wait()
+            self.p = None
+
+    def fotograma(self, p, extra=1.0, dx=0.0):
+        i = int(p * self.tramo * FPS)
+        if self.p is None or i < self.n - 1:
+            self._abrir()
+        while self.n <= i:
+            raw = self.p.stdout.read(W * H * 3)
+            if len(raw) == W * H * 3:
+                self.ultimo = Image.frombytes("RGB", (W, H), raw)
+            self.n += 1
+        img = self.ultimo
+        if extra != 1.0 or dx:
+            img = img.transform((W, H), Image.AFFINE, (1 / extra, 0, W / 2 * (1 - 1 / extra) - dx / extra, 0, 1 / extra,
+                                                       H / 2 * (1 - 1 / extra)), resample=Image.BILINEAR)
+        return img
+
+    def y_sujetos(self, p=0.0):
+        return None
+
+
+def es_video(ruta):
+    return str(ruta).lower().endswith(".mp4")
+
+
+def plan_con_videos(fondos, dur):
+    """Como render.plan_fondos: cada trozo dura lo que dura (como mucho 1,5 veces lo que le toca) y las imágenes se
+    reparten el resto (al menos 2,5 s cada una); si solo hay trozos, se repiten hasta llenar."""
+    n = len(fondos)
+    fotos = [k for k in range(n) if not isinstance(fondos[k], VideoFondo)]
+    if not fotos:
+        tramos, t, k = [], 0.0, 0
+        while t < dur - 0.05:
+            largo = max(min(fondos[k % n].dur, dur - t), 0.1)
+            tramos.append((k % n, t, t + largo))
+            t += largo
+            k += 1
+        return tramos
+    largos = [min(f.dur, dur / n * 1.5) if isinstance(f, VideoFondo) else 0.0 for f in fondos]
+    resto = dur - sum(largos)
+    if resto / len(fotos) < 2.5:
+        sobra = sum(largos) - (dur - 2.5 * len(fotos))
+        factor = max(0.2, (sum(largos) - sobra) / max(sum(largos), 1e-3))
+        largos = [x * factor for x in largos]
+        resto = dur - sum(largos)
+    largos = [x if isinstance(fondos[k], VideoFondo) else resto / len(fotos) for k, x in enumerate(largos)]
+    tramos, t = [], 0.0
+    for k, x in enumerate(largos):
+        tramos.append((k, t, dur if k == n - 1 else t + x))
+        t += x
+    return tramos
+
+
 def plan_tramos(n, dur, cortes_deseados):
     """Tramos [(fondo, ini, fin)] con los cortes en los momentos deseados (o repartidos)."""
     cortes = [0.0] + list(cortes_deseados[: n - 1]) + [dur]
@@ -289,6 +455,7 @@ def fondo_en(t, fondos, tramos, estilo_trans):
     q = max(j for j in range(len(tramos)) if tramos[j][1] <= t + 1e-6)
     k, a, b = tramos[q]
     p = (t - a) / max(b - a, 1e-3)
+    fondos[k].tramo = b - a
     # ¿cerca del corte siguiente o del anterior?
     efecto, lado = 0.0, 0
     if q + 1 < len(tramos) and b - t < TRANS / 2:
@@ -607,8 +774,13 @@ def montar(cfg):
     - cuenta_atras: {"de": 26, "a": 25, "fecha": "JUEVES 19 DE NOVIEMBRE", "precarga": "PRECARGA: 12 DE NOVIEMBRE",
       "trozos_intro": 2, "trozo_dato": 2, "fondo_intro": ruta, "foco_intro": 0.5}
       Los «trozos_intro» primeros trozos se ven con el número gigante (sin subtítulos); el trozo «trozo_dato» es
-      «Dato del día:» y estampa el rótulo; después, subtítulos normales con las capturas del dato."""
+      «Dato del día:» y estampa el rótulo; después, subtítulos normales con las capturas del dato.
+    Si faltan, las palabras se sacan con Whisper y los sujetos de cada imagen con encuadre.py. Las rutas .mp4 son
+    trozos de vídeo (ya en vertical). Otras claves (p. ej. el «reloj» del montaje antiguo) se ignoran."""
+    asegurar_anton()
     trozos, tiempos = cfg["trozos"], cfg["tiempos"]
+    if not cfg.get("palabras"):
+        cfg["palabras"] = palabras_whisper(cfg["voz"], trozos)
     info = sf.info(cfg["voz"])
     dur = info.frames / info.samplerate + 1.3
     ca = cfg.get("cuenta_atras")
@@ -617,9 +789,16 @@ def montar(cfg):
     ultimo = len(trozos) - 1
 
     # fondos y cortes
-    caps = [Fondo(c[0], c[1], c[2], estilo=i % 3, sujetos=c[3] if len(c) > 3 else None) for i, c in enumerate(cfg["capturas"])]
+    caps = []
+    for i, c in enumerate(cfg["capturas"]):
+        if es_video(c[0]):
+            caps.append(VideoFondo(c[0]))
+        else:
+            suj = c[3] if len(c) > 3 else sujetos_de(c[0], trozos[0])
+            caps.append(Fondo(c[0], c[1], c[2], estilo=i % 3, sujetos=suj))
     if ca:
-        intro = Fondo(ca["fondo_intro"], ca.get("foco_intro", 0.5), "retrato", estilo=0, sujetos=ca.get("sujetos_intro"))
+        suj = ca["sujetos_intro"] if "sujetos_intro" in ca else sujetos_de(ca["fondo_intro"])
+        intro = Fondo(ca["fondo_intro"], ca.get("foco_intro", 0.5), "retrato", estilo=0, sujetos=suj)
         fondos = [intro] + caps
         corte_dato = tiempos[ca["trozo_dato"]][0] - 0.05
         resto = caps
@@ -634,6 +813,8 @@ def montar(cfg):
         cortes = [_corte_cerca(tiempos[1][0] - 0.05 if len(fondos) > 1 and j == 0 else ini + (fin - ini) * j / max(len(fondos) - 1, 1), tiempos)
                   for j in range(len(fondos) - 1)]
     tramos = plan_tramos(len(fondos), dur, cortes)
+    if not ca and any(isinstance(x, VideoFondo) for x in fondos):  # con trozos de vídeo: cada trozo dura lo suyo
+        tramos = plan_con_videos(fondos, dur)
     estilo_trans = ["barrido" if j % 2 == 0 else "zoom" for j in range(len(tramos))]
     impactos = [CUENTA_IMPACTO] if ca else []
     audio = mezclar(cfg, dur, [b for _, _, b in tramos[:-1]], impactos)
@@ -712,6 +893,9 @@ def montar(cfg):
              "-b:a", "128k", "-shortest", "-movflags", "+faststart", salida], stdin=subprocess.PIPE)
         for i in range(nframes):
             proc.stdin.write(fotograma(i).tobytes())
+        for x in fondos:
+            if isinstance(x, VideoFondo):
+                x.cerrar()
         proc.stdin.close()
         proc.wait()
         if proc.returncode:
