@@ -1,0 +1,63 @@
+name: Prueba de la edición V2 (sin publicar)
+
+on:
+  workflow_dispatch:
+    inputs:
+      noticia:
+        description: "Texto del titular de la noticia de prueba"
+        default: "teletrabajo"
+      dato:
+        description: "Texto del titular del dato de prueba"
+        default: "Boobie Ike"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: videos
+  cancel-in-progress: false
+
+jobs:
+  prueba:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    env:
+      AIRTABLE_TOKEN: ${{ secrets.AIRTABLE_TOKEN }}
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      NOTICIA: ${{ inputs.noticia }}
+      DATO: ${{ inputs.dato }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: ./.github/actions/entorno
+      - name: Tipografía Anton (Google Fonts, licencia OFL)
+        run: |
+          mkdir -p gta/fuentes
+          curl -sSfL -o gta/fuentes/Anton-Regular.ttf https://raw.githubusercontent.com/google/fonts/main/ofl/anton/Anton-Regular.ttf
+          curl -sSfL -o gta/fuentes/Anton-OFL.txt https://raw.githubusercontent.com/google/fonts/main/ofl/anton/OFL.txt
+      - name: Montar los 3 vídeos de prueba (solo lee Airtable)
+        run: python gta/prueba_edicion.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: prueba-edicion-v2
+          path: salida_edicion/
+          retention-days: 7
+      - name: Dejar los vídeos en la rama prueba-edicion (para verlos sin descargar)
+        if: always() && hashFiles('salida_edicion/*') != ''
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          mkdir -p /tmp/salida && cp salida_edicion/* /tmp/salida/
+          git checkout --orphan prueba-edicion
+          git rm -rq --cached .
+          git clean -fdq -e cache
+          cp /tmp/salida/* .
+          (cd /tmp/salida && ls) | xargs git add --
+          git commit -qm "Prueba de la edición V2 (run ${{ github.run_number }})"
+          git push -fq origin prueba-edicion
+      - name: Guardar las voces
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: cache/voces
+          key: voces-${{ github.run_id }}
