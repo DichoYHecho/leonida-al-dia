@@ -2,6 +2,8 @@
 
 - Noticia: la publicación de Airtable cuyo titular contiene NOTICIA (por defecto «teletrabajo»).
 - Dato: la publicación cuyo titular contiene DATO (por defecto «Boobie Ike»).
+- Encuadre inteligente (encuadre.py): Gemini dice dónde están las caras o lo importante de cada imagen (1 vez por
+  imagen; se guarda en la caché).
 - Cuenta atrás de hoy, más corta: gancho, precarga, «Y el dato del día:», el dato y la pregunta (el mismo dato que
   elegiría la de las 17:00). Gasta 1 audio de Gemini; la noticia y el dato reutilizan su voz de la caché.
 Deja los vídeos y una hoja de fotogramas en salida_edicion/."""
@@ -9,7 +11,7 @@ import os, random, shutil, sys, tempfile
 from datetime import date, datetime
 import numpy as np, soundfile as sf
 from PIL import Image
-import airtable, cuenta_atras as ca, medios, render2, video, voz
+import airtable, cuenta_atras as ca, encuadre, medios, render2, video, voz
 from config import MADRID, T_PUB, cuenta_atras as pastilla_cuenta
 
 OUT = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "salida_edicion")
@@ -94,8 +96,10 @@ def montar(nombre, f, dia, extra=None):
         if r.lower().endswith(".mp4"):  # el prototipo solo usa imágenes (los trozos y clips, más adelante)
             continue
         foco, plano = medios.foco_plano(c)
+        suj = encuadre.sujetos(r, f.get("Titular") or (video.trozos_de(f) or [""])[0])
+        print(f"  {nombre} · {c[:40]}: {[s['que'] for s in suj] or 'sin sujetos (foco de siempre)'}", flush=True)
         caps.append(c)
-        fondos.append((r, foco, plano))
+        fondos.append((r, foco, plano, [s["caja"] for s in suj]))
     if not caps:
         raise RuntimeError(f"{nombre}: sin imágenes")
     wav, tiempos, nombre_voz, _, _ = video.preparar_voz(f)
@@ -144,7 +148,8 @@ def cuenta(dia):
     extra = {"cuenta_atras": {"de": n + 1, "a": n, "fecha": "JUEVES 19 DE NOVIEMBRE",
                               "precarga": "PRECARGA: 12 DE NOVIEMBRE" if p >= 0 else "PRECARGA ABIERTA",
                               "trozos_intro": 2, "trozo_dato": 2, "fondo_intro": medios.ruta(intro),
-                              "foco_intro": medios.CAPTURAS[intro]["foco"]}}
+                              "foco_intro": medios.CAPTURAS[intro]["foco"],
+                              "sujetos_intro": [s["caja"] for s in encuadre.sujetos(medios.ruta(intro))]}}
     print(f"Cuenta atrás: faltan {n} · dato {d['Orden']} · foto del día {intro} · dato con {caps}", flush=True)
     return montar("cuenta_atras", f, dia, extra)
 
