@@ -4,15 +4,17 @@ Cambios frente a render.py (plantilla estática):
 - Tipografía de tráiler (Anton, licencia libre OFL) para el gancho, el número y la pregunta; Inter Display Black
   para los subtítulos.
 - Subtítulos de 1 a 3 palabras; la palabra que suena va sobre una pastilla del color del tipo.
-- Movimiento de cámara con zoom y paneo suaves (hacia el foco de la captura) y transiciones (barrido o zoom con
-  destello) cuando cambia la imagen, con un «whoosh» en la música.
+- Movimiento de cámara con zoom y paneo suaves y transiciones (barrido o zoom con destello) cuando cambia la imagen,
+  con un «whoosh» en la música. Encuadre inteligente (encuadre.py): la cámara enseña las caras o lo importante de
+  la imagen; si no caben a la vez, va de una a otra.
 - Primer fotograma pensado como portada: el gancho entero y grande desde el fotograma 0.
 - Intro de marca (destello de luz al empezar) y cierre de marca (logo y @) en el último segundo.
 - Barra de progreso arriba.
 - Cuenta atrás (cfg["cuenta"]): número gigante que baja del de ayer al de hoy con impacto, y luego «DATO DEL DÍA».
 
 Entrada: igual que render.montar (trozos, tiempos, voz, capturas, etiqueta, tipo, personaje, cuenta, pie, salida,
-semilla, tmp) más, opcionales: «palabras» [(texto, ini, fin)] de Whisper y «cuenta_atras» (ver montar).
+semilla, tmp) más, opcionales: «palabras» [(texto, ini, fin)] de Whisper, «cuenta_atras» (ver montar) y, en cada
+captura, un 4.º valor con los sujetos que hay que enseñar [(x0, y0, x1, y1)].
 """
 import math, os, re, subprocess
 import numpy as np, soundfile as sf
@@ -173,9 +175,39 @@ def grupos_subtitulos(pals, trozos_sub, f, ancho=860, maximo=3):
 
 
 # ---------------------------------------------------------------- imágenes de fondo
+def recorte_bordes(im):
+    """Caja (x0, y0, x1, y1) sin los márgenes lisos que traen algunas imágenes de noticias (como render.sin_bordes)."""
+    from PIL import ImageChops
+    x0, y0, x1, y1 = 0, 0, im.width, im.height
+    for _ in range(2):
+        sub = im.crop((x0, y0, x1, y1))
+        fondo = Image.new("RGB", sub.size, sub.getpixel((2, 2)))
+        caja = ImageChops.difference(sub, fondo).convert("L").point(lambda v: 255 if v > 24 else 0).getbbox()
+        if not caja or caja == (0, 0, sub.width, sub.height):
+            break
+        if (caja[2] - caja[0]) < sub.width * 0.3 or (caja[3] - caja[1]) < sub.height * 0.3:
+            break
+        x0, y0, x1, y1 = x0 + caja[0], y0 + caja[1], x0 + caja[2], y0 + caja[3]
+    return x0, y0, x1, y1
+
+
 class Fondo:
-    def __init__(self, ruta, foco=0.5, plano="retrato", estilo=0):
+    """Imagen de fondo con su movimiento de cámara.
+    sujetos: cajas (x0, y0, x1, y1) de 0 a 1 de lo que hay que enseñar (caras…), de encuadre.py. Si caben a la vez,
+    la cámara se acerca a ellas; si no, va de una a otra. Sin sujetos, se usa el foco de capturas.csv."""
+    Y_SUJETO = 0.47  # altura de la pantalla donde se intenta dejar a los sujetos (entre el gancho y los subtítulos)
+
+    def __init__(self, ruta, foco=0.5, plano="retrato", estilo=0, sujetos=None):
         im = Image.open(ruta).convert("RGB")
+        cajas = [tuple(c) for c in (sujetos or [])]
+        if plano == "imagen":  # imagen de noticia: fuera márgenes lisos (y se recolocan las cajas)
+            x0, y0, x1, y1 = recorte_bordes(im)
+            if (x0, y0, x1, y1) != (0, 0, im.width, im.height):
+                w0, h0 = im.width, im.height
+                im = im.crop((x0, y0, x1, y1))
+                cajas = [((a * w0 - x0) / im.width, (b * h0 - y0) / im.height, (c * w0 - x0) / im.width,
+                          (d * h0 - y0) / im.height) for a, b, c, d in cajas]
+                cajas = [tuple(min(max(v, 0.0), 1.0) for v in c) for c in cajas]
         s = max(W / im.width, H / im.height) * 1.22
         im = im.resize((round(im.width * s), round(im.height * s)), Image.LANCZOS)
         a = np.asarray(im).astype(np.float32) / 255
@@ -188,28 +220,53 @@ class Fondo:
         self.foco = foco
         self.plano = plano
         self.estilo = estilo  # 0 acercar, 1 alejar, 2 barrido
+        self.cajas = [c for c in cajas if c[2] > c[0] and c[3] > c[1]]
+        self.plan = self._plan()
+
+    def _plan(self):
+        """(x inicial, x final, y, zoom inicial, zoom final, paseo), todo de 0 a 1 salvo el zoom."""
+        bw, bh = self.im.size
+        frac = min(1.0, bh * W / H / bw)  # parte del ancho que se ve sin zoom
+        z0, z1 = (1.0, 1.12) if self.estilo == 0 else (1.12, 1.0) if self.estilo == 1 else (1.05, 1.05)
+        if self.cajas:
+            principales = self.cajas[:3]
+            ux0, ux1 = min(c[0] for c in principales), max(c[2] for c in principales)
+            uy = (min(c[1] for c in principales) + max(c[3] for c in principales)) / 2
+            if ux1 - ux0 + 0.05 <= frac * 0.95:  # caben todos: acercarse (o alejarse) centrado en ellos
+                c = (ux0 + ux1) / 2
+                return c, c, uy, z0, z1, False
+            orden = sorted(principales, key=lambda c: c[0] + c[2])  # de izquierda a derecha
+            a, b = (orden[0][0] + orden[0][2]) / 2, (orden[-1][0] + orden[-1][2]) / 2
+            return a, b, uy, 1.0, 1.04, True
+        f = self.foco
+        if self.estilo == 2 or self.plano in ("panorámica", "imagen"):
+            rango = (1 - frac) if self.plano == "imagen" else min(1 - frac, 0.22)
+            c0 = min(max(f - rango / 2, frac / 2), 1 - frac / 2 - rango)
+            return c0, c0 + rango, 0.5, z0, z1, False
+        return f + (0.5 - f) * 0.15, f, 0.5, z0, z1, False
 
     def ventana(self, p, extra=1.0):
         """Ventana (x0, y0, ancho, alto) en la imagen para el progreso p (0-1) del tramo."""
         bw, bh = self.im.size
-        z0, z1 = (1.0, 1.13) if self.estilo == 0 else (1.13, 1.0) if self.estilo == 1 else (1.06, 1.06)
-        q = 0.15 * suave(p) + 0.85 * p
-        z = (z0 + (z1 - z0) * q) * extra
+        a, b, cy, z0, z1, paseo = self.plan
+        lineal = 0.15 * suave(p) + 0.85 * p
+        q = suave((p - 0.42) / 0.16) if paseo else lineal  # paseo: quieto en el primero, va rápido, quieto en el otro
+        z = (z0 + (z1 - z0) * (lineal if paseo else q)) * extra
         sh = bh / z
         sw = sh * W / H
         if sw > bw:
             sw = bw
             sh = sw * H / W
-        cx_f = self.foco * bw
-        if self.estilo == 2 or self.plano == "panorámica":
-            rango = min(bw - sw, bw * 0.22)
-            c0 = np.clip(cx_f - rango / 2, sw / 2, bw - sw / 2)
-            cx = c0 + rango * q
-        else:
-            cx = cx_f + (bw / 2 - cx_f) * 0.15 * (1 - q)
-        cx = float(np.clip(cx, sw / 2, bw - sw / 2))
-        cy = bh / 2
-        return cx - sw / 2, cy - sh / 2, sw, sh
+        cx = float(np.clip((a + (b - a) * q) * bw, sw / 2, bw - sw / 2))
+        y0 = float(np.clip(cy * bh - self.Y_SUJETO * sh, 0, bh - sh))
+        return cx - sw / 2, y0, sw, sh
+
+    def y_sujetos(self, p=0.0):
+        """Altura en pantalla (0 arriba, 1 abajo) del centro de los sujetos, o None si no hay."""
+        if not self.cajas:
+            return None
+        x0, y0, sw, sh = self.ventana(p)
+        return (self.plan[2] * self.im.size[1] - y0) / sh
 
     def fotograma(self, p, extra=1.0, dx=0.0):
         x0, y0, sw, sh = self.ventana(p, extra)
@@ -386,8 +443,8 @@ def partir_lineas(ws, f, ancho):
     return lineas
 
 
-def gancho(img, t, ws, acento, salida):
-    """Gancho grande arriba (portada). ws: [(palabra, ini, fin)]. Sale hacia arriba al terminar."""
+def gancho(img, t, ws, acento, salida, cy=470):
+    """Gancho grande (portada), arriba o, si las caras están arriba, abajo. ws: [(palabra, ini, fin)]. Sale hacia arriba."""
     tam = 132
     while tam > 84:
         f = fuente(FA, tam)
@@ -395,13 +452,14 @@ def gancho(img, t, ws, acento, salida):
         if len(lineas) <= 3:
             break
         tam -= 6
-    e = suave((t - salida) / 0.22) if t > salida else 0.0
+    abajo = cy > 900
+    e = suave((t - salida) / (0.15 if abajo else 0.22)) if t > salida else 0.0
     if e >= 1:
         return
     capa = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-    poner_palabras(capa, lineas, 470, f, acento, t, borde=0, interlinea=1.04, espacio=f.size * 0.24, caja=False)
+    poner_palabras(capa, lineas, cy, f, acento, t, borde=0, interlinea=1.04, espacio=f.size * 0.24, caja=False)
     if e > 0:
-        capa = capa.transform((W, H), Image.AFFINE, (1, 0, 0, 0, 1, 260 * e), resample=Image.BILINEAR)
+        capa = capa.transform((W, H), Image.AFFINE, (1, 0, 0, 0, 1, (-200 if abajo else 260) * e), resample=Image.BILINEAR)
         capa.putalpha(capa.getchannel("A").point(lambda v: int(v * (1 - e))))
     img.alpha_composite(capa)
 
@@ -557,9 +615,9 @@ def montar(cfg):
     ultimo = len(trozos) - 1
 
     # fondos y cortes
-    caps = [Fondo(r, f, p, estilo=i % 3) for i, (r, f, p) in enumerate(cfg["capturas"])]
+    caps = [Fondo(c[0], c[1], c[2], estilo=i % 3, sujetos=c[3] if len(c) > 3 else None) for i, c in enumerate(cfg["capturas"])]
     if ca:
-        intro = Fondo(ca["fondo_intro"], ca.get("foco_intro", 0.5), "retrato", estilo=0)
+        intro = Fondo(ca["fondo_intro"], ca.get("foco_intro", 0.5), "retrato", estilo=0, sujetos=ca.get("sujetos_intro"))
         fondos = [intro] + caps
         corte_dato = tiempos[ca["trozo_dato"]][0] - 0.05
         resto = caps
@@ -585,6 +643,10 @@ def montar(cfg):
     gancho_ws = [(w, a, b) for k, w, a, b in pals if k == 0]
     viñeta = capa_viñeta()
     salida_gancho = tiempos[0][1] + 0.12
+    ys = fondos[0].y_sujetos(0.0)
+    y_gancho = 1260 if ys is not None and ys < 0.5 else 470  # que el gancho no tape las caras
+    if y_gancho > 900:  # abajo se cruzaría con el primer subtítulo: sale antes
+        salida_gancho = tiempos[0][1] - 0.02
     t_pregunta = tiempos[ultimo][0] - 0.05
     t_cierre = max(tiempos[ultimo][1] + 0.25, dur - 1.05)
     salida = cfg["salida"]
@@ -606,7 +668,7 @@ def montar(cfg):
         img = barrido_luz(img, t)
         cabecera(img, t, cfg, mostrar_cuenta=not en_intro)
         if not ca:
-            gancho(img, t, gancho_ws, acento, salida_gancho)
+            gancho(img, t, gancho_ws, acento, salida_gancho, y_gancho)
         if ca:
             sello(img, t, "DATO DEL DÍA", tiempos[ca["trozo_dato"]][0] - 0.05, AMBER)
         # subtítulos
