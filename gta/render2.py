@@ -229,7 +229,9 @@ class Fondo:
         frac = min(1.0, bh * W / H / bw)  # parte del ancho que se ve sin zoom
         z0, z1 = (1.0, 1.12) if self.estilo == 0 else (1.12, 1.0) if self.estilo == 1 else (1.05, 1.05)
         if self.cajas:
-            principales = self.cajas[:3]
+            area = lambda c: (c[2] - c[0]) * (c[3] - c[1])
+            # solo los que se ven casi tan grandes como el principal (no la gente pequeña del fondo)
+            principales = [c for c in self.cajas[:3] if area(c) >= 0.4 * area(self.cajas[0])]
             ux0, ux1 = min(c[0] for c in principales), max(c[2] for c in principales)
             uy = (min(c[1] for c in principales) + max(c[3] for c in principales)) / 2
             if ux1 - ux0 + 0.05 <= frac * 0.95:  # caben todos: acercarse (o alejarse) centrado en ellos
