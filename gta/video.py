@@ -3,13 +3,16 @@
 - La voz se guarda en la caché de GitHub (cache/voces/<huella>.wav), no en Airtable, para gastar menos
   llamadas. «Huella» = huella del guion: si cambio el guion en Airtable, se vuelve a pedir la voz.
 - «Huella vídeo» = guion + etiqueta + capturas + fuente + día: si cambia algo de eso, se vuelve a montar
-  el vídeo (sin gastar voz). Así puedo corregir el texto en la revisión sin borrar nada."""
+  el vídeo (sin gastar voz). Así puedo corregir el texto en la revisión sin borrar nada.
+- Desde el 25 oct el montaje es render2 (edición V2: tipografía de tráiler, subtítulos palabra a palabra,
+  encuadre de las caras con Gemini…); la «Huella vídeo» lleva también la versión de la edición (EDICION)."""
 import hashlib, json, os, re, shutil, tempfile, unicodedata
 from datetime import date
-import airtable, medios, render, voz
+import airtable, medios, render, render2, voz
 from config import CACHE, T_PUB, cuenta_atras
 
 VOCES = os.path.join(CACHE, "voces")
+EDICION = "v2"  # 25 oct: edición nueva (render2 + encuadre). Si cambia, la repesca rehace los vídeos sin publicar
 
 
 def huella(*partes):
@@ -21,7 +24,7 @@ def trozos_de(f):
 
 
 def huella_video(f, dia):
-    return huella((f.get("Guion") or "").strip(), (f.get("Etiqueta") or "").strip(), (f.get("Capturas") or "").strip(),
+    return huella(EDICION, (f.get("Guion") or "").strip(), (f.get("Etiqueta") or "").strip(), (f.get("Capturas") or "").strip(),
                   (f.get("Fuente") or "").strip(), bool(f.get("Personaje")), f.get("Tipo"), dia.isoformat())
 
 
@@ -71,7 +74,7 @@ def montar(f, dia, semilla, salida_dir, extra=None):
         etiqueta = unicodedata.normalize("NFKD", (f.get("Etiqueta") or "gta6").lower()).encode("ascii", "ignore").decode()
         etiqueta = re.sub(r"[^a-z0-9]+", "-", etiqueta).strip("-")[:30] or "gta6"
         salida = os.path.join(salida_dir, f"leonida-{dia.isoformat()}-{etiqueta}.mp4")
-        info = render.montar({
+        info = render2.montar({
             "trozos": trozos, "tiempos": tiempos, "voz": wav,
             "capturas": [(r, *medios.foco_plano(c)) for r, c in zip(rutas, caps)],
             "etiqueta": f.get("Etiqueta"), "tipo": f.get("Tipo"), "personaje": f.get("Personaje"),
