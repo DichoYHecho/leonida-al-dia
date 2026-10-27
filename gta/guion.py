@@ -8,10 +8,10 @@ from config import HASHTAGS_FIJOS, PIE_POST, OFICIALES
 from medios import GRUPOS, CAPTURAS, validas
 
 REGLAS = """Eres el guionista de «Leónida al Día», una cuenta de fans de GTA 6 en español de España.
-Escribes vídeos verticales de 15 a 30 segundos (unas 45-75 palabras en total) que lee una voz sintética.
+Escribes vídeos verticales de 12 a 20 segundos (unas 35-55 palabras en total; cuanto más corto, mejor) que lee una voz sintética.
 Reglas que no se pueden saltar:
 - Usa SOLO la información del TEXTO DE LA FUENTE. No añadas datos, cifras, fechas ni opiniones que no estén ahí.
-- Si la fuente no es oficial (Rockstar Games o Take-Two), atribúyelo: «Según {medio}…». «Rockstar confirma» solo si lo dice Rockstar o Take-Two.
+- Si la fuente no es oficial (Rockstar Games o Take-Two), atribúyelo: «Según {medio}…», en el primer trozo del cuerpo (nunca en el gancho). «Rockstar confirma» solo si lo dice Rockstar o Take-Two.
 - Nada de filtraciones (material filtrado), rumores presentados como hechos ni destripes de la historia.
 - No copies frases literales de la fuente: cuéntalo con tus palabras.
 - No invites a comprar ni a reservar, y no pongas enlaces.
@@ -31,8 +31,8 @@ FORMATO = """Devuelve SOLO un JSON con estos campos:
   "etiqueta": "tema en mayúsculas, máximo 16 caracteres (un personaje como LUCÍA, un lugar como VICE CITY, o el asunto: PRECIO, TRÁILER, FECHA, MÚSICA, VENTAS…)",
   "es_personaje": true o false (si la etiqueta es un personaje),
   "grupo_capturas": "uno de: %s",
-  "gancho": "primera frase, máximo 80 caracteres: el dato concreto con la palabra clave (GTA 6, Vice City, Lucía…). Varía la forma (una afirmación directa, una cifra, un contraste, una cita corta…). NUNCA empieces por «¿Sabías que» ni hagas una pregunta, y no prometas ni exageres nada que no diga la fuente",
-  "cuerpo": ["3 a 6 trozos de máximo 45 caracteres cada uno, que se leen seguidos. Punto al acabar cada frase; si la frase sigue en el trozo siguiente, no pongas coma al final salvo que la gramática la pida"],
+  "gancho": "primera frase, máximo 60 caracteres (8-10 palabras), que sale en grande en la portada: lo más llamativo y concreto del vídeo (una cifra, un nombre, un contraste) con la palabra clave (GTA 6, Vice City, Lucía…). Sin nombrar al medio ni empezar por «Según», «Repasamos», «Conoce» o «Descubre». Varía la forma (una afirmación directa, una cifra, un contraste, una cita corta…). NUNCA empieces por «¿Sabías que» ni hagas una pregunta, y no prometas ni exageres nada que no diga la fuente",
+  "cuerpo": ["2 a 4 trozos de máximo 45 caracteres cada uno, que se leen seguidos. Punto al acabar cada frase; si la frase sigue en el trozo siguiente, no pongas coma al final salvo que la gramática la pida"],
   "cierre": "pregunta final para comentar, máximo 60 caracteres",
   "texto_post": "2 o 3 frases para el texto de la publicación (sin hashtags); la primera, con «GTA 6» y el tema concreto, porque es lo que se busca",
   "cosas_reales": ["cada cosa REAL y concreta que se nombra en el guion y que NO sale en el juego (un restaurante, un producto, una persona, una portada, una tienda, un evento…), con su nombre propio tal cual, una por elemento (si se nombran dos restaurantes, son dos); [] si todo se puede enseñar con capturas del juego"],
@@ -107,6 +107,26 @@ def validar(j):
     }
 
 
+# 27 oct: en YouTube la mitad de la gente deslizaba al empezar. El gancho es lo que se ve y se oye primero:
+# si es una pregunta o empieza por «Según…», «¿Sabías…», «Repasamos»… se pide otro (el texto de Gemini es barato).
+GANCHO_FLOJO = re.compile(r"^\W*(sab[ií]as|seg[uú]n\b|repasamos|conoce\b|descubre\b|te contamos)", re.I)
+AVISO_GANCHO = ("\n\nOJO: el gancho anterior no valía (era una pregunta o empezaba por «Según», «¿Sabías…», «Repasamos» o "
+                "«Conoce»). Escribe un gancho que sea una afirmación corta con lo más llamativo del dato.")
+
+def gancho_flojo(txt):
+    txt = (txt or "").strip()
+    return txt.startswith("¿") or txt.endswith("?") or bool(GANCHO_FLOJO.search(txt))
+
+def con_buen_gancho(prompt, intentos=3):
+    """Pide el guion; si el gancho es flojo, lo vuelve a pedir (como mucho «intentos» veces) y se queda el último."""
+    g = None
+    for i in range(intentos):
+        g = validar(gemini.texto_json(prompt if i == 0 else prompt + AVISO_GANCHO))
+        if not gancho_flojo(g["trozos"][0]):
+            return g
+        print(f"  (gancho flojo, se pide otro: {g['trozos'][0]})", flush=True)
+    return g
+
 def caption(g, fuente, oficial, voz_reserva=False):
     linea = f"Fuente: {fuente}" + ("" if oficial else " (según medios)")
     extra = "\nVoz: sharvard (CC BY 3.0)" if voz_reserva else ""
@@ -122,7 +142,7 @@ def de_dato(dato):
               f"Tema: {dato.get('Tema')}\nFuente: {dato.get('Fuente')} ({'oficial' if oficial else 'no oficial: atribúyelo'})\n"
               f"Grupo de capturas: {grupo or 'el que mejor case'}\n\n{catalogo(grupo)}\n\n"
               f"TEXTO DE LA FUENTE:\n{dato.get('Dato')}\n\n" + FORMATO)
-    g = validar(gemini.texto_json(prompt))
+    g = con_buen_gancho(prompt)
     if grupo:
         g["grupo"] = grupo  # la imagen la decide el banco (regla de G2)
         g["capturas"] = [c for c in g["capturas"] if CAPTURAS[c]["grupo"] == grupo]
@@ -134,7 +154,7 @@ def de_noticia(medio, titulo, texto):
     prompt = (REGLAS + "\n" + AYUDA_GRUPOS + "\n\nVas a contar una NOTICIA de hoy sobre GTA 6.\n"
               f"Medio: {medio} ({'oficial' if oficial else 'no oficial: di «Según ' + medio + '»'})\n"
               f"Titular original: {titulo}\n\n{catalogo()}\n\nTEXTO DE LA FUENTE:\n{texto[:7000]}\n\n" + FORMATO)
-    g = validar(gemini.texto_json(prompt))
+    g = con_buen_gancho(prompt)
     if g["capturas"]:  # el grupo, el de la primera captura elegida
         g["grupo"] = CAPTURAS[g["capturas"][0]]["grupo"]
     return g
