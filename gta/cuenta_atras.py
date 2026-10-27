@@ -83,7 +83,7 @@ def textos(hoy, ahora, d):
         precarga, corta = "La precarga digital ya está abierta.", "Precarga abierta desde el 12 de noviembre"
     voz_precarga = ("La precarga digital, el 12 de noviembre." if p > 1 else "¡La precarga digital empieza mañana!" if p == 1
                     else "¡Hoy empieza la precarga digital!" if p == 0 else "La precarga digital ya está abierta.")
-    trozos = [gancho, voz_precarga, "Y el dato del día:"] + partir(d["Dato"]) + [PREGUNTAS[hoy.toordinal() % len(PREGUNTAS)]]
+    trozos = [gancho, "Y el dato del día:"] # 27 oct: sin la frase de la precarga (sigue en pantalla), para ir antes al dato + partir(d["Dato"]) + [PREGUNTAS[hoy.toordinal() % len(PREGUNTAS)]]
     return n, trozos, precarga, corta
 
 
@@ -123,7 +123,7 @@ def main():
     extra = {"cuenta_atras": {"de": n + 1, "a": n, "abajo": "DÍA PARA GTA 6" if n == 1 else "DÍAS PARA GTA 6",
                               "fecha": "JUEVES 19 DE NOVIEMBRE",
                               "precarga": "PRECARGA: 12 DE NOVIEMBRE" if (PRECARGA.date() - hoy).days >= 0 else "PRECARGA ABIERTA",
-                              "trozos_intro": 2, "trozo_dato": 2, "fondo_intro": medios.ruta(intro),
+                              "trozos_intro": 1, "trozo_dato": 1, "fondo_intro": medios.ruta(intro),
                               "foco_intro": medios.CAPTURAS[intro]["foco"]}}
     print(f"Foto del día: {intro}", flush=True)
     ruta, info, cambios = video.montar(f, hoy, "cuenta-atras", carpeta, extra)
