@@ -8,7 +8,7 @@ Cambios frente a render.py (plantilla estática):
   con un «whoosh» en la música. Encuadre inteligente (encuadre.py): la cámara enseña las caras o lo importante de
   la imagen; si no caben a la vez, va de una a otra.
 - Primer fotograma pensado como portada: el gancho entero y grande desde el fotograma 0.
-- Intro de marca (destello de luz al empezar) y cierre de marca (logo y @) en el último segundo.
+- Intro de marca (destello de luz al empezar). El cierre de marca (logo y @) se quitó el 27 oct.
 - Barra de progreso arriba.
 - Cuenta atrás (cfg["cuenta"]): número gigante que baja del de ayer al de hoy con impacto, y luego «DATO DEL DÍA».
 
@@ -782,7 +782,7 @@ def montar(cfg):
     if not cfg.get("palabras"):
         cfg["palabras"] = palabras_whisper(cfg["voz"], trozos)
     info = sf.info(cfg["voz"])
-    dur = info.frames / info.samplerate + 1.3
+    dur = info.frames / info.samplerate + 0.5 # 27 oct: sin cierre de marca, el vídeo vuelve a empezar enseguida
     ca = cfg.get("cuenta_atras")
     acento = PINK if cfg.get("personaje") else COLOR_TIPO.get(cfg.get("tipo"), AMBER)
     pals = tiempos_palabras(trozos, tiempos, cfg.get("palabras"))
@@ -831,7 +831,7 @@ def montar(cfg):
     if y_gancho > 900:  # abajo se cruzaría con el primer subtítulo: sale antes
         salida_gancho = tiempos[0][1] - 0.02
     t_pregunta = tiempos[ultimo][0] - 0.05
-    t_cierre = max(tiempos[ultimo][1] + 0.25, dur - 1.05)
+    t_cierre = dur + 1.0 # 27 oct: ya no sale el cierre de marca (logo y @): alargaba el final y hacía que la gente deslizara
     salida = cfg["salida"]
 
     def fotograma(i):
