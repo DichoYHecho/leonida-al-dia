@@ -83,7 +83,8 @@ def textos(hoy, ahora, d):
         precarga, corta = "La precarga digital ya está abierta.", "Precarga abierta desde el 12 de noviembre"
     voz_precarga = ("La precarga digital, el 12 de noviembre." if p > 1 else "¡La precarga digital empieza mañana!" if p == 1
                     else "¡Hoy empieza la precarga digital!" if p == 0 else "La precarga digital ya está abierta.")
-    trozos = [gancho, "Y el dato del día:"] # 27 oct: sin la frase de la precarga (sigue en pantalla), para ir antes al dato + partir(d["Dato"]) + [PREGUNTAS[hoy.toordinal() % len(PREGUNTAS)]]
+    trozos = [gancho, "Y el dato del día:"] + partir(d["Dato"]) + [PREGUNTAS[hoy.toordinal() % len(PREGUNTAS)]]
+    # 27 oct: sin la frase de la precarga en la voz (sigue en pantalla), para ir antes al dato
     return n, trozos, precarga, corta
 
 
