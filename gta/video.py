@@ -12,7 +12,7 @@ import airtable, medios, render, render2, voz
 from config import CACHE, T_PUB, cuenta_atras
 
 VOCES = os.path.join(CACHE, "voces")
-EDICION = "v2"  # 25 oct: edición nueva (render2 + encuadre). Si cambia, la repesca rehace los vídeos sin publicar
+EDICION = "v3"  # 27 oct: sin cierre de marca (v2, 25 oct: edición nueva (render2 + encuadre). Si cambia, la repesca rehace los vídeos sin publicar
 
 
 def huella(*partes):
