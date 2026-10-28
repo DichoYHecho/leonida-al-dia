@@ -11,8 +11,19 @@ runs:
     - name: Instalar FFmpeg y la fuente Inter
       shell: bash
       run: |
-        sudo apt-get update -q
-        sudo apt-get install -y -q ffmpeg fonts-inter
+        # 28 oct: el 27 oct esta instalación se colgó 30 min y se perdió la publicación de las 12:00.
+        # Cada intento tiene como máximo 5 minutos; si no termina, se corta y se reintenta (3 veces).
+        for i in 1 2 3; do
+          if timeout 300 sudo bash -c 'apt-get update -q -o Acquire::Retries=3 -o Acquire::http::Timeout=30 && DEBIAN_FRONTEND=noninteractive apt-get install -y -q -o Acquire::Retries=3 -o Acquire::http::Timeout=30 ffmpeg fonts-inter'; then
+            exit 0
+          fi
+          echo "La instalación de FFmpeg no terminó (intento $i de 3): se corta y se reintenta en 15 s"
+          sudo pkill -9 -x apt-get || true
+          sudo dpkg --configure -a || true
+          sleep 15
+        done
+        echo "No se pudo instalar FFmpeg tras 3 intentos"
+        exit 1
 
     - name: Instalar librerías de Python
       shell: bash
