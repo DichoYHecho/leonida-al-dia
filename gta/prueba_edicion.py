@@ -88,14 +88,26 @@ def hoja(nombre, dur, momentos):
     s.save(os.path.join(OUT, f"hoja_{nombre}.jpg"), quality=85)
 
 
+def con_trozo(caps):
+    """E1 (28 oct): mete el trozo de prueba (por defecto el del logo de GTA VI) como 2.º fondo, si no está ya."""
+    caps = list(caps)
+    t = (os.environ.get("TROZO") or "").strip()
+    if not t or t in caps or not medios.es_trozo(t):
+        return caps
+    return caps[:1] + [t] + caps[1:]
+
+
 def montar(nombre, f, dia, extra=None):
     medios.preparar()
     caps, fondos = [], []
-    for c in medios.validas(f.get("Capturas")):
+    for c in con_trozo(medios.validas(f.get("Capturas"))):
         r = medios.ruta(c)
-        if r.lower().endswith(".mp4"):  # el prototipo solo usa imágenes (los trozos y clips, más adelante)
-            continue
         foco, plano = medios.foco_plano(c)
+        if r.lower().endswith(".mp4"):  # trozo de vídeo (E1: también se prueban, por el logo de GTA VI)
+            print(f"  {nombre} · {c[:40]}: trozo de vídeo", flush=True)
+            caps.append(c)
+            fondos.append((r, foco, plano))
+            continue
         suj = encuadre.sujetos(r, f.get("Titular") or (video.trozos_de(f) or [""])[0])
         print(f"  {nombre} · {c[:40]}: {[s['que'] for s in suj] or 'sin sujetos (foco de siempre)'}", flush=True)
         caps.append(c)
@@ -111,11 +123,21 @@ def montar(nombre, f, dia, extra=None):
                "capturas": fondos,
                "etiqueta": f.get("Etiqueta"), "tipo": f.get("Tipo"), "personaje": f.get("Personaje"),
                "cuenta": pastilla_cuenta(dia), "pie": video.pie(f, nombre_voz.startswith("Piper"), False, caps),
-               "salida": os.path.join(OUT, f"{nombre}.mp4"), "semilla": 3, "tmp": tmp}
+               "salida": os.path.join(OUT, f"{nombre}.mp4"), "semilla": 3, "tmp": tmp,
+               "subs": os.environ.get("SUBS") or "e1"}
         cfg.update(extra or {})
         info = render2.montar(cfg)
         d = info["duracion"]
-        hoja(nombre, d, [0, 0.4, 0.7, 0.9, 1.5, d * 0.3, d * 0.45, d * 0.6, d * 0.75, d - 1.6, d - 0.6, d - 0.1])
+        plan = getattr(render2.montar, "plan_subs", None) or []
+        if plan:  # E1: un fotograma por subtítulo (en su mitad) para revisar que todos se leen
+            hoja(nombre, d, [0] + [(p["a"] + p["b"]) / 2 for p in plan][:23])
+            with open(os.path.join(OUT, f"subtitulos_{nombre}.txt"), "w", encoding="utf-8") as fo:
+                for p in plan:
+                    fo.write(f"{p['a']:6.2f}-{p['b']:6.2f}  zona {p['zona']:5s}  fondo {p['nota']:.2f}  banda {p['banda']:.2f}\n")
+                for a in info.get("avisos", []):
+                    fo.write("AVISO: " + a + "\n")
+        else:
+            hoja(nombre, d, [0, 0.4, 0.7, 0.9, 1.5, d * 0.3, d * 0.45, d * 0.6, d * 0.75, d - 1.6, d - 0.6, d - 0.1])
         print(f"{nombre}: {info} · voz {nombre_voz} · palabras {'Whisper' if pals else 'repartidas'} · {len(caps)} imágenes", flush=True)
         return info
     finally:
@@ -169,7 +191,8 @@ def main():
             fallos.append(f"{nombre}: {e}")
             print(f"⚠️ {nombre}: {e}", flush=True)
     try:
-        cuenta(hoy)
+        if (os.environ.get("CUENTA") or "no").strip().lower() in ("si", "sí"):  # gasta 1 audio de Gemini
+            cuenta(hoy)
     except Exception as e:
         fallos.append(f"cuenta atrás: {e}")
         print(f"⚠️ cuenta atrás: {e}", flush=True)
