@@ -12,7 +12,7 @@ import airtable, medios, render, render2, voz
 from config import CACHE, T_PUB, cuenta_atras
 
 VOCES = os.path.join(CACHE, "voces")
-EDICION = "v3"  # 27 oct: sin cierre de marca (v2, 25 oct: edición nueva (render2 + encuadre). Si cambia, la repesca rehace los vídeos sin publicar
+EDICION = "v4"  # 29 oct: subtítulos siempre legibles (fase E1, subtitulos.py). v3, 27 oct: sin cierre de marca (v2, 25 oct: edición nueva (render2 + encuadre). Si cambia, la repesca rehace los vídeos sin publicar
 
 
 def huella(*partes):
@@ -80,11 +80,12 @@ def montar(f, dia, semilla, salida_dir, extra=None):
             "etiqueta": f.get("Etiqueta"), "tipo": f.get("Tipo"), "personaje": f.get("Personaje"),
             "cuenta": cuenta_atras(dia), "pie": pie(f, reserva, any(medios.con_sonido(c) for c in caps), caps), "salida": salida,
             "semilla": int(huella((f.get("Guion") or "").strip())[:6], 16) % 1000, "tmp": tmp,
+            "subs": "e1",  # 29 oct: fase E1 (zona segura, banda oscura según el fondo, logo de GTA VI encogido)
             **(extra or {})})  # extra: p. ej. el reloj de la cuenta atrás
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
     cambios.update({"Para el día": dia.isoformat(), "Huella vídeo": huella_video(f, dia)})
-    aviso = "\n".join(a for a in (aviso, aviso_img) if a)
+    aviso = "\n".join(a for a in (aviso, aviso_img, *info.get("avisos", [])) if a)  # «Subtítulo tapado» (E1)
     if aviso:
         cambios["Avisos"] = aviso
     info["voz"] = nombre
