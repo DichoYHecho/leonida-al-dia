@@ -1,0 +1,12 @@
+  4.68-  5.14  zona media  fondo 0.01  banda 0.00
+  5.14-  5.76  zona media  fondo 0.01  banda 0.00
+  5.76-  6.46  zona media  fondo 0.01  banda 0.00
+  6.46-  7.70  zona media  fondo 0.01  banda 0.00
+  7.70-  8.89  zona media  fondo 0.27  banda 0.45
+  8.98-  9.22  zona media  fondo 0.28  banda 0.45
+  9.22-  9.64  zona media  fondo 0.27  banda 0.44
+  9.64- 10.68  zona media  fondo 0.27  banda 0.45
+ 10.68- 11.08  zona media  fondo 0.04  banda 0.00
+ 11.08- 11.96  zona media  fondo 0.04  banda 0.00
+ 11.96- 12.74  zona media  fondo 0.08  banda 0.00
+ 12.74- 13.74  zona media  fondo 0.08  banda 0.00
