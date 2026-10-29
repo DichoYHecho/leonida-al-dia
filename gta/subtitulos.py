@@ -10,8 +10,9 @@
 - Control: cada grupo queda anotado (zona, banda, nota del fondo) y si ni con la banda queda limpio, se avisa
   («Subtítulo tapado»).
 """
+import os
 import numpy as np
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageEnhance, ImageFilter
 
 W, H = 1080, 1920
 CX = 510           # centro horizontal (30 px a la izquierda: botones de la derecha)
@@ -19,15 +20,35 @@ ANCHO = 800        # ancho máximo del texto (de 110 a 910 px)
 ALTO_ZONA = 200    # alto que se mide alrededor de la línea
 ZONAS = (("media", 1180, 0.0), ("baja", 1360, 0.02), ("alta", 440, 0.06))  # nombre, centro y, penalización
 LIMPIO = 0.18      # por debajo, el fondo no molesta: zona media y sin banda
-BANDA_MAX = 0.72   # opacidad máxima de la banda oscura
+BANDA_MAX = 0.78   # opacidad máxima de la banda oscura
+CAMBIAR = 0.40     # la zona solo cambia si la media pasa de esto…
+MEJORA = 0.15      # …y la otra es al menos esto más limpia
 TAPADO = 0.85      # nota tan alta que ni con la banda se garantiza la lectura → aviso
+ENCOGER_LOGO = (0.72, -260)  # trozos con el logo de GTA VI: tamaño y desplazamiento vertical (sube)
 
 
-def nota_fondo(rgb, cy):
+def es_logo(ruta):
+    """Trozo oficial con el logo grande de GTA VI (p. ej. Mirada_Logo.mp4)."""
+    return "logo" in os.path.basename(str(ruta)).lower()
+
+
+def encoger(img, s, dy):
+    """Encoge el fotograma y lo sube, sobre una versión borrosa y oscura de sí mismo: el logo deja libre la zona de
+    los subtítulos y el gancho."""
+    fondo = img.resize((W // 8, H // 8), Image.BILINEAR).filter(ImageFilter.GaussianBlur(2)).resize((W, H), Image.BILINEAR)
+    fondo = ImageEnhance.Brightness(fondo).enhance(0.35)
+    pw, ph = int(W * s), int(H * s)
+    fondo.paste(img.resize((pw, ph), Image.BILINEAR), ((W - pw) // 2, (H - ph) // 2 + dy))
+    return fondo
+
+
+def nota_fondo(rgb, cy, caja=None):
     """Nota de 0 (fondo oscuro y liso) a ~1,5 (claro, de colores vivos y con mucho detalle) del trozo de imagen
-    donde iría el subtítulo. rgb: array (H, W, 3) uint8."""
+    donde iría el subtítulo (o de la caja x0, y0, x1, y1). rgb: array (H, W, 3) uint8."""
     y0, y1 = int(max(0, cy - ALTO_ZONA / 2)), int(min(H, cy + ALTO_ZONA / 2))
     x0, x1 = CX - ANCHO // 2, CX + ANCHO // 2
+    if caja:
+        x0, y0, x1, y1 = (int(min(max(v, 0), m)) for v, m in zip(caja, (W, H, W, H)))
     a = rgb[y0:y1:4, x0:x1:4].astype(np.float32) / 255
     lum = a[..., 0] * 0.299 + a[..., 1] * 0.587 + a[..., 2] * 0.114
     claro = float((lum > 0.6).mean())
@@ -82,10 +103,9 @@ def planificar(grupos, t_pregunta, fondo_rgb, tramo_de, gancho=None):
     # zona por tramo: la de menor nota (peor caso del tramo), con preferencia por la media
     zona_tramo = {}
     for k, notas in por_tramo.items():
-        if notas["media"] <= LIMPIO:
-            zona_tramo[k] = "media"
-        else:
-            zona_tramo[k] = min(ZONAS, key=lambda z: notas[z[0]] + z[2])[0]
+        mejor = min(ZONAS, key=lambda z: notas[z[0]] + z[2])
+        cambia = notas["media"] >= CAMBIAR and notas[mejor[0]] + mejor[2] <= notas["media"] - MEJORA
+        zona_tramo[k] = mejor[0] if cambia else "media"
     cy_de = {n: cy for n, cy, _ in ZONAS}
     plan, avisos = [], []
     for i, ((a, b), notas) in enumerate(zip(ints, muestras)):
@@ -102,6 +122,32 @@ def planificar(grupos, t_pregunta, fondo_rgb, tramo_de, gancho=None):
             texto = " ".join(p[1] for p in grupos[i])
             avisos.append(f"Subtítulo tapado ({a:.1f} s, «{texto}», fondo {nota:.2f})")
     return plan, avisos
+
+
+def plan_gancho(fondo_rgb, caja, salida, abajo):
+    """Banda detrás del gancho (portada) si el fondo lo pide. caja: (x0, y0, x1, y1) del texto del gancho."""
+    if not caja:
+        return None
+    nota = max(nota_fondo(fondo_rgb(t), 0, caja) for t in (0.0, salida * 0.5, max(salida - 0.05, 0.0)))
+    banda = banda_para(nota)
+    return {"caja": caja, "banda": banda, "nota": nota, "salida": salida, "dura": 0.15 if abajo else 0.22}
+
+
+def dibujar_banda_gancho(img, t, pg):
+    """Banda oscura detrás del gancho; se apaga cuando el gancho se va."""
+    if not pg or pg["banda"] <= 0:
+        return
+    e = 0.0
+    if t > pg["salida"]:
+        x = min(max((t - pg["salida"]) / pg["dura"], 0.0), 1.0)
+        e = x * x * (3 - 2 * x)
+    if e >= 1:
+        return
+    x0, y0, x1, y1 = pg["caja"]
+    capa = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    ImageDraw.Draw(capa).rounded_rectangle([max(x0 - 36, 20), y0 - 24, min(x1 + 36, W - 20), y1 + 24], 40,
+                                           fill=(10, 14, 38, int(255 * pg["banda"] * (1 - e))))
+    img.alpha_composite(capa)
 
 
 def dibujar(img, t, plan, grupos, f, acento, r):
