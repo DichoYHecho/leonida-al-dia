@@ -10,7 +10,7 @@ Cambios frente a render.py (plantilla estática):
 - Primer fotograma pensado como portada: el gancho entero y grande desde el fotograma 0.
 - Intro de marca (destello de luz al empezar). El cierre de marca (logo y @) se quitó el 27 oct.
 - Barra de progreso arriba.
-- Cuenta atrás (cfg["cuenta"]) : número gigante que baja del de ayer al de hoy con impacto, y luego «DATO DEL DÍA».
+- Cuenta atrás (cfg["cuenta"]): número gigante que baja del de ayer al de hoy con impacto, y luego «DATO DEL DÍA».
 
 Entrada: igual que render.montar (trozos, tiempos, voz, capturas, etiqueta, tipo, personaje, cuenta, pie, salida,
 semilla, tmp) más, opcionales: «palabras» [(texto, ini, fin)] de Whisper, «cuenta_atras» (ver montar) y, en cada
