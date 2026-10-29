@@ -10,7 +10,7 @@ Cambios frente a render.py (plantilla estática):
 - Primer fotograma pensado como portada: el gancho entero y grande desde el fotograma 0.
 - Intro de marca (destello de luz al empezar). El cierre de marca (logo y @) se quitó el 27 oct.
 - Barra de progreso arriba.
-- Cuenta atrás (cfg["cuenta"]): número gigante que baja del de ayer al de hoy con impacto, y luego «DATO DEL DÍA».
+- Cuenta atrás (cfg["cuenta"]) : número gigante que baja del de ayer al de hoy con impacto, y luego «DATO DEL DÍA».
 
 Entrada: igual que render.montar (trozos, tiempos, voz, capturas, etiqueta, tipo, personaje, cuenta, pie, salida,
 semilla, tmp) más, opcionales: «palabras» [(texto, ini, fin)] de Whisper, «cuenta_atras» (ver montar) y, en cada
@@ -404,6 +404,9 @@ class VideoFondo:
         if extra != 1.0 or dx:
             img = img.transform((W, H), Image.AFFINE, (1 / extra, 0, W / 2 * (1 - 1 / extra) - dx / extra, 0, 1 / extra,
                                                        H / 2 * (1 - 1 / extra)), resample=Image.BILINEAR)
+        if getattr(self, "encoger", None):  # E1: trozo con el logo de GTA VI
+            import subtitulos
+            img = subtitulos.encoger(img, *self.encoger)
         return img
 
     def y_sujetos(self, p=0.0):
@@ -825,18 +828,23 @@ def montar(cfg):
     e1 = cfg.get("subs") == "e1"  # fase E1 (28 oct): subtítulos siempre legibles (subtitulos.py)
     if e1:
         import sys, subtitulos
+        for x in fondos:  # el logo grande de GTA VI se encoge y sube (deja libres el gancho y los subtítulos)
+            if isinstance(x, VideoFondo) and subtitulos.es_logo(x.ruta):
+                x.encoger = subtitulos.ENCOGER_LOGO
     grupos = grupos_subtitulos(pals, range(t_sub_ini, ultimo), f_sub, ancho=subtitulos.ANCHO if e1 else 860)
     gancho_ws = [(w, a, b) for k, w, a, b in pals if k == 0]
     viñeta = capa_viñeta()
     salida_gancho = tiempos[0][1] + 0.12
     ys = fondos[0].y_sujetos(0.0)
     y_gancho = 1260 if ys is not None and ys < 0.5 else 470  # que el gancho no tape las caras
+    if e1 and getattr(fondos[0], "encoger", None):
+        y_gancho = 1260  # E1: el logo (encogido) queda arriba; el gancho, debajo
     if y_gancho > 900:  # abajo se cruzaría con el primer subtítulo: sale antes
         salida_gancho = tiempos[0][1] - 0.02
     t_pregunta = tiempos[ultimo][0] - 0.05
     t_cierre = dur + 1.0 # 27 oct: ya no sale el cierre de marca (logo y @): alargaba el final y hacía que la gente deslizara
     salida = cfg["salida"]
-    plan_subs, avisos_subs = [], []
+    plan_subs, avisos_subs, plan_g = [], [], None
     if e1:
         def fondo_rgb(t):
             b, _ = fondo_en(t, fondos, tramos, estilo_trans)
@@ -847,6 +855,12 @@ def montar(cfg):
 
         fin_gancho = None if ca else (salida_gancho + (0.15 if y_gancho > 900 else 0.22), y_gancho)
         plan_subs, avisos_subs = subtitulos.planificar(grupos, t_pregunta, fondo_rgb, tramo_de, fin_gancho)
+        if not ca:  # banda detrás del gancho (portada) si el fondo lo pide
+            capa_g = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+            gancho(capa_g, 0.0, gancho_ws, acento, salida_gancho, y_gancho)
+            plan_g = subtitulos.plan_gancho(fondo_rgb, capa_g.getbbox(), salida_gancho, y_gancho > 900)
+            if plan_g:
+                print(f"  Gancho E1: y {y_gancho} · fondo {plan_g['nota']:.2f} · banda {plan_g['banda']:.2f}", flush=True)
         for x in fondos:
             if isinstance(x, VideoFondo):
                 x.cerrar()
@@ -871,6 +885,8 @@ def montar(cfg):
         img = barrido_luz(img, t)
         cabecera(img, t, cfg, mostrar_cuenta=not en_intro)
         if not ca:
+            if e1:
+                subtitulos.dibujar_banda_gancho(img, t, plan_g)
             gancho(img, t, gancho_ws, acento, salida_gancho, y_gancho)
         if ca:
             sello(img, t, "DATO DEL DÍA", tiempos[ca["trozo_dato"]][0] - 0.05, AMBER)
