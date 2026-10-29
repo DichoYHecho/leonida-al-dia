@@ -404,6 +404,9 @@ class VideoFondo:
         if extra != 1.0 or dx:
             img = img.transform((W, H), Image.AFFINE, (1 / extra, 0, W / 2 * (1 - 1 / extra) - dx / extra, 0, 1 / extra,
                                                        H / 2 * (1 - 1 / extra)), resample=Image.BILINEAR)
+        if getattr(self, "encoger", None):  # E1: trozo con el logo de GTA VI
+            import subtitulos
+            img = subtitulos.encoger(img, *self.encoger)
         return img
 
     def y_sujetos(self, p=0.0):
@@ -822,17 +825,48 @@ def montar(cfg):
     # subtítulos
     t_sub_ini = (ca["trozo_dato"] + 1) if ca else 1
     f_sub = fuente(FB, 90)
-    grupos = grupos_subtitulos(pals, range(t_sub_ini, ultimo), f_sub)
+    e1 = cfg.get("subs") == "e1"  # fase E1 (28 oct): subtítulos siempre legibles (subtitulos.py)
+    if e1:
+        import sys, subtitulos
+        for x in fondos:  # el logo grande de GTA VI se encoge y sube (deja libres el gancho y los subtítulos)
+            if isinstance(x, VideoFondo) and subtitulos.es_logo(x.ruta):
+                x.encoger = subtitulos.ENCOGER_LOGO
+    grupos = grupos_subtitulos(pals, range(t_sub_ini, ultimo), f_sub, ancho=subtitulos.ANCHO if e1 else 860)
     gancho_ws = [(w, a, b) for k, w, a, b in pals if k == 0]
     viñeta = capa_viñeta()
     salida_gancho = tiempos[0][1] + 0.12
     ys = fondos[0].y_sujetos(0.0)
     y_gancho = 1260 if ys is not None and ys < 0.5 else 470  # que el gancho no tape las caras
+    if e1 and getattr(fondos[0], "encoger", None):
+        y_gancho = 1260  # E1: el logo (encogido) queda arriba; el gancho, debajo
     if y_gancho > 900:  # abajo se cruzaría con el primer subtítulo: sale antes
         salida_gancho = tiempos[0][1] - 0.02
     t_pregunta = tiempos[ultimo][0] - 0.05
     t_cierre = dur + 1.0 # 27 oct: ya no sale el cierre de marca (logo y @): alargaba el final y hacía que la gente deslizara
     salida = cfg["salida"]
+    plan_subs, avisos_subs, plan_g = [], [], None
+    if e1:
+        def fondo_rgb(t):
+            b, _ = fondo_en(t, fondos, tramos, estilo_trans)
+            return np.asarray(Image.alpha_composite(b.convert("RGBA"), viñeta).convert("RGB"))
+
+        def tramo_de(t):
+            return max([j for j in range(len(tramos)) if tramos[j][1] <= t + 1e-6] or [0])
+
+        fin_gancho = None if ca else (salida_gancho + (0.15 if y_gancho > 900 else 0.22), y_gancho)
+        plan_subs, avisos_subs = subtitulos.planificar(grupos, t_pregunta, fondo_rgb, tramo_de, fin_gancho)
+        if not ca:  # banda detrás del gancho (portada) si el fondo lo pide
+            capa_g = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+            gancho(capa_g, 0.0, gancho_ws, acento, salida_gancho, y_gancho)
+            plan_g = subtitulos.plan_gancho(fondo_rgb, capa_g.getbbox(), salida_gancho, y_gancho > 900)
+            if plan_g:
+                print(f"  Gancho E1: y {y_gancho} · fondo {plan_g['nota']:.2f} · banda {plan_g['banda']:.2f}", flush=True)
+        for x in fondos:
+            if isinstance(x, VideoFondo):
+                x.cerrar()
+        print("  Subtítulos E1: " + subtitulos.informe(plan_subs), flush=True)
+        for aviso in avisos_subs:
+            print("  ⚠️ " + aviso, flush=True)
 
     def fotograma(i):
         t = i / FPS
@@ -851,11 +885,13 @@ def montar(cfg):
         img = barrido_luz(img, t)
         cabecera(img, t, cfg, mostrar_cuenta=not en_intro)
         if not ca:
+            if e1:
+                subtitulos.dibujar_banda_gancho(img, t, plan_g)
             gancho(img, t, gancho_ws, acento, salida_gancho, y_gancho)
         if ca:
             sello(img, t, "DATO DEL DÍA", tiempos[ca["trozo_dato"]][0] - 0.05, AMBER)
         # subtítulos
-        if t < t_pregunta:
+        if t < t_pregunta and not e1:
             for g_i, g in enumerate(grupos):
                 a = g[0][2] - 0.06
                 b = grupos[g_i + 1][0][2] - 0.06 if g_i + 1 < len(grupos) else g[-1][3] + 0.3
@@ -878,6 +914,8 @@ def montar(cfg):
         barra_progreso(img, t, dur, acento if acento != WHITE else AMBER)
         if flash > 0:
             img = Image.alpha_composite(img, Image.new("RGBA", (W, H), (255, 255, 255, int(255 * min(flash, 0.8)))))
+        if e1:  # capa siempre encima: los subtítulos se pintan los últimos (también encima del destello)
+            subtitulos.dibujar(img, t, plan_subs, grupos, f_sub, acento if acento != WHITE else AMBER, sys.modules[__name__])
         out = img.convert("RGB")
         if temblor:
             out = out.transform((W, H), Image.AFFINE, (1, 0, temblor, 0, 1, -temblor // 2), resample=Image.NEAREST)
@@ -906,7 +944,11 @@ def montar(cfg):
     if mb > MAX_MB:  # Airtable admite como mucho 5 MB por archivo
         mb = codificar(int(1800 * MAX_MB / mb * 0.85))
     montar.fotograma = fotograma  # para sacar fotogramas sueltos en las pruebas
-    return {"duracion": round(dur, 1), "mb": round(mb, 2)}
+    montar.plan_subs = plan_subs
+    res = {"duracion": round(dur, 1), "mb": round(mb, 2)}
+    if e1:
+        res["avisos"] = avisos_subs
+    return res
 
 
 def _corte_cerca(ideal, tiempos):

@@ -9,6 +9,12 @@ on:
       dato:
         description: "Texto del titular del dato de prueba"
         default: "Boobie Ike"
+      trozo:
+        description: "Trozo oficial que se mete como 2.º fondo (E1: el del logo de GTA VI)"
+        default: "Mirada_Logo"
+      cuenta:
+        description: "¿Montar también la cuenta atrás? (gasta 1 audio de Gemini: si/no)"
+        default: "no"
 
 permissions:
   contents: write
@@ -26,6 +32,9 @@ jobs:
       GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
       NOTICIA: ${{ inputs.noticia }}
       DATO: ${{ inputs.dato }}
+      TROZO: ${{ inputs.trozo }}
+      CUENTA: ${{ inputs.cuenta }}
+      SUBS: e1
     steps:
       - uses: actions/checkout@v5
       - uses: ./.github/actions/entorno
@@ -45,7 +54,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: prueba-edicion-v2
+          name: prueba-edicion-e1
           path: salida_edicion/
           retention-days: 7
       - name: Dejar los vídeos en la rama prueba-edicion (para verlos sin descargar)
