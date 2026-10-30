@@ -32,6 +32,10 @@ on:
         description: "Redes a las que volver a mandarla (reel, tiktok, youtube)"
         required: false
         default: "reel"
+      para:
+        description: "Hora de Madrid (HH:MM) a la que dejarla programada en Buffer; vacío = publicar ya (30 oct)"
+        required: false
+        default: ""
 
 concurrency:
   group: publicar
@@ -92,6 +96,7 @@ jobs:
           QUE: ${{ inputs.que }}
           REINTENTAR: ${{ inputs.reintentar }}
           REDES: ${{ inputs.redes }}
+          PARA_MANUAL: ${{ inputs.para }}
         run: |
           case "$HORA" in
             11:15) export PARA=12:00 ;;
@@ -99,6 +104,7 @@ jobs:
             20:15) export PARA=21:00 ;;
             18:45) export PARA=19:30 ;;
           esac
+          if [ -n "$PARA_MANUAL" ]; then export PARA="$PARA_MANUAL"; fi
           if [ "$HORA" = "23:17" ] || [ "$QUE" = "lanzamiento" ]; then
             python gta/lanzamiento.py
           elif [ "$HORA" = "16:15" ] || [ "$QUE" = "cuenta_atras" ]; then
