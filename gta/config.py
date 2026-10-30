@@ -15,7 +15,7 @@ T_DATOS = "Datos"
 # Buffer (segunda cuenta Free, la de adria.sanandreas)
 CANAL_IG = "6ad768d7778b240e2f697abc"
 CANAL_TT = "6ad7696b778b240e2f69823a"
-CANAL_YT = 6ae49b912f1f5ed648202118"
+CANAL_YT = "6ae49b912f1f5ed648202118"  # canal nuevo @LeonidaalDiaGTA6 (30 oct 2026)
 YT_CATEGORIA = "20"  # Videojuegos
 
 # Gemini
