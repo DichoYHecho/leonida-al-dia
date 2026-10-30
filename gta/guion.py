@@ -34,12 +34,12 @@ FORMATO = """Devuelve SOLO un JSON con estos campos:
   "gancho": "primera frase, máximo 60 caracteres (8-10 palabras), que sale en grande en la portada: lo más llamativo y concreto del vídeo (una cifra, un nombre, un contraste) con la palabra clave (GTA 6, Vice City, Lucía…). Sin nombrar al medio ni empezar por «Según», «Repasamos», «Conoce» o «Descubre». Varía la forma (una afirmación directa, una cifra, un contraste, una cita corta…). NUNCA empieces por «¿Sabías que» ni hagas una pregunta, y no prometas ni exageres nada que no diga la fuente",
   "cuerpo": ["2 a 4 trozos de máximo 45 caracteres cada uno, que se leen seguidos. Punto al acabar cada frase; si la frase sigue en el trozo siguiente, no pongas coma al final salvo que la gramática la pida"],
   "cierre": "pregunta final para comentar, máximo 60 caracteres",
-  "texto_post": "2 o 3 frases para el texto de la publicación (sin hashtags); la primera, con «GTA 6» y el tema concreto, porque es lo que se busca",
+  "texto_post": "2 o 3 frases para el texto de la publicación (sin hashtags); la primera, con «GTA 6» y el tema concreto, porque es lo que se busca; sin empezar por «Conoce», «Repasamos», «Descubre», «Te contamos» ni «Según», y con las cifras en número (50 temas, 210 GB)",
   "cosas_reales": ["cada cosa REAL y concreta que se nombra en el guion y que NO sale en el juego (un restaurante, un producto, una persona, una portada, una tienda, un evento…), con su nombre propio tal cual, una por elemento (si se nombran dos restaurantes, son dos); [] si todo se puede enseñar con capturas del juego"],
   "imagen_del_juego": true o false (false si lo que se cuenta es algo real que NO sale en el juego y tiene su propia imagen: un producto o aparato, una persona, una portada, un evento, un anuncio, una tienda…; true si se puede enseñar con capturas del juego),
   "capturas": ["2 o 3 nombres EXACTOS del CATÁLOGO DE CAPTURAS que enseñen lo que se cuenta (el mismo personaje o lugar); si hay un trozo de VÍDEO que encaje, pon uno (como mucho dos)"],
   "hashtags": ["1 o 2 hashtags del tema, sin tildes, p. ej. #ViceCity o #Lucia"],
-  "titulo_youtube": "título para YouTube de menos de 70 caracteres que empiece por «GTA 6» o por el nombre concreto (Vice City, Lucía, Jason…) y diga el dato; sin preguntas, sin exagerar y sin engañar"
+  "titulo_youtube": "título para YouTube de menos de 70 caracteres que empiece por «GTA 6» o por el nombre concreto (Vice City, Lucía, Jason…) y diga el dato; sin preguntas, sin exagerar y sin engañar; las cifras siempre en número (50 temas, 210 GB, 2 tráileres), nunca en letra"
 }""" % ", ".join(GRUPOS)
 
 AYUDA_GRUPOS = """Grupos de capturas oficiales (elige el que mejor case con lo que se cuenta; si es algo general como fechas, precio, ventas o tráileres, usa Jason_and_Lucia o Vice_City):
@@ -86,6 +86,28 @@ def hashtags(extra):
     return " ".join(out[:5])
 
 
+NUMEROS = {"dos": 2, "tres": 3, "cuatro": 4, "cinco": 5, "seis": 6, "siete": 7, "ocho": 8, "nueve": 9, "diez": 10,
+           "once": 11, "doce": 12, "trece": 13, "catorce": 14, "quince": 15, "dieciséis": 16, "diecisiete": 17,
+           "dieciocho": 18, "diecinueve": 19, "veinte": 20, "treinta": 30, "cuarenta": 40, "cincuenta": 50,
+           "sesenta": 60, "setenta": 70, "ochenta": 80, "noventa": 90, "cien": 100, "doscientos": 200,
+           "trescientos": 300, "cuatrocientos": 400, "quinientos": 500}
+
+def en_cifras(t):
+    """30 oct: en títulos y textos, las cifras en número («cincuenta temas» → «50 temas»). Solo números sueltos:
+    si van juntos («doscientos diez») o con «y» o «mil» («treinta y dos»), se dejan como están."""
+    if not t:
+        return t
+    partes = re.split(r"(\w+)", t)
+    pos = list(range(1, len(partes), 2))
+    raro = lambda w: w.lower() in NUMEROS or w.lower() in ("y", "mil")
+    for k, i in enumerate(pos):
+        if partes[i].lower() not in NUMEROS:
+            continue
+        vecinos = [partes[pos[k - 1]] if k > 0 else "", partes[pos[k + 1]] if k + 1 < len(pos) else ""]
+        if not any(raro(w) for w in vecinos):
+            partes[i] = str(NUMEROS[partes[i].lower()])
+    return "".join(partes)
+
 def validar(j):
     """Comprueba y recorta lo que devuelve Gemini. Lanza un error si falta lo esencial."""
     cuerpo = [_limpiar(c, 60) for c in (j.get("cuerpo") or []) if str(c).strip()]
@@ -99,9 +121,9 @@ def validar(j):
         "grupo": grupo,
         "trozos": [_limpiar(j["gancho"], 95)] + cuerpo[:6] + [pregunta(_limpiar(j["cierre"], 75))],
         "capturas": validas(", ".join(str(c) for c in (j.get("capturas") or []))),
-        "texto_post": _limpiar(j.get("texto_post"), 600),
+        "texto_post": en_cifras(_limpiar(j.get("texto_post"), 600)),
         "hashtags": hashtags(j.get("hashtags")),
-        "titulo": _limpiar(j.get("titulo_youtube"), 95),
+        "titulo": en_cifras(_limpiar(j.get("titulo_youtube"), 95)),
         "imagen_juego": j.get("imagen_del_juego") is not False and not j.get("cosas_reales"),
         "cosas": [_limpiar(str(c), 60) for c in (j.get("cosas_reales") or []) if str(c).strip()][:3],
     }
@@ -111,7 +133,7 @@ def validar(j):
 # si es una pregunta o empieza por «Según…», «¿Sabías…», «Repasamos»… se pide otro (el texto de Gemini es barato).
 GANCHO_FLOJO = re.compile(r"^\W*(sab[ií]as|seg[uú]n\b|repasamos|conoce\b|descubre\b|te contamos)", re.I)
 AVISO_GANCHO = ("\n\nOJO: el gancho anterior no valía (era una pregunta o empezaba por «Según», «¿Sabías…», «Repasamos» o "
-                "«Conoce»). Escribe un gancho que sea una afirmación corta con lo más llamativo del dato.")
+                "«Conoce»). Escribe un gancho que sea una afirmación corta con lo más llamativo del dato. El texto de la publicación tampoco puede empezar así.")
 
 def gancho_flojo(txt):
     txt = (txt or "").strip()
@@ -122,7 +144,7 @@ def con_buen_gancho(prompt, intentos=3):
     g = None
     for i in range(intentos):
         g = validar(gemini.texto_json(prompt if i == 0 else prompt + AVISO_GANCHO))
-        if not gancho_flojo(g["trozos"][0]):
+        if not gancho_flojo(g["trozos"][0]) and not GANCHO_FLOJO.search(g["texto_post"] or ""):  # 30 oct: también el texto
             return g
         print(f"  (gancho flojo, se pide otro: {g['trozos'][0]})", flush=True)
     return g
