@@ -13,8 +13,12 @@ import requests
 API = "https://www.googleapis.com/youtube/v3"
 
 
-def token():
-    ids = [os.environ.get(k) for k in ("GOOGLE_CLIENT_ID", "GOOGLE_CLIENT_SECRET", "GOOGLE_REFRESH_TOKEN")]
+def token(clave="GOOGLE_REFRESH_TOKEN"):
+    # El canal nuevo (@LeonidaalDiaGTA6, 30 oct) usa su propio permiso (GOOGLE_YT_REFRESH_TOKEN);
+    # Drive (clips) sigue con GOOGLE_REFRESH_TOKEN, de la cuenta principal.
+    if not os.environ.get(clave):
+        clave = "GOOGLE_REFRESH_TOKEN"
+    ids = [os.environ.get(k) for k in ("GOOGLE_CLIENT_ID", "GOOGLE_CLIENT_SECRET", clave)]
     if not all(ids):
         return None
     r = requests.post("https://oauth2.googleapis.com/token", timeout=30,
@@ -68,7 +72,7 @@ def comentar(tok, vid, texto):
 
 def repasar(pubs):
     """pubs = [(título de YouTube, pregunta)] de lo publicado en los últimos 2 días. Devuelve líneas de resumen."""
-    tok = token()
+    tok = token("GOOGLE_YT_REFRESH_TOKEN")
     if not tok:
         return ["YouTube: sin acceso a la API (faltan los secrets GOOGLE_*); se salta"]
     canal, videos = subidos(tok)
