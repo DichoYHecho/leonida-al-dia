@@ -10,9 +10,9 @@
 - Desde el 25 oct (edición V2): vídeo corto con el número gigante, la precarga, «DATO DEL DÍA» y el dato, y de fondo
   una captura distinta cada día (foto_del_dia), sin repetir hasta el lanzamiento.
 - Con PRUEBA = true monta el vídeo en salida_cuenta/ y no toca Airtable (solo lee) ni publica."""
-import csv, os, random, shutil, tempfile
+import csv, os, random, re, shutil, tempfile
 from datetime import date, datetime, timezone
-import airtable, medios, publicar, video
+import airtable, gemini, guion, medios, publicar, video
 from config import AQUI, MADRID, T_PUB, HASHTAGS_FIJOS, PIE_POST
 
 SALIDA = datetime(2026, 11, 19, 0, 0, tzinfo=MADRID)
@@ -67,6 +67,57 @@ def elegir_dato(usados, hoy):
     return None
 
 
+PROMPT_GANCHO = """Este es un dato comprobado sobre GTA 6:
+«%s»
+Escribe la primera frase de un vídeo corto de YouTube con ese dato: máximo 55 caracteres, una afirmación directa con lo
+más llamativo y concreto (una cifra, un nombre, algo curioso). Usa SOLO lo que dice el dato: no añadas nada. Sin
+preguntas, sin «¿Sabías…», sin empezar por «Según», «Conoce» o «Descubre», sin nombrar al medio y sin exagerar.
+Responde solo con JSON: {"gancho": "..."}"""
+
+def gancho_gemini(dato):
+    """30 oct: Gemini resume el dato en un gancho corto (solo texto, gratis). None si no vale: entonces se usa el
+    principio del dato tal cual (gancho_dato). El dato entero se lee después, como siempre."""
+    try:
+        j = gemini.texto_json(PROMPT_GANCHO % dato, 0.5)
+        g = " ".join(str((j if isinstance(j, dict) else {}).get("gancho") or "").split())
+    except Exception as e:
+        print(f"  (gancho de Gemini no disponible: {str(e)[:120]})", flush=True)
+        return None
+    cifras_ok = all(c in dato for c in re.findall(r"\d+", g))
+    if not (12 <= len(g) <= 65) or guion.gancho_flojo(g) or "?" in g or not cifras_ok:
+        print(f"  (gancho de Gemini descartado: {g})", flush=True)
+        return None
+    return g
+
+def gancho_dato(dato, maximo=70):
+    """30 oct: el principio del dato hace de gancho (la primera frase si cabe; si no, hasta una coma o dos puntos).
+    Devuelve (gancho, resto del dato)."""
+    dato = " ".join(dato.split())
+    frases = re.split(r"(?<=[.!?…])\s+", dato, maxsplit=1)
+    primera, resto = frases[0], (frases[1] if len(frases) > 1 else "")
+    if len(primera) <= maximo:
+        return primera, resto
+    cortes = [m.end() for m in re.finditer(r"[,:;]", primera) if 20 <= m.end() <= maximo]
+    if cortes:
+        i = cortes[-1]
+    else:
+        i = primera.rfind(" ", 0, maximo - 1)
+        if i < 20:
+            return primera, resto
+    gancho = primera[:i].rstrip(" ,;") + ("" if primera[i - 1] == ":" else "…")
+    return gancho, (primera[i:].strip() + " " + resto).strip()
+
+def titulo_dato(dato, n, gancho=None):
+    """30 oct: título de YouTube = el dato (su primera frase) y, si cabe, los días que faltan."""
+    t = (gancho.rstrip(" .:") if gancho and not gancho.endswith("…")
+         else re.split(r"(?<=[.!?…])\s+", " ".join(dato.split()), maxsplit=1)[0].rstrip(" ."))
+    if len(t) > 85:
+        t = gancho_dato(dato)[0].rstrip(" …:,;")
+    if "GTA" not in t.upper():
+        t = "GTA 6 · " + t
+    cola = " (sale mañana)" if n == 1 else f" (faltan {n} días)"
+    return t + cola if len(t + cola) <= 100 else t[:100]
+
 def textos(hoy, ahora, d):
     n = (SALIDA.date() - hoy).days
     p = (PRECARGA.date() - hoy).days
@@ -83,7 +134,15 @@ def textos(hoy, ahora, d):
         precarga, corta = "La precarga digital ya está abierta.", "Precarga abierta desde el 12 de noviembre"
     voz_precarga = ("La precarga digital, el 12 de noviembre." if p > 1 else "¡La precarga digital empieza mañana!" if p == 1
                     else "¡Hoy empieza la precarga digital!" if p == 0 else "La precarga digital ya está abierta.")
-    trozos = [gancho, "Y el dato del día:"] + partir(d["Dato"]) + [PREGUNTAS[hoy.toordinal() % len(PREGUNTAS)]]
+    # 30 oct: el dato es el gancho (y el título); los días que faltan van pequeños en la esquina y al final de la voz
+    inicio = gancho_gemini(d["Dato"])
+    if inicio:
+        cuerpo = partir(d["Dato"])
+    else:
+        inicio, resto_dato = gancho_dato(d["Dato"])
+        cuerpo = partir(resto_dato) if resto_dato else []
+    final = "¡GTA 6 sale mañana!" if n == 1 else f"Faltan {n} días para GTA 6."
+    trozos = [inicio] + cuerpo + [final, PREGUNTAS[hoy.toordinal() % len(PREGUNTAS)]]
     # 27 oct: sin la frase de la precarga en la voz (sigue en pantalla), para ir antes al dato
     return n, trozos, precarga, corta
 
@@ -104,16 +163,16 @@ def main():
     n, trozos, precarga, corta = textos(hoy, ahora, d)
     oficial = d["Estado"] == "Oficial"
     grupo = d.get("Imagen sugerida") if d.get("Imagen sugerida") in medios.GRUPOS else "Vice_City"
-    caps = medios.elegir(grupo, d["Orden"], 1)
-    caption = (f"Faltan {n} días para GTA 6: sale el jueves 19 de noviembre en PS5 y Xbox Series X|S. {precarga}\n"
-               f"Dato del día: {d['Dato']}\n\n"
+    caps = medios.elegir(grupo, d["Orden"], 2)  # 30 oct: 2 capturas del tema (sin la foto del día)
+    caption = (f"{d['Dato']}\n\n"
+               f"Faltan {n} días para GTA 6: sale el jueves 19 de noviembre en PS5 y Xbox Series X|S. {precarga}\n\n"
                "Cuenta atrás hasta las 00:00 (hora de España): Rockstar no ha confirmado la hora de salida.\n"
                f"Fuente del dato: {d['Fuente']}{'' if oficial else ' (según medios)'}\n{PIE_POST}\n\n"
                + " ".join(HASHTAGS_FIJOS + ["#CuentaAtras"]))
     f = {"Titular": f"Cuenta atrás: faltan {n} días (dato {d['Orden']})", "Estado": "Por Revisar", "Tipo": "Dato",
-         "Info": "Oficial" if oficial else "Según medios", "Guion": "\n".join(trozos), "Etiqueta": "CUENTA ATRÁS",
+         "Info": "Oficial" if oficial else "Según medios", "Guion": "\n".join(trozos), "Etiqueta": (d.get("Tema") or "Dato del día").upper(),
          "Personaje": False, "Capturas": ", ".join(caps), "Caption": caption,
-         "Título YouTube": f"Faltan {n} días para GTA 6: cuenta atrás y dato del día",
+         "Título YouTube": titulo_dato(d["Dato"], n, trozos[0]),
          "Fuente": d["Fuente"], "Enlace": d["Enlace"], "Texto de la fuente": d["Dato"], "Orden dato": int(d["Orden"]),
          "Creada": datetime.now(timezone.utc).isoformat(timespec="seconds"),
          "Avisos": "Cuenta atrás de las 17:00: se publica sola"}
@@ -127,7 +186,7 @@ def main():
                               "trozos_intro": 1, "trozo_dato": 1, "fondo_intro": medios.ruta(intro),
                               "foco_intro": medios.CAPTURAS[intro]["foco"]}}
     print(f"Foto del día: {intro}", flush=True)
-    ruta, info, cambios = video.montar(f, hoy, "cuenta-atras", carpeta, extra)
+    ruta, info, cambios = video.montar(f, hoy, "cuenta-atras", carpeta)  # 30 oct: sin el número gigante ("extra" ya no se usa)
     if info["voz"].startswith("Piper"):
         f["Caption"] = f["Caption"].replace("\n\n#", "\nVoz: sharvard (CC BY 3.0)\n\n#", 1)
     print(f"Vídeo: {info}", flush=True)
