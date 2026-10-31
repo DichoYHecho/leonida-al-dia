@@ -33,7 +33,7 @@ runs:
       uses: actions/cache@v4
       with:
         path: cache/capturas
-        key: capturas-v1
+        key: capturas-v2  # 31 oct: + arte oficial en vertical (arte.csv)
 
     - name: Caché de los trozos de vídeo oficiales (se cortan de nuevo si cambia trozos.csv)
       uses: actions/cache@v4
