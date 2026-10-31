@@ -1,56 +1,43 @@
-Lanz_Cartel: Lanzamiento 2.79 + 4.06 s  · cortes cerca: 2.67, 6.97, 9.97
-Lanz_Puerto_Aereo: Lanzamiento 2.79 + 4.06 s  · cortes cerca: 2.67, 6.97, 9.97, 11.90
-Lanz_Muelle: Lanzamiento 10.09 + 1.69 s  · cortes cerca: 2.67, 6.97, 9.97, 11.90, 14.20, 15.17
-Lanz_Noche: Lanzamiento 15.50 + 5.00 s  · cortes cerca: 11.90, 14.20, 15.17, 21.17
-Lanz_Atardecer: Lanzamiento 21.29 + 4.96 s  · cortes cerca: 21.17, 26.37, 27.83, 29.40, 32.80
-Lanz_Descapotable: Lanzamiento 26.49 + 1.23 s corto · cortes cerca: 21.17, 26.37, 27.83, 29.40, 32.80, 33.63
-Lanz_Paseo: Lanzamiento 40.55 + 1.66 s  · cortes cerca: 32.80, 33.63, 35.07, 36.47, 38.00, 39.00, 40.43, 42.33, 45.07, 46.97
-Lanz_Deportivo: Lanzamiento 45.19 + 1.66 s  · cortes cerca: 39.00, 40.43, 42.33, 45.07, 46.97, 48.90, 54.20
-Lanz_Moto_Salto: Lanzamiento 49.02 + 4.00 s  · cortes cerca: 42.33, 45.07, 46.97, 48.90, 54.20, 55.17, 57.07
-Lanz_Balcon: Lanzamiento 67.19 + 1.23 s corto · cortes cerca: 59.90, 63.17, 64.03, 67.07, 68.53, 70.87, 72.07, 72.77, 73.80
-Lanz_Logo: Lanzamiento 72.89 + 0.79 s corto · cortes cerca: 67.07, 68.53, 70.87, 72.07, 72.77, 73.80
-Lanz_Fecha: Lanzamiento 81.00 + 4.00 s  · cortes cerca: 88.67
-T1_Autopista: Trailer_1 2.79 + 2.09 s  · cortes cerca: 2.67, 5.00, 6.53, 8.47, 9.63, 10.93
-T1_Lancha: Trailer_1 9.75 + 1.06 s corto · cortes cerca: 2.67, 5.00, 6.53, 8.47, 9.63, 10.93, 18.37
-T1_Motos_Agua: Trailer_1 11.05 + 4.00 s  · cortes cerca: 5.00, 6.53, 8.47, 9.63, 10.93, 18.37, 19.17
-T1_Playa: Trailer_1 11.50 + 4.00 s  · cortes cerca: 6.53, 8.47, 9.63, 10.93, 18.37, 19.17
-T1_Torres: Trailer_1 14.25 + 4.00 s  · cortes cerca: 10.93, 18.37, 19.17, 21.73, 23.27, 24.83
-T1_Humedal: Trailer_1 19.29 + 2.33 s  · cortes cerca: 18.37, 19.17, 21.73, 23.27, 24.83, 27.43
-T1_Lancha_Rapida: Trailer_1 23.39 + 1.33 s corto · cortes cerca: 18.37, 19.17, 21.73, 23.27, 24.83, 27.43, 28.97, 30.00, 31.03
-T1_Calle: Trailer_1 24.95 + 2.36 s  · cortes cerca: 19.17, 21.73, 23.27, 24.83, 27.43, 28.97, 30.00, 31.03, 32.57, 34.13
-T1_Noche_Aerea: Trailer_1 31.15 + 1.29 s corto · cortes cerca: 24.83, 27.43, 28.97, 30.00, 31.03, 32.57, 34.13, 35.67, 37.43
-T1_Neones: Trailer_1 32.69 + 1.33 s corto · cortes cerca: 27.43, 28.97, 30.00, 31.03, 32.57, 34.13, 35.67, 37.43, 39.80
-T1_Puente_Cayos: Trailer_1 35.79 + 1.53 s  · cortes cerca: 28.97, 30.00, 31.03, 32.57, 34.13, 35.67, 37.43, 39.80, 41.33, 42.40, 43.90
-T1_Letras_Vice: Trailer_1 39.92 + 1.29 s corto · cortes cerca: 32.57, 34.13, 35.67, 37.43, 39.80, 41.33, 42.40, 43.90, 45.47, 46.53, 47.53
-T2_Cayos_Aereo: Trailer_2 4.00 + 4.00 s  · cortes cerca: 0.17, 8.13, 9.80, 11.47, 13.67
-T2_Casa_Pilotes: Trailer_2 4.01 + 4.00 s  · cortes cerca: 0.17, 8.13, 9.80, 11.47, 13.67
-T2_Brian: Trailer_2 13.79 + 4.93 s  · cortes cerca: 8.13, 9.80, 11.47, 13.67, 18.83, 20.47
-T2_Jason_Tejado: Trailer_2 18.95 + 1.39 s corto · cortes cerca: 13.67, 18.83, 20.47, 23.27, 27.33
-T2_Jason_Conduce: Trailer_2 27.45 + 4.73 s  · cortes cerca: 23.27, 27.33, 32.30, 33.20, 34.60
-T2_Autopista: Trailer_2 34.72 + 3.53 s  · cortes cerca: 32.30, 33.20, 34.60, 38.37, 41.60
-T2_Gimnasio_Playa: Trailer_2 38.49 + 2.99 s  · cortes cerca: 32.30, 33.20, 34.60, 38.37, 41.60, 45.27
-T2_Murales: Trailer_2 45.39 + 4.00 s  · cortes cerca: 41.60, 45.27, 49.83, 51.87
-T2_Bar: Trailer_2 79.62 + 0.76 s corto · cortes cerca: 75.90, 76.67, 79.50, 80.50, 81.40, 83.10, 85.10, 86.00, 86.93
-T2_Atardecer_Muelle: Trailer_2 81.52 + 1.46 s corto · cortes cerca: 75.90, 76.67, 79.50, 80.50, 81.40, 83.10, 85.10, 86.00, 86.93, 88.23, 89.50, 90.37
-T2_Helicoptero: Trailer_2 134.52 + 3.49 s  · cortes cerca: 134.40, 138.13, 139.10, 140.03, 141.83, 143.73
-T2_Moto_Agua: Trailer_2 139.22 + 0.69 s corto · cortes cerca: 134.40, 138.13, 139.10, 140.03, 141.83, 143.73, 147.30
-T2_Descapotable: Trailer_2 148.35 + 4.00 s  · cortes cerca: 143.73, 147.30, 148.23, 152.87
-T2_Atardecer: Trailer_2 152.99 + 4.00 s  · cortes cerca: 147.30, 148.23, 152.87
-Mirada_Jason_Calle: Mirada 365.02 + 4.00 s  · cortes cerca: 360.37, 364.90, 369.30
-Mirada_Coche_Clasico: Mirada 369.42 + 5.00 s  · cortes cerca: 364.90, 369.30
-Mirada_Camiones: Mirada 380.02 + 2.49 s  · cortes cerca: 379.90, 382.63, 384.43, 386.93
-Mirada_Jason_Patio: Mirada 485.50 + 5.00 s  · cortes cerca: 481.53, 483.57
+Lanz_Cartel_Keys: Lanzamiento 2.80 + 2.20 s  · cortes cerca: 
+Lanz_Marina: Lanzamiento 5.10 + 1.70 s  · cortes cerca: 
+Lanz_Descapotable: Lanzamiento 26.50 + 1.30 s corto · cortes cerca: 
+Lanz_Paseo: Lanzamiento 40.50 + 1.70 s  · cortes cerca: 
+Lanz_Policia: Lanzamiento 47.70 + 1.10 s corto · cortes cerca: 
+Lanz_Moto_Salto: Lanzamiento 49.00 + 2.20 s  · cortes cerca: 
+Lanz_Playa: Lanzamiento 55.30 + 1.70 s  · cortes cerca: 
+Lanz_Balcon: Lanzamiento 67.20 + 1.30 s corto · cortes cerca: 
+T1_Autopista: Trailer_1 2.79 + 2.09 s  · cortes cerca: 
+T1_Playa_Aerea: Trailer_1 11.10 + 3.00 s  · cortes cerca: 
+T1_Humedal: Trailer_1 19.30 + 1.40 s corto · cortes cerca: 
+T1_Lancha_Rapida: Trailer_1 23.39 + 1.33 s corto · cortes cerca: 
+T1_Coches_Noche: Trailer_1 24.95 + 2.36 s  · cortes cerca: 
+T1_Camioneta: Trailer_1 27.60 + 1.30 s corto · cortes cerca: 
+T1_Noche_Aerea: Trailer_1 31.15 + 1.29 s corto · cortes cerca: 
+T1_Neones: Trailer_1 32.69 + 1.33 s corto · cortes cerca: 
+T1_Puente_Cayos: Trailer_1 35.79 + 1.53 s  · cortes cerca: 
+T1_Letras_Vice: Trailer_1 39.92 + 1.29 s corto · cortes cerca: 
+T2_Cayos_Aereo: Trailer_2 5.50 + 2.50 s  · cortes cerca: 
+T2_Casa_Pilotes: Trailer_2 8.20 + 1.50 s  · cortes cerca: 
+T2_Brian: Trailer_2 13.79 + 4.93 s  · cortes cerca: 
+T2_Jason_Tejado: Trailer_2 18.95 + 1.39 s corto · cortes cerca: 
+T2_Casa_Aerea: Trailer_2 20.60 + 2.60 s  · cortes cerca: 
+T2_Jason_Conduce: Trailer_2 27.45 + 4.73 s  · cortes cerca: 
+T2_Autopista: Trailer_2 34.70 + 3.60 s  · cortes cerca: 
+T2_Gimnasio_Playa: Trailer_2 38.49 + 2.99 s  · cortes cerca: 
+T2_Muelle_Atardecer: Trailer_2 81.52 + 1.46 s corto · cortes cerca: 
+T2_Mar_Atardecer: Trailer_2 83.20 + 1.80 s  · cortes cerca: 
+T2_Moto_Agua: Trailer_2 140.20 + 1.30 s corto · cortes cerca: 
+Mirada_Jason_Calle: Mirada 365.02 + 4.00 s  · cortes cerca: 
+Mirada_Coche_Clasico: Mirada 369.42 + 2.50 s  · cortes cerca: 
+Mirada_Camiones: Mirada 380.02 + 2.49 s  · cortes cerca: 
+Mirada_Jason_Patio: Mirada 486.50 + 4.00 s  · cortes cerca: 
 Mirada_Terraza: Mirada 603.50 + 5.00 s  · cortes cerca: 
-Mirada_Azotea: Mirada 735.25 + 5.00 s  · cortes cerca: 729.13, 731.63, 733.77, 735.13, 744.67
-Mirada_Pilotes: Mirada 1029.99 + 2.89 s  · cortes cerca: 1026.23, 1029.87, 1033.00, 1036.03, 1038.70
-Mirada_Lucia_Gym: Mirada 1036.15 + 2.43 s  · cortes cerca: 1033.00, 1036.03, 1038.70, 1042.20, 1045.00
-Mirada_Moto_Calle: Mirada 1083.50 + 5.00 s  · cortes cerca: 1080.00, 1083.33, 1083.37, 1091.93
-Mirada_Motocross: Mirada 1114.92 + 4.16 s  · cortes cerca: 1108.47, 1111.30, 1114.80, 1119.20, 1122.40
-Mirada_Noche_Coche: Mirada 1203.50 + 5.00 s  · cortes cerca: 
-Mirada_Neon: Mirada 1221.59 + 0.33 s corto · cortes cerca: 1221.47, 1222.03
+Mirada_Azotea: Mirada 735.25 + 5.00 s  · cortes cerca: 
+Mirada_Moto_Calle: Mirada 1083.50 + 5.00 s  · cortes cerca: 
+Mirada_Motocross: Mirada 1114.92 + 4.16 s  · cortes cerca: 
 Clip_Brian: Clips:Brian_Heder_Video_Clip.mp4 0.00 + 1.00 s  · cortes cerca: 
 Clip_Cal: Clips:Cal_Hampton_Video_Clip.mp4 0.00 + 1.00 s  · cortes cerca: 
 Clip_DreQuan: Clips:DreQuan_Priest_Video_Clip.mp4 0.00 + 1.00 s  · cortes cerca: 
 Clip_Boobie: Clips:Boobie_Ike_Video_Clip.mp4 0.00 + 1.00 s  · cortes cerca: 
 Clip_Real_Dimez: Clips:Real_Dimez_Video_Clip.mp4 0.00 + 1.00 s  · cortes cerca: 
-Portada_Animada: Clips:GTAVI_Official_Cover_Art_Landscape.mp4 17.00 + 6.00 s  · cortes cerca: 
+Portada_Animada: Clips:GTAVI_Official_Cover_Art_Landscape.mp4 17.00 + 4.50 s  · cortes cerca: 
