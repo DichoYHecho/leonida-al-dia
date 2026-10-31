@@ -1,0 +1,6 @@
+https://media-rockstargames-com.akamaized.net/VI/downloads/videos/GTAVI_Trailer_2/GTAVI_Trailer_2.mp4
+-rw-r--r-- 1 runner runner 1313369687 Oct 31 12:04 oficial.mp4
+width=3840
+height=2160
+r_frame_rate=30/1
+duration=166.733333
