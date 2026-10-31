@@ -52,7 +52,7 @@ def main():
         v = r["Vídeo"].strip()
         src = medios.origen(v)
         t, maximo = float(r["Aprox (s)"]), float(r["Máx (s)"] or 5)
-        if v.startswith("Clips:"):  # clip del zip: desde «Aprox» y «Máx» segundos, tal cual
+        if v.startswith("Clips:") or (r.get("Exacto") or "").strip().lower() == "si":  # inicio y duración ya exactos
             ini, dur, cs = t, maximo, []
         else:
             ini, dur, cs = plano(src, t, maximo)
