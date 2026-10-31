@@ -1,0 +1,30 @@
+name: Candidatos del stock nuevo (sin publicar)
+
+# 31 oct: planos exactos de los trozos nuevos (stock_nuevo.csv), cortados como en producción y con hojas para revisarlos.
+# No toca Airtable ni publica nada: deja las hojas en la rama «hojas-stock» (carpeta Revision).
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  candidatos:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v5
+      - uses: ./.github/actions/entorno
+      - name: Planos exactos, trozos en vertical y hojas
+        run: python gta/candidatos_stock.py
+      - name: Subir a la rama hojas-stock (carpeta Revision)
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git clone -q --depth 1 -b hojas-stock "https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git" pub
+          rm -rf pub/Revision && mkdir -p pub/Revision && cp -r salida_candidatos/. pub/Revision/ || true
+          cd pub && git add -A
+          git -c user.name="github-actions" -c user.email="github-actions@users.noreply.github.com" commit -qm "Revisión de candidatos (run ${{ github.run_number }})" && git push -q
+          ls Revision
