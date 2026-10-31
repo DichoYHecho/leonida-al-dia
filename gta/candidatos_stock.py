@@ -89,6 +89,16 @@ def main():
             ficha.paste(Image.open(q), (4 + k * 184, 46))
         fichas.append(ficha)
         os.remove(mp4)  # el vídeo no hace falta guardarlo
+    medios.preparar_arte()  # arte oficial en vertical (arte.csv), un fotograma por imagen
+    for n, c in medios.CAPTURAS.items():
+        if not c.get("archivo"):
+            continue
+        ficha = Image.new("RGB", (4 * 184 + 8, 320 + 50), (20, 20, 20))
+        dr = ImageDraw.Draw(ficha)
+        dr.text((4, 4), f"{n} · {c['grupo']} · {c['uso']}", font=letra, fill=(255, 255, 255))
+        dr.text((4, 24), c["que"][:80], font=letra, fill=(190, 190, 190))
+        ficha.paste(Image.open(os.path.join(medios.DIR, n + ".jpg")).convert("RGB").resize((180, 320)), (4, 46))
+        fichas.append(ficha)
     por = 12
     for h in range(0, len(fichas), por):
         grupo = fichas[h:h + por]
