@@ -1,0 +1,98 @@
+name: Hojas del stock (tráileres, clips y arte)
+
+# 31 oct: hojas de contacto de los 4 vídeos oficiales, los 9 clips y el arte oficial, para elegir material nuevo
+# para los fondos. No toca Airtable ni publica nada: deja las hojas en la rama «hojas-stock».
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  hojas:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 50
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - nombre: Mirada
+            video: https://videos-rockstargames-com.akamaized.net/v4/rk721912/flv/es-es-1080p.mp4
+            cada: "3"
+          - nombre: Trailer_1
+            video: https://media-rockstargames-com.akamaized.net/VI/downloads/videos/GTAVI_Trailer_1/GTAVI_Trailer_1.mp4
+            cada: "1.5"
+          - nombre: Trailer_2
+            video: https://media-rockstargames-com.akamaized.net/VI/downloads/videos/GTAVI_Trailer_2/GTAVI_Trailer_2.mp4
+            cada: "1.5"
+          - nombre: Lanzamiento
+            video: https://media-rockstargames-com.akamaized.net/VI/downloads/videos/GTAVI_Launch_Trailer/GTAVI_Launch_Trailer.mp4
+            cada: "1.5"
+    env:
+      CADA: ${{ matrix.cada }}
+      VIDEO: ${{ matrix.video }}
+      NOMBRE: ${{ matrix.nombre }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: ./.github/actions/entorno
+      - name: Descargar el vídeo oficial (se reanuda si se corta)
+        run: |
+          for i in 1 2 3 4 5 6 7 8; do
+            curl -sSfL -A "LeonidaAlDiaBot/1.0 (cuenta de fans de GTA 6) GitHubActions" -C - -o oficial.mp4 "$VIDEO" && break
+            echo "Cortado; se reanuda ($i)"; sleep 5
+          done
+          ls -l oficial.mp4
+      - name: Hojas y transcripción
+        run: python gta/hojas.py oficial.mp4
+      - name: Guardar con su nombre
+        if: always()
+        run: |
+          mkdir -p "out/$NOMBRE"
+          cp -r salida_hojas/. "out/$NOMBRE/" || true
+          { echo "$VIDEO"; ls -l oficial.mp4; ffprobe -v error -select_streams v:0 -show_entries stream=width,height,r_frame_rate:format=duration -of default=nw=1 oficial.mp4; } > "out/$NOMBRE/info.txt" || true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hojas-${{ matrix.nombre }}
+          path: out/
+          retention-days: 7
+
+  extra:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v5
+      - uses: ./.github/actions/entorno
+      - name: Hojas de los clips y del arte oficial
+        run: python gta/hojas_extra.py
+      - name: Guardar
+        if: always()
+        run: mkdir -p out/Extra && cp -r salida_extra/. out/Extra/ || true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hojas-extra
+          path: out/
+          retention-days: 7
+
+  rama:
+    needs: [hojas, extra]
+    if: always()
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: hojas-*
+          merge-multiple: true
+          path: out
+      - name: Subir las hojas a la rama hojas-stock
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cd out
+          git init -q -b hojas-stock
+          git add -A
+          git -c user.name="github-actions" -c user.email="github-actions@users.noreply.github.com" commit -qm "Hojas del stock (run ${{ github.run_number }})"
+          git push -fq "https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git" hojas-stock
+          find . -path ./.git -prune -o -type f -print | sort
