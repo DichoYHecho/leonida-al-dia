@@ -54,6 +54,7 @@ def fila(g, tipo, fuente, oficial, enlace, texto_fuente, dia, orden=None):
             caps = [clip] + caps[:2]
     if caps and all(medios.es_trozo(c) for c in caps):  # al menos una captura (los trozos son cortos)
         caps = caps[:2] + [c for c in medios.elegir(g["grupo"], g["titular"], 2) if c not in caps][:1]
+    caps = medios.con_mas_video(caps, g["grupo"], g["titular"] + str(orden or ""))  # 31 oct: más vídeo que fotos
     texto = guion.caption(g, fuente, oficial)
     if any(medios.con_sonido(c) for c in caps):
         texto = texto.replace("Imágenes: Rockstar Games.", "Imágenes y sonido: Rockstar Games.")
