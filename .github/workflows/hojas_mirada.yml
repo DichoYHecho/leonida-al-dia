@@ -1,0 +1,56 @@
+name: Hojas de la mirada extendida
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  hojas:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Instalar programas
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg fonts-dejavu-core
+          pip install numpy faster-whisper==1.2.1
+
+      - name: Recuperar el modelo de Whisper
+        uses: actions/cache@v4
+        with:
+          path: cache/whisper-base
+          key: whisper-base-directo-v1
+
+      - name: Descargar el vídeo oficial (se reanuda si se corta)
+        run: |
+          for i in 1 2 3 4 5 6 7 8; do
+            curl -sSfL -A "LeonidaAlDiaBot/1.0 (cuenta de fans de GTA 6) GitHubActions" -C - -o oficial.mp4 "https://videos-rockstargames-com.akamaized.net/v4/rk721912/flv/es-es-1080p.mp4" && break
+            echo "Cortado; se reanuda ($i)"; sleep 5
+          done
+          ls -l oficial.mp4
+
+      - name: Hojas y transcripción
+        run: python video_largo/hojas_mirada.py oficial.mp4
+
+      - name: Publicar en la rama hojas-mirada
+        if: always()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          cd salida_hojas
+          git init -q
+          git checkout -q -b hojas-mirada
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add .
+          git commit -q -m "Hojas de la mirada extendida"
+          git remote add origin "https://x-access-token:$GH_TOKEN@github.com/$GITHUB_REPOSITORY.git"
+          git push -f origin hojas-mirada
