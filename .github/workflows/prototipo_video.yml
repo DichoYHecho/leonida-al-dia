@@ -23,7 +23,7 @@ jobs:
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y -qq ffmpeg fonts-dejavu-core
-          pip install numpy
+          pip install numpy faster-whisper==1.2.1
 
       - name: Trozos del stock nuevo
         run: git show origin/stock-nuevo:gta/trozos.csv > video_largo/trozos.csv
@@ -38,8 +38,8 @@ jobs:
       - name: Recuperar el modelo de Whisper
         uses: actions/cache@v4
         with:
-          path: ~/.cache/huggingface
-          key: whisper-base-v1
+          path: cache/whisper-base
+          key: whisper-base-directo-v1
 
       - name: Montar el prototipo
         env:
