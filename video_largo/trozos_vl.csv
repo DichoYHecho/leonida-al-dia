@@ -1,0 +1,47 @@
+Trozo,Grupo,Inicio (s),Duración (s),Qué se ve,Foco (0 izquierda - 1 derecha),Uso,Sonido,Notas,Vídeo,Lento
+VL_Poli_1,Policia,840,3,Tiroteo contra la policía: coche negro y camión,0.5,principal,no,14:00,Mirada,1
+VL_Poli_2,Policia,847,3,Todoterreno de la policía con chispas de balas,0.5,principal,si,14:07 con sonido,Mirada,1
+VL_Poli_3,Policia,856,3,Coche de policía en un callejón,0.5,principal,no,14:16,Mirada,1
+VL_Poli_4,Policia,861,2.5,Un coche de policía vuelca,0.5,principal,no,14:21,Mirada,1
+VL_Poli_Heli,Policia,945,3,Helicóptero y coches de policía,0.5,principal,no,15:45,Mirada,1
+VL_HUD_Pasillo,Policia,258,3,Tiroteo en un pasillo con el HUD,0.5,principal,no,4:18,Mirada,1
+VL_Fuego,Policia,963,3.5,Fuego junto a un coche en un aparcamiento,0.5,principal,no,16:03 (comprobar que es el molotov),Mirada,1
+VL_Espejo_1,Ropa,405,3,Lucía ante el espejo de luces,0.5,principal,no,6:45,Mirada,1
+VL_Espejo_2,Ropa,411,3,Jason y Lucía en el dormitorio rosa,0.5,principal,no,6:51,Mirada,1
+VL_Dormitorio,Ropa,387,3,Dormitorio rosa,0.5,principal,no,6:27,Mirada,1
+VL_Nevera,Casa,435,3,Jason junto al frigorífico,0.5,principal,no,7:15,Mirada,1
+VL_Tele_1,Casa,450,3,Anuncio satírico en la tele,0.5,principal,no,7:30,Mirada,1
+VL_Tele_Audio,Casa,445,5,Anuncio satírico en la tele con su sonido,0.5,principal,si,7:25 Angstapan,Mirada,1
+VL_Azotea_1,Multitud,591,3,Azotea-bar llena de gente,0.5,principal,no,9:51,Mirada,1
+VL_Azotea_2,Multitud,600,3,Azotea-bar llena de gente,0.5,principal,no,10:00,Mirada,1
+VL_Azotea_3,Multitud,609,3,Azotea-bar llena de gente,0.5,principal,no,10:09,Mirada,1
+VL_Disco_0,Discoteca,1227,3,Baile con neones,0.5,principal,no,20:27,Mirada,1
+VL_Disco_1,Discoteca,1251,3,Discoteca llena con neones,0.5,principal,no,20:51,Mirada,1
+VL_Disco_2,Discoteca,1257,3,Discoteca llena con neones,0.5,principal,no,20:57,Mirada,1
+VL_Disco_3,Discoteca,1263,3,Discoteca llena con neones,0.5,principal,no,21:03,Mirada,1
+VL_Disco_4,Discoteca,1269,3,Discoteca llena con neones,0.5,principal,no,21:09,Mirada,1
+VL_Descap_3,Coches,504,3,Descapotable rojo por Vice City,0.5,principal,no,8:24,Mirada,1
+VL_Descap_Cayos,Coches,534,3,Descapotable rojo junto al mar,0.5,principal,no,8:54,Mirada,1
+VL_Negro_1,Coches,750,3,Coche negro por la autopista al atardecer,0.5,principal,no,12:30,Mirada,1
+VL_Negro_2,Coches,760,3,Coche negro por la autopista al atardecer,0.5,principal,no,12:40,Mirada,1
+VL_Negro_3,Coches,770,3,Coche negro por la autopista al atardecer,0.5,principal,no,12:50,Mirada,1
+VL_Negro_4,Coches,780,3,Coche negro por la autopista al atardecer,0.5,principal,no,13:00,Mirada,1
+VL_Interior_1,Coches,792,3,Jason y Lucía dentro del coche,0.5,principal,no,13:12,Mirada,1
+VL_Interior_2,Coches,801,3,Jason y Lucía dentro del coche,0.5,principal,no,13:21,Mirada,1
+VL_Atraco_1,Atraco,690,3,Atraco a una tienda con pañuelos en la cara,0.5,principal,no,11:30,Mirada,1
+VL_Atraco_2,Atraco,705,3,Interior de la tienda,0.5,principal,no,11:45,Mirada,1
+VL_Atraco_3,Atraco,714,3,Atracadores con pañuelos,0.5,principal,no,11:54,Mirada,1
+VL_Mural,Calle,1026,3,Calle con mural de colores,0.5,principal,no,17:06,Mirada,1
+VL_Baloncesto,Actividades,1033,3,Baloncesto en una cabaña de madera,0.5,principal,no,17:13,Mirada,1
+VL_Pesas,Actividades,1039,3,Pesas en un gimnasio,0.5,principal,no,17:19,Mirada,1
+VL_Moto_Agua,Actividades,1045,2.5,Moto de agua,0.5,principal,no,17:25,Mirada,1
+VL_Joyeria,Calle,1080,3,Joyería,0.5,principal,no,18:00,Mirada,1
+VL_Perro_Acerca,Perro,114,3,Jason se acerca al perro por el pasillo,0.5,principal,no,1:54,Mirada,1
+VL_Perro_Caricia,Perro,118,5,Jason acaricia al perro,0.5,principal,si,1:58 con sonido,Mirada,1
+VL_Pasillo_Sigue,Perro,124,3,Jason sigue por el pasillo,0.5,principal,no,2:04,Mirada,1
+VL_Frase_Lucia,Lucia,529.8,5,Lucía: Relationships are about communication Jay,0.5,principal,si,8:50 (ajustar con Whisper),Mirada,1
+VL_Hidroavion,Cierre,1566,3,Hidroavión,0.5,principal,no,26:06,Mirada,1
+VL_Atardecer_Final,Cierre,1569,3,Atardecer sobre el skyline,0.5,principal,no,26:09,Mirada,1
+VL_Lancha_Pareja,Cierre,1572,3,Pareja en una lancha,0.5,principal,no,26:12,Mirada,1
+VL_Rotulo_PS5,Cierre,1587,3,Rótulo CAPTURED ON PS5,0.5,principal,no,26:27,Mirada,1
+VL_Fecha,Cierre,1593,3,Rótulo 19 de noviembre de 2026,0.5,principal,no,26:33,Mirada,1
