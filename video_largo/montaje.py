@@ -3,7 +3,7 @@
 Reutiliza las funciones del prototipo (voz, Whisper, subtítulos, rótulos, música) y añade: bajar cada vídeo oficial una
 sola vez, clips en cámara lenta, los 22 bloques del guion, un sonido original por bloque cuando toca y los capítulos.
 
-Salidas: «salida_hq/video_largo.mp4» (alta calidad), «salida_montaje/previa.mp4» (540p, ligera), «hoja.jpg»,
+Salidas: «salida_hq/video_largo.mp4» (alta calidad), «salida_montaje/previa_00.mp4…» (720p, en partes de 5 min), «hoja.jpg»,
 «capitulos.txt», «informe.txt». Pruebas: DRY=1 (imágenes de relleno), BLOQUES_SOLO=hook,c01 (solo esos bloques)."""
 import csv
 import os
@@ -281,9 +281,10 @@ def main():
            "-pix_fmt", "yuv420p", "-c:a", "aac", "-b:a", "192k", "-ar", SR, "-shortest", "-movflags", "+faststart",
            final])
     print(f"Vídeo final listo ({time.time() - t0:.0f} s)", flush=True)
-    P.run(["ffmpeg", "-y", "-loglevel", "error", "-i", final, "-vf", "scale=960:540", "-c:v", "libx264", "-crf", "30",
-           "-maxrate", "1100k", "-bufsize", "2200k", "-preset", "fast", "-c:a", "aac", "-b:a", "96k", "-movflags",
-           "+faststart", OUT / "previa.mp4"])
+    P.run(["ffmpeg", "-y", "-loglevel", "error", "-i", final, "-vf", "scale=1280:720", "-c:v", "libx264", "-crf", "27",
+           "-maxrate", "2000k", "-bufsize", "4000k", "-preset", "fast", "-force_key_frames", "expr:gte(t,n_forced*300)",
+           "-c:a", "aac", "-b:a", "112k", "-f", "segment", "-segment_time", "300", "-reset_timestamps", "1",
+           "-segment_format_options", "movflags=+faststart", str(OUT / "previa_%02d.mp4")])
     P.run(["ffmpeg", "-y", "-loglevel", "error", "-i", final, "-vf", "fps=1/20,scale=320:-1,tile=6x6", "-frames:v", "1",
            "-q:v", "3", OUT / "hoja.jpg"])
     dur = float(P.run(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", final]).stdout)
@@ -295,7 +296,7 @@ def main():
             caps.append(f"{hms(b['ini'])} Lo que Rockstar aún no ha contado")
     (OUT / "capitulos.txt").write_text("\n".join(caps), encoding="utf-8")
     informe = [f"Duración: {dur:.1f} s ({hms(dur)})", f"Tamaño: {final.stat().st_size / 1e6:.0f} MB (alta calidad), "
-               f"{(OUT / 'previa.mp4').stat().st_size / 1e6:.0f} MB (previa)", f"Tiempo de montaje: {time.time() - t0:.0f} s", ""]
+               f"{sum(p.stat().st_size for p in OUT.glob('previa_*.mp4')) / 1e6:.0f} MB (previa en partes de 5 min)", f"Tiempo de montaje: {time.time() - t0:.0f} s", ""]
     for b in bloques:
         informe.append(f"{b['id']}: voz {b['dur_voz']:.1f} s, {len(b['plan'])} planos, subtítulos por {b['metodo']}"
                        + (f", sonido original {b['original']}" if b.get("original") else ""))
