@@ -23,7 +23,7 @@ jobs:
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y -qq ffmpeg fonts-dejavu-core fonts-montserrat fonts-bebas-neue
-          pip install numpy faster-whisper==1.2.1
+          pip install numpy pillow faster-whisper==1.2.1
 
       - name: Trozos del stock nuevo
         run: git show origin/stock-nuevo:gta/trozos.csv > video_largo/trozos.csv
