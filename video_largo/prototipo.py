@@ -1,13 +1,15 @@
-"""Prototipo del vídeo largo de «Leónida al Día» (fase V-L3). 16:9, 1080p, unos 75 s.
+"""Prototipo del vídeo largo de «Leónida al Día» (fase V-L3). 16:9, 1080p.
 
 Solo se lanza a mano y NO publica nada. Une: voz de Gemini (Orus, estilo relajado), trozos oficiales
-(sin su sonido, salvo un momento con sonido original), música hecha con código que baja con la voz,
-contador de curiosidad, subtítulos y rótulos. Deja el MP4 y una hoja de fotogramas en «salida_prototipo/».
+en 4K (sin su sonido, salvo un momento con sonido original), música hecha con código que baja con la voz,
+contador de curiosidad, subtítulos palabra a palabra (Whisper) y rótulos. Deja el MP4 de revisión y una hoja
+de fotogramas en «salida_prototipo/» y el MP4 de alta calidad en «salida_hq/».
 
 Modo de prueba local: DRY=1 (sin Gemini ni descargas; usa imágenes de relleno).
 """
 import base64
 import csv
+import difflib
 import hashlib
 import json
 import os
@@ -16,7 +18,6 @@ import re
 import subprocess
 import sys
 import time
-import difflib
 import unicodedata
 import urllib.error
 import urllib.request
@@ -36,7 +37,8 @@ ESTILO = (
 UA = "LeonidaAlDiaBot/1.0 (cuenta de fans de GTA 6) GitHubActions"
 _V = "https://media-rockstargames-com.akamaized.net/VI/downloads/videos/"
 VIDEOS = {
-    "Mirada": "https://videos-rockstargames-com.akamaized.net/v4/rk721912/flv/es-es-1080p.mp4",
+    # «Una mirada extendida» existe en 4K (2160p): de ahí salen los planos y el sonido original
+    "Mirada": "https://videos-rockstargames-com.akamaized.net/v4/rk721912/flv/es-es-2160p.mp4",
     "Trailer_1": _V + "GTAVI_Trailer_1/GTAVI_Trailer_1.mp4",
     "Trailer_2": _V + "GTAVI_Trailer_2/GTAVI_Trailer_2.mp4",
     "Lanzamiento": _V + "GTAVI_Launch_Trailer/GTAVI_Launch_Trailer.mp4",
@@ -45,6 +47,7 @@ W, H, FPS, SR = 1920, 1080, 30, 48000
 AQUI = pathlib.Path(__file__).resolve().parent
 TMP = pathlib.Path(os.environ.get("TMP_DIR", "tmp_proto"))
 OUT = pathlib.Path("salida_prototipo")
+HQ = pathlib.Path("salida_hq")
 VOCES = pathlib.Path(os.environ.get("CACHE_VOZ", "cache/voz"))
 for d in (TMP, OUT, VOCES):
     d.mkdir(parents=True, exist_ok=True)
@@ -52,7 +55,7 @@ for d in (TMP, OUT, VOCES):
 BLOQUES = [
     {
         "id": "hook", "num": None, "titulo": "",
-        "overlay": "TIRAR LA BASURA = MEJOR REPUTACIÓN",
+        "overlay": "TIRAR LA BASURA|= MEJOR REPUTACIÓN",
         "texto": ("Rockstar ha tardado trece años en hacer GTA 6. Trece. Y entre todo lo que han "
                   "metido, hay un detalle que me tiene obsesionado: en este juego puedes mejorar tu "
                   "reputación criminal... tirando la basura al contenedor. Sí. Has oído bien."),
@@ -86,7 +89,7 @@ BLOQUES = [
 ]
 TOTAL_CURIOSIDADES = 20
 TEMPO_VOZ = float(os.environ.get("TEMPO_VOZ", "1.12"))  # más ritmo sin cambiar el tono
-HQ = pathlib.Path("salida_hq")
+ACENTO = "&HA34FFF&"  # rosa de la marca (ASS usa el orden azul-verde-rojo)
 
 
 def run(cmd, **kw):
@@ -106,43 +109,59 @@ def trozos():
 
 
 # ---------------------------------------------------------------- voz
-def sintetizar(texto):
-    clave = hashlib.sha1((MODELO + VOZ + ESTILO + texto).encode("utf-8")).hexdigest()[:16]
-    destino = VOCES / (clave + ".wav")
-    if destino.exists():
-        print("  voz en caché", clave, flush=True)
-        return destino
-    if DRY:
-        n = int(24000 * (len(texto) / 15.0))
-        t = np.arange(n) / 24000
-        env = (np.sin(2 * np.pi * 3.2 * t) > -0.3).astype(float)
-        x = 0.3 * env * np.sin(2 * np.pi * 140 * t) + 0.05 * np.random.randn(n) * env
-        pcm = (x * 32767).astype("<i2").tobytes()
-        frec = 24000
-    else:
-        time.sleep(21)  # máximo 3 audios por minuto
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/{MODELO}:generateContent"
-        cuerpo = {
-            "contents": [{"parts": [{"text": f"{ESTILO}\n\n{texto}"}]}],
-            "generationConfig": {"responseModalities": ["AUDIO"],
-                                 "speechConfig": {"voiceConfig": {"prebuiltVoiceConfig": {"voiceName": VOZ}}}},
-        }
-        pet = urllib.request.Request(url, data=json.dumps(cuerpo).encode("utf-8"), method="POST",
-                                     headers={"Content-Type": "application/json", "x-goog-api-key": CLAVE})
-        with urllib.request.urlopen(pet, timeout=240) as resp:
-            datos = json.loads(resp.read().decode("utf-8"))
-        parte = datos["candidates"][0]["content"]["parts"][0]["inlineData"]
-        frec = 24000
-        m = re.search(r"rate=(\d+)", parte.get("mimeType", ""))
-        if m:
-            frec = int(m.group(1))
-        pcm = base64.b64decode(parte["data"])
+def pedir_voz(texto):
+    """Pide el audio a Gemini. El estilo va en su apartado («## Style»), para que NO se lea en voz alta."""
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/{MODELO}:generateContent"
+    cuerpo = {
+        "contents": [{"role": "user", "parts": [{"text": f"## Style:\n{ESTILO}\n\n## Transcript:\n{texto}"}]}],
+        "generationConfig": {"temperature": 1, "responseModalities": ["AUDIO"],
+                             "speechConfig": {"voiceConfig": {"prebuiltVoiceConfig": {"voiceName": VOZ}}}},
+    }
+    pet = urllib.request.Request(url, data=json.dumps(cuerpo).encode("utf-8"), method="POST",
+                                 headers={"Content-Type": "application/json", "x-goog-api-key": CLAVE})
+    with urllib.request.urlopen(pet, timeout=240) as resp:
+        datos = json.loads(resp.read().decode("utf-8"))
+    parte = datos["candidates"][0]["content"]["parts"][0]["inlineData"]
+    frec = 24000
+    m = re.search(r"rate=(\d+)", parte.get("mimeType", ""))
+    if m:
+        frec = int(m.group(1))
+    return base64.b64decode(parte["data"]), frec
+
+
+def guardar_pcm(destino, pcm, frec):
     with wave.open(str(destino), "wb") as f:
         f.setnchannels(1)
         f.setsampwidth(2)
         f.setframerate(frec)
         f.writeframes(pcm)
-    return destino
+
+
+def sintetizar(texto):
+    base = MODELO + VOZ + ESTILO + texto
+    nueva = VOCES / (hashlib.sha1(("v2" + base).encode("utf-8")).hexdigest()[:16] + ".wav")
+    vieja = VOCES / (hashlib.sha1(base.encode("utf-8")).hexdigest()[:16] + ".wav")  # la que leía el estilo en inglés
+    if nueva.exists():
+        print("  voz en caché", nueva.stem, flush=True)
+        return nueva
+    if DRY:
+        n = int(24000 * (len(texto) / 15.0))
+        t = np.arange(n) / 24000
+        env = (np.sin(2 * np.pi * 3.2 * t) > -0.3).astype(float)
+        x = 0.3 * env * np.sin(2 * np.pi * 140 * t) + 0.05 * np.random.randn(n) * env
+        guardar_pcm(nueva, (x * 32767).astype("<i2").tobytes(), 24000)
+        return nueva
+    try:
+        time.sleep(21)  # máximo 3 audios por minuto
+        pcm, frec = pedir_voz(texto)
+        guardar_pcm(nueva, pcm, frec)
+        print("  voz nueva pedida a Gemini", nueva.stem, flush=True)
+        return nueva
+    except Exception as e:  # noqa: BLE001
+        if vieja.exists():
+            print("  no se ha podido pedir la voz nueva (", str(e)[:120], "): se usa la anterior y se le quita el principio", flush=True)
+            return vieja
+        raise
 
 
 def leer_wav(ruta, tempo=1.0):
@@ -155,7 +174,7 @@ def leer_wav(ruta, tempo=1.0):
     return datos.reshape(-1, 2)
 
 
-# ---------------------------------------------------------------- subtítulos
+# ---------------------------------------------------------------- Whisper y tiempos de las palabras
 def audio_16k(ruta):
     """Audio mono a 16 kHz como lista de números (así lo pide Whisper; evita PyAV, que daba error)."""
     r = subprocess.run(["ffmpeg", "-loglevel", "error", "-i", str(ruta), "-ar", "16000", "-ac", "1",
@@ -166,7 +185,7 @@ def audio_16k(ruta):
 
 
 def modelo_whisper():
-    """Baja el modelo de Whisper directamente (sin la librería de Hugging Face, que daba error)."""
+    """Baja el modelo de Whisper directamente (sin la librería de Hugging Face)."""
     d = pathlib.Path(os.environ.get("CACHE_WHISPER", "cache/whisper-base"))
     d.mkdir(parents=True, exist_ok=True)
     base = "https://huggingface.co/Systran/faster-whisper-base/resolve/main/"
@@ -191,9 +210,40 @@ def modelo_whisper():
     return str(d)
 
 
+_WHISPER = []
+
+
+def palabras_whisper(ruta):
+    """[(palabra, inicio, fin)] de lo que oye Whisper; [] si no puede."""
+    if DRY or os.environ.get("USAR_WHISPER", "1") != "1":
+        return []
+    try:
+        if not _WHISPER:
+            from faster_whisper import WhisperModel
+            _WHISPER.append(WhisperModel(modelo_whisper(), device="cpu", compute_type="int8"))
+        segs, _ = _WHISPER[0].transcribe(audio_16k(ruta), language="es", word_timestamps=True)
+        return [(w.word, w.start, w.end) for s in segs for w in (s.words or [])]
+    except Exception as e:  # noqa: BLE001
+        print("  Whisper no ha podido:", type(e).__name__, e, flush=True)
+        return []
+
+
 def normalizar(p):
     p = unicodedata.normalize("NFD", p.lower())
     return re.sub(r"[^a-z0-9]", "", "".join(c for c in p if unicodedata.category(c) != "Mn"))
+
+
+def inicio_guion(pal, ws):
+    """Segundo en el que empieza el guion de verdad (por si la voz arranca diciendo otra cosa antes)."""
+    if not ws:
+        return 0.0
+    a = [normalizar(w[0]) for w in ws]
+    b = [normalizar(p) for p in pal]
+    for i, j, n in difflib.SequenceMatcher(None, a, b, autojunk=False).get_matching_blocks():
+        if n >= 2 or (n >= 1 and j < 3):
+            antes = sum(len(p) + 1 for p in pal[:j]) * 0.075
+            return max(0.0, ws[i][1] - antes - 0.12)
+    return 0.0
 
 
 def alinear(pal, ws, dur):
@@ -228,33 +278,8 @@ def alinear(pal, ws, dur):
     return t
 
 
-def tiempos_palabras(ruta_wav, texto, dur):
-    """Tiempo (inicio, fin) de cada palabra del guion. Whisper si está; si no, a prorrata por letras."""
-    pal = texto.split()
-    ws = []
-    if os.environ.get("USAR_WHISPER", "1") == "1" and not DRY:
-        try:
-            from faster_whisper import WhisperModel
-            modelo = WhisperModel(modelo_whisper(), device="cpu", compute_type="int8")
-            segs, _ = modelo.transcribe(audio_16k(ruta_wav), language="es", word_timestamps=True)
-            ws = [(w.word, w.start, w.end) for s in segs for w in (s.words or [])]
-        except Exception as e:  # noqa: BLE001
-            print("  Whisper no ha podido:", type(e).__name__, e, flush=True)
-    if ws:
-        out = alinear(pal, ws, dur)
-        if out:
-            return out, "Whisper"
-    letras = [len(p) + 1 for p in pal]
-    total = sum(letras)
-    acum, out = 0, []
-    for l in letras:
-        out.append((dur * acum / total, dur * (acum + l) / total))
-        acum += l
-    return out, "a prorrata"
-
-
 def tiempos_por_voz(audio, texto):
-    """Tiempo de cada palabra según dónde suena la voz (salta los silencios y las pausas)."""
+    """Plan B sin Whisper: tiempo de cada palabra según dónde suena la voz (salta las pausas)."""
     x = audio.mean(axis=1)
     hop = SR // 100
     rms = np.sqrt(np.convolve(x ** 2, np.ones(hop) / hop, "same"))[::hop]
@@ -291,30 +316,34 @@ def tiempos_por_voz(audio, texto):
     for p in pesos:
         out.append((real(total * acum / suma), real(total * (acum + p) / suma)))
         acum += p
-    return out, "la voz (pausas)"
-
-
-def trozos_de_subtitulo(pal, tiempos, ini):
-    """Agrupa palabras en frases cortas de 2-4 palabras, cortando en la puntuación."""
-    grupos, actual = [], []
-    for i, p in enumerate(pal):
-        actual.append(i)
-        if len(actual) >= 4 or re.search(r"[.,:;?!…]$", p) and len(actual) >= 2:
-            grupos.append(actual)
-            actual = []
-    if actual:
-        grupos.append(actual)
-    out = []
-    for g in grupos:
-        a = ini + tiempos[g[0]][0]
-        b = ini + tiempos[g[-1]][1] + 0.06
-        out.append((a, b, " ".join(pal[i] for i in g)))
     return out
 
 
+def frases_de_subtitulo(pal, tiempos, ini):
+    """Agrupa las palabras en frases cortas de 2-5 palabras (cortando en la puntuación).
+    Cada frase es una lista de (palabra, inicio, fin) ya con el desfase del bloque."""
+    grupos, actual = [], []
+    for i, p in enumerate(pal):
+        actual.append(i)
+        if len(actual) >= 5 or (re.search(r"[.,:;?!…]$", p) and len(actual) >= 2):
+            grupos.append(actual)
+            actual = []
+    if actual:
+        if grupos and len(actual) == 1:
+            grupos[-1] += actual
+        else:
+            grupos.append(actual)
+    return [[(pal[i], ini + tiempos[i][0], ini + tiempos[i][1]) for i in g] for g in grupos]
+
+
+# ---------------------------------------------------------------- rótulos y subtítulos (ASS)
 def ass_t(t):
     t = max(0.0, t)
     return f"{int(t // 3600)}:{int(t % 3600 // 60):02d}:{t % 60:05.2f}"
+
+
+def limpiar(txt):
+    return txt.replace("{", "(").replace("}", ")")
 
 
 def escribir_ass(ruta, bloques, total):
@@ -322,31 +351,62 @@ def escribir_ass(ruta, bloques, total):
 ScriptType: v4.00+
 PlayResX: {W}
 PlayResY: {H}
-WrapStyle: 0
+WrapStyle: 2
 
 [V4+ Styles]
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
-Style: Sub,DejaVu Sans,70,&H00FFFFFF,&H000000FF,&H00000000,&H80000000,-1,0,0,0,100,100,0,0,1,5,2,2,120,120,64,1
-Style: Chip,DejaVu Sans,56,&H00FFFFFF,&H000000FF,&H00A34FFF,&H00000000,-1,0,0,0,100,100,0,0,3,16,0,7,60,0,50,1
-Style: Titulo,DejaVu Sans,44,&H00FFFFFF,&H000000FF,&H00000000,&H80000000,-1,0,0,0,100,100,2,0,1,4,2,7,66,0,150,1
-Style: Marca,DejaVu Sans,34,&H99FFFFFF,&H000000FF,&H00000000,&H80000000,-1,0,0,0,100,100,3,0,1,3,1,9,0,60,50,1
-Style: Gancho,DejaVu Sans,104,&H00FFFFFF,&H000000FF,&H00A34FFF,&H00000000,-1,0,0,0,100,100,0,0,1,9,3,5,160,160,0,1
+Style: Sub,Montserrat ExtraBold,62,&H00FFFFFF,&H000000FF,&H00000000,&H96000000,0,0,0,0,100,100,0,0,1,6,3,2,200,200,74,1
+Style: Num,Montserrat Black,132,&H00A34FFF,&H000000FF,&H00000000,&H90000000,0,0,0,0,100,100,0,0,1,0,4,7,0,0,0,1
+Style: Total,Montserrat ExtraBold,46,&H99FFFFFF,&H000000FF,&H00000000,&H90000000,0,0,0,0,100,100,0,0,1,0,3,7,0,0,0,1
+Style: Titulo,Bebas Neue Bold,74,&H00FFFFFF,&H000000FF,&H00000000,&H90000000,0,0,0,0,100,100,5,0,1,0,3,7,0,0,0,1
+Style: Gancho,Montserrat Black,112,&H00FFFFFF,&H000000FF,&H00000000,&H90000000,0,0,0,0,100,100,0,0,1,9,4,5,0,0,0,1
+Style: Marca,Montserrat ExtraBold,28,&H66FFFFFF,&H000000FF,&H00000000,&H90000000,0,0,0,0,100,100,7,0,1,0,2,9,0,60,50,1
+Style: Dibujo,Montserrat Black,20,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,0,0,7,0,0,0,1
 
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
 """
-    ev = [f"Dialogue: 0,{ass_t(0)},{ass_t(total)},Marca,,0,0,0,,{{\\fad(400,400)}}LEÓNIDA AL DÍA"]
+    ev = [f"Dialogue: 0,{ass_t(0)},{ass_t(total)},Marca,,0,0,0,,{{\\fad(500,500)}}LEÓNIDA AL DÍA"]
     for b in bloques:
+        a, z = ass_t(b["ini"]), ass_t(b["fin"])
         if b["num"]:
-            ev.append(f"Dialogue: 0,{ass_t(b['ini'])},{ass_t(b['fin'])},Chip,,0,0,0,,"
-                      f"{{\\fad(150,150)}}  {b['num']}/{TOTAL_CURIOSIDADES}  ")
-            ev.append(f"Dialogue: 0,{ass_t(b['ini'])},{ass_t(b['fin'])},Titulo,,0,0,0,,"
-                      f"{{\\fad(250,250)}}{b['titulo']}")
+            ev.append(f"Dialogue: 1,{a},{z},Num,,0,0,0,,{{\\move(30,26,70,26,0,350)\\fad(250,250)}}{b['num']:02d}")
+            ev.append(f"Dialogue: 1,{a},{z},Total,,0,0,0,,{{\\pos(196,100)\\fad(400,250)}}/{TOTAL_CURIOSIDADES}")
+            ev.append(f"Dialogue: 1,{a},{z},Dibujo,,0,0,0,,{{\\pos(76,170)\\c{ACENTO}\\p1\\fad(350,250)"
+                      f"\\t(0,450,\\fscx100)}}m 0 0 l 96 0 96 7 0 7")
+            ev.append(f"Dialogue: 1,{a},{z},Titulo,,0,0,0,,{{\\move(40,184,76,184,0,350)\\fad(350,250)}}"
+                      f"{limpiar(b['titulo'])}")
         if b["overlay"]:
-            ev.append(f"Dialogue: 1,{ass_t(b['ini'] + 0.4)},{ass_t(b['ini'] + 3.6)},Gancho,,0,0,0,,"
-                      f"{{\\fad(180,180)\\t(0,350,\\fscx108\\fscy108)}}{b['overlay']}")
-        for a, z, txt in b["subs"]:
-            ev.append(f"Dialogue: 0,{ass_t(a)},{ass_t(z)},Sub,,0,0,0,,{txt}")
+            l1, l2 = (b["overlay"].split("|") + [""])[:2]
+            ev.append(f"Dialogue: 2,{ass_t(b['ini'] + 0.4)},{ass_t(b['ini'] + 3.7)},Gancho,,0,0,0,,"
+                      f"{{\\an5\\pos(960,470)\\fad(150,220)\\fscx72\\fscy72\\t(0,280,\\fscx100\\fscy100)}}"
+                      f"{limpiar(l1)}\\N{{\\c{ACENTO}}}{limpiar(l2)}")
+        for frase in b["subs"]:
+            palabras = [limpiar(w) for w, _, _ in frase]
+            largo = sum(len(w) + 1 for w in palabras)
+            corte = None
+            if largo > 30 and len(palabras) >= 3:
+                acum = 0
+                for i, w in enumerate(palabras):
+                    acum += len(w) + 1
+                    if acum >= largo / 2:
+                        corte = i + 1
+                        break
+            for k, (w, ini, fin) in enumerate(frase):
+                sig = frase[k + 1][1] if k + 1 < len(frase) else fin + 0.12
+                fin_k = min(sig, fin + 0.45) if k + 1 < len(frase) else sig
+                partes = []
+                for i, pw in enumerate(palabras):
+                    if i == k:
+                        partes.append(f"{{\\c{ACENTO}}}{pw}{{\\c&HFFFFFF&}}")
+                    else:
+                        partes.append(pw)
+                    if corte is not None and i + 1 == corte and i + 1 < len(palabras):
+                        partes.append("\\N")
+                    elif i + 1 < len(palabras):
+                        partes.append(" ")
+                texto = "".join(partes).replace(" \\N ", "\\N").replace(" \\N", "\\N")
+                ev.append(f"Dialogue: 0,{ass_t(ini)},{ass_t(fin_k)},Sub,,0,0,0,,{texto}")
     pathlib.Path(ruta).write_text(cab + "\n".join(ev) + "\n", encoding="utf-8")
 
 
@@ -362,10 +422,7 @@ def cortar_plano(nombre, t, dur, destino, sentido):
         pre = ["-ss", f"{t['ini']:.2f}", "-t", f"{dur:.2f}", "-user_agent", UA,
                "-reconnect", "1", "-reconnect_on_network_error", "1", "-reconnect_delay_max", "10"]
     x = f"(in_w-out_w)*t/{dur:.3f}" if sentido == 0 else f"(in_w-out_w)*(1-t/{dur:.3f})"
-    if t["video"] == "Mirada":  # fuente de 1080p: sin ampliar, para que no se vea borroso
-        vf = f"scale={W}:{H}:flags=lanczos,fps={FPS},format=yuv420p"
-    else:  # tráileres en 4K: ligero movimiento de cámara
-        vf = f"scale=2112:1188:flags=lanczos,crop={W}:{H}:x='{x}':y='(in_h-out_h)/2',fps={FPS},format=yuv420p"
+    vf = f"scale=2112:1188:flags=lanczos,crop={W}:{H}:x='{x}':y='(in_h-out_h)/2',fps={FPS},format=yuv420p"
     for _ in range(3):
         try:
             run(["ffmpeg", "-y", "-loglevel", "error", *pre, *fuente, "-t", f"{dur:.2f}", "-an", "-vf", vf,
@@ -385,7 +442,7 @@ def planificar(bloque, dur_visual, tabla):
         n = nombres[i % len(nombres)]
         d = min(tabla[n]["dur"], resto)
         if d < 0.7 and lista:
-            lista[-1][1] += d  # un plano demasiado corto se suma al anterior (se alarga con la última imagen)
+            lista[-1][1] += d  # un plano demasiado corto se suma al anterior
             lista[-1][2] = True
         else:
             lista.append([n, d, False])
@@ -396,7 +453,6 @@ def planificar(bloque, dur_visual, tabla):
 
 def musica(dur):
     n = int(dur * SR)
-    t = np.arange(n) / SR
     bpm = 104
     beat = 60 / bpm
     raices = [55.0, 43.65, 65.41, 49.0]
@@ -465,12 +521,21 @@ def suavizar(env, tasa, ataque, relajo):
 def main():
     tabla = trozos()
     t0 = time.time()
-    # 1) voz de cada bloque
+    # 1) voz de cada bloque (quitando lo que diga antes del guion, si lo hay) y palabras de Whisper
     for b in BLOQUES:
         print("Voz de", b["id"], flush=True)
         b["wav"] = sintetizar(b.get("voz", b["texto"]))
         b["wav48"] = TMP / (pathlib.Path(b["wav"]).stem + "_48k.wav")
         b["audio"] = leer_wav(b["wav"], TEMPO_VOZ)
+        pal = b["texto"].split()
+        ws = palabras_whisper(b["wav48"])
+        rec = inicio_guion(pal, ws)
+        b["recorte"] = rec if rec > 0.4 else 0.0
+        if b["recorte"]:
+            print(f"  se quitan los primeros {b['recorte']:.1f} s (no son del guion)", flush=True)
+            b["audio"] = b["audio"][int(b["recorte"] * SR):]
+            ws = [(w, a - b["recorte"], e - b["recorte"]) for w, a, e in ws if e > b["recorte"]]
+        b["ws"] = ws
         b["dur_voz"] = len(b["audio"]) / SR
         print(f"  {b['dur_voz']:.1f} s", flush=True)
     # 2) línea de tiempo
@@ -518,11 +583,11 @@ def main():
     # 4) subtítulos y rótulos
     for b in BLOQUES:
         pal = b["texto"].split()
-        tiempos, metodo = tiempos_palabras(b["wav48"], b["texto"], b["dur_voz"])
-        if metodo != "Whisper":
-            tiempos, metodo = tiempos_por_voz(b["audio"], b["texto"])
-        b["subs"] = trozos_de_subtitulo(pal, tiempos, b["voz_ini"])
-        b["metodo"] = metodo
+        tiempos = alinear(pal, b["ws"], b["dur_voz"]) if b["ws"] else None
+        b["metodo"] = "Whisper"
+        if not tiempos:
+            tiempos, b["metodo"] = tiempos_por_voz(b["audio"], b["texto"]), "la voz (pausas)"
+        b["subs"] = frases_de_subtitulo(pal, tiempos, b["voz_ini"])
     escribir_ass(TMP / "rotulos.ass", BLOQUES, total)
     # 5) audio: voz + música que baja con la voz + sonido original
     n = int(total * SR)
@@ -556,24 +621,29 @@ def main():
         f.setsampwidth(2)
         f.setframerate(SR)
         f.writeframes((mezcla * 32767).astype("<i2").tobytes())
-    # 6) montaje final
+    # 6) montaje final: ligero ajuste de color y nitidez, y encima los rótulos
     HQ.mkdir(exist_ok=True)
     final = HQ / "prototipo_hq.mp4"
-    vf = f"ass={TMP / 'rotulos.ass'}"
+    vf = f"eq=contrast=1.04:saturation=1.08,unsharp=5:5:0.4:5:5:0.0,ass={TMP / 'rotulos.ass'}"
     run(["ffmpeg", "-y", "-loglevel", "error", "-i", TMP / "sin_audio.mp4", "-i", TMP / "mezcla.wav",
          "-vf", vf, "-af", "loudnorm=I=-14:TP=-1.5:LRA=11", "-c:v", "libx264", "-crf", "17",
          "-preset", "medium", "-pix_fmt", "yuv420p", "-c:a", "aac", "-b:a", "192k", "-ar", SR,
          "-shortest", "-movflags", "+faststart", final])
-    run(["ffmpeg", "-y", "-loglevel", "error", "-i", final, "-c:v", "libx264", "-crf", "23", "-maxrate", "7M", "-bufsize", "14M", "-preset", "fast", "-c:a", "aac", "-b:a", "128k", "-movflags", "+faststart",
+    run(["ffmpeg", "-y", "-loglevel", "error", "-i", final, "-c:v", "libx264", "-crf", "23", "-maxrate", "7M",
+         "-bufsize", "14M", "-preset", "fast", "-c:a", "aac", "-b:a", "128k", "-movflags", "+faststart",
          OUT / "prototipo.mp4"])
     run(["ffmpeg", "-y", "-loglevel", "error", "-i", final, "-vf", "fps=1/3,scale=480:-1,tile=5x4",
          "-frames:v", "1", "-q:v", "3", OUT / "hoja.jpg"])
     dur = float(run(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", final]).stdout)
-    informe = [f"Voz: {VOZ} ({MODELO})", f"Duración: {dur:.1f} s", f"Tamaño: {final.stat().st_size / 1e6:.1f} MB (alta calidad), {(OUT / 'prototipo.mp4').stat().st_size / 1e6:.1f} MB (revisión)",
+    informe = [f"Voz: {VOZ} ({MODELO})", f"Duración: {dur:.1f} s",
+               f"Tamaño: {final.stat().st_size / 1e6:.1f} MB (alta calidad), "
+               f"{(OUT / 'prototipo.mp4').stat().st_size / 1e6:.1f} MB (revisión)",
                f"Tiempo de montaje: {time.time() - t0:.0f} s", ""]
     for b in BLOQUES:
-        informe.append(f"{b['id']}: voz {b['dur_voz']:.1f} s, {len(b['plan'])} planos, "
-                       f"subtítulos por {b['metodo']}" + (", con sonido original" if b.get("original") else ""))
+        informe.append(f"{b['id']}: voz {b['dur_voz']:.1f} s"
+                       + (f" (se quitaron {b['recorte']:.1f} s del principio)" if b["recorte"] else "")
+                       + f", {len(b['plan'])} planos, subtítulos por {b['metodo']}"
+                       + (", con sonido original" if b.get("original") else ""))
     texto = "\n".join(informe)
     (OUT / "informe.txt").write_text(texto, encoding="utf-8")
     print(texto)
