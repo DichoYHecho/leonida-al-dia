@@ -156,6 +156,15 @@ def leer_wav(ruta, tempo=1.0):
 
 
 # ---------------------------------------------------------------- subtítulos
+def audio_16k(ruta):
+    """Audio mono a 16 kHz como lista de números (así lo pide Whisper; evita PyAV, que daba error)."""
+    r = subprocess.run(["ffmpeg", "-loglevel", "error", "-i", str(ruta), "-ar", "16000", "-ac", "1",
+                        "-f", "s16le", "pipe:1"], capture_output=True)
+    if r.returncode != 0:
+        raise RuntimeError(r.stderr.decode("utf-8", "ignore")[-300:])
+    return np.frombuffer(r.stdout, dtype="<i2").astype(np.float32) / 32768
+
+
 def modelo_whisper():
     """Baja el modelo de Whisper directamente (sin la librería de Hugging Face, que daba error)."""
     d = pathlib.Path(os.environ.get("CACHE_WHISPER", "cache/whisper-base"))
@@ -227,7 +236,7 @@ def tiempos_palabras(ruta_wav, texto, dur):
         try:
             from faster_whisper import WhisperModel
             modelo = WhisperModel(modelo_whisper(), device="cpu", compute_type="int8")
-            segs, _ = modelo.transcribe(str(ruta_wav), language="es", word_timestamps=True)
+            segs, _ = modelo.transcribe(audio_16k(ruta_wav), language="es", word_timestamps=True)
             ws = [(w.word, w.start, w.end) for s in segs for w in (s.words or [])]
         except Exception as e:  # noqa: BLE001
             print("  Whisper no ha podido:", type(e).__name__, e, flush=True)
@@ -555,7 +564,7 @@ def main():
          "-vf", vf, "-af", "loudnorm=I=-14:TP=-1.5:LRA=11", "-c:v", "libx264", "-crf", "17",
          "-preset", "medium", "-pix_fmt", "yuv420p", "-c:a", "aac", "-b:a", "192k", "-ar", SR,
          "-shortest", "-movflags", "+faststart", final])
-    run(["ffmpeg", "-y", "-loglevel", "error", "-i", final, "-c:v", "libx264", "-crf", "22", "-maxrate", "9M", "-bufsize", "18M", "-preset", "fast", "-c:a", "aac", "-b:a", "128k", "-movflags", "+faststart",
+    run(["ffmpeg", "-y", "-loglevel", "error", "-i", final, "-c:v", "libx264", "-crf", "23", "-maxrate", "7M", "-bufsize", "14M", "-preset", "fast", "-c:a", "aac", "-b:a", "128k", "-movflags", "+faststart",
          OUT / "prototipo.mp4"])
     run(["ffmpeg", "-y", "-loglevel", "error", "-i", final, "-vf", "fps=1/3,scale=480:-1,tile=5x4",
          "-frames:v", "1", "-q:v", "3", OUT / "hoja.jpg"])
