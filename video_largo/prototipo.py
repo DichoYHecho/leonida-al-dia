@@ -411,12 +411,13 @@ Style: Num,Montserrat Black,132,&H00A34FFF,&H000000FF,&H00000000,&H90000000,0,0,
 Style: Total,Montserrat ExtraBold,46,&H99FFFFFF,&H000000FF,&H00000000,&H90000000,0,0,0,0,100,100,0,0,1,0,3,7,0,0,0,1
 Style: Titulo,Bebas Neue Bold,74,&H00FFFFFF,&H000000FF,&H00000000,&H90000000,0,0,0,0,100,100,5,0,1,0,3,7,0,0,0,1
 Style: Gancho,Montserrat Black,112,&H00FFFFFF,&H000000FF,&H00000000,&H90000000,0,0,0,0,100,100,0,0,1,9,4,5,0,0,0,1
+Style: Marca,Montserrat Black,40,&H00FFFFFF,&H000000FF,&H00000000,&H96000000,0,0,0,0,100,100,3,0,1,0,3,9,0,56,44,1
 Style: Dibujo,Montserrat Black,20,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,0,0,7,0,0,0,1
 
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
 """
-    ev = []
+    ev = [f"Dialogue: 1,{ass_t(0)},{ass_t(total)},Marca,,0,0,0,,{{\\fad(600,600)}}LEÓNIDA {{\\c{ACENTO}}}AL DÍA"]
     for b in bloques:
         a, z = ass_t(b["ini"]), ass_t(b["fin"])
         if b["num"]:
@@ -452,29 +453,6 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
                 ev.append(f"Dialogue: 1,{ass_t(ini)},{ass_t(fin_k)},Sub,,0,0,0,,"
                           f"{{\\blur1.2{fund}}}{armar(palabras, corte, k)}")
     pathlib.Path(ruta).write_text(cab + "\n".join(ev) + "\n", encoding="utf-8")
-
-
-def crear_marca(ruta):
-    """Marca de agua «LEÓNIDA AL DÍA» como imagen con transparencia, dibujada 4 veces más grande y reducida
-    después (bordes suaves, sin píxeles)."""
-    from PIL import Image, ImageDraw, ImageFilter, ImageFont
-    k = 4
-    fuente = ImageFont.truetype(CARPETA_FUENTES + "Montserrat-Black.ttf", 34 * k)
-    a, b = "LEÓNIDA", " AL DÍA"
-    medida = ImageDraw.Draw(Image.new("RGBA", (10, 10)))
-    wa, wb = medida.textlength(a, font=fuente), medida.textlength(b, font=fuente)
-    margen = 18 * k
-    ancho, alto = int(wa + wb) + 2 * margen, 92 * k
-    base = Image.new("RGBA", (ancho, alto), (0, 0, 0, 0))
-    sombra = Image.new("RGBA", (ancho, alto), (0, 0, 0, 0))
-    ds = ImageDraw.Draw(sombra)
-    ds.text((margen, 10 * k + 3 * k), a + b, font=fuente, fill=(0, 0, 0, 150))
-    base.alpha_composite(sombra.filter(ImageFilter.GaussianBlur(4 * k)))
-    d = ImageDraw.Draw(base)
-    d.text((margen, 10 * k), a, font=fuente, fill=(255, 255, 255, 245))
-    d.text((margen + wa, 10 * k), b, font=fuente, fill=(255, 79, 163, 255))
-    d.rounded_rectangle((margen, 66 * k, margen + 52 * k, 66 * k + 6 * k), radius=3 * k, fill=(255, 79, 163, 255))
-    base.resize((ancho // k, alto // k), Image.LANCZOS).save(ruta)
 
 
 def crear_degradado(ruta):
@@ -702,14 +680,11 @@ def main():
     # 6) montaje final: ligero ajuste de color y nitidez, y encima los rótulos
     HQ.mkdir(exist_ok=True)
     final = HQ / "prototipo_hq.mp4"
-    crear_marca(TMP / "marca.png")
     crear_degradado(TMP / "degradado.png")
     grafo = (f"[0:v]eq=contrast=1.04:saturation=1.08,unsharp=5:5:0.4:5:5:0.0[v0];"
-             f"[3:v]format=rgba[g];[v0][g]overlay=0:{H - ALTO_DEGRADADO}:shortest=1[v1];"
-             f"[2:v]format=rgba,fade=t=in:st=0.4:d=0.9:alpha=1[m];[v1][m]overlay=W-w-56:46:shortest=1[v2];"
-             f"[v2]ass={TMP / 'rotulos.ass'}[v]")
+             f"[2:v]format=rgba[g];[v0][g]overlay=0:{H - ALTO_DEGRADADO}:shortest=1[v1];"
+             f"[v1]ass={TMP / 'rotulos.ass'}[v]")
     run(["ffmpeg", "-y", "-loglevel", "error", "-i", TMP / "sin_audio.mp4", "-i", TMP / "mezcla.wav",
-         "-loop", "1", "-framerate", FPS, "-i", TMP / "marca.png",
          "-loop", "1", "-framerate", FPS, "-i", TMP / "degradado.png",
          "-filter_complex", grafo, "-map", "[v]", "-map", "1:a", "-af", "loudnorm=I=-14:TP=-1.5:LRA=11",
          "-c:v", "libx264", "-crf", "17",
