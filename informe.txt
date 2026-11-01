@@ -1,0 +1,5 @@
+PRUEBA SOLO AUDIO (71.0 s)
+
+hook: voz 13.42 s, de 0.15 s a 13.57 s; se quitaron 0.37 s del final; final (RMS/100 ms): [0.319, 0.15, 0.0, 0.0, 0.002, 0.026, 0.055, 0.066]
+c1: voz 24.07 s, de 14.32 s a 38.39 s; se quitaron 0.23 s del final; final (RMS/100 ms): [0.318, 0.144, 0.0, 0.01, 0.036, 0.065, 0.087, 0.073]
+c2: voz 27.59 s, de 39.14 s a 66.73 s; se quitaron 0.31 s del final; final (RMS/100 ms): [0.313, 0.15, 0.0, 0.001, 0.011, 0.046, 0.031, 0.045]
