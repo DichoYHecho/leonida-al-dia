@@ -22,7 +22,7 @@ jobs:
       - name: Instalar programas
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -y -qq ffmpeg fonts-dejavu-core
+          sudo apt-get install -y -qq ffmpeg fonts-dejavu-core fonts-montserrat fonts-bebas-neue
           pip install numpy faster-whisper==1.2.1
 
       - name: Trozos del stock nuevo
