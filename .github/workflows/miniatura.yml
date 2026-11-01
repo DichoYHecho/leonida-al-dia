@@ -1,0 +1,43 @@
+name: Miniaturas del vídeo largo
+
+on:
+  workflow_dispatch:
+    inputs:
+      frames:
+        description: "Fotogramas «vídeo:segundo» separados por comas (los tres primeros se convierten en miniatura)"
+        default: "Lanzamiento:40.5,Mirada:1013,Lanzamiento:26.5,Lanzamiento:67.2,Trailer_2:27.5,Trailer_2:13.8"
+
+permissions:
+  contents: write
+
+jobs:
+  miniatura:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      FRAMES: ${{ inputs.frames }}
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Instalar programas
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg fonts-montserrat
+          pip install pillow
+
+      - name: Sacar fotogramas y componer miniaturas
+        run: python3 video_largo/miniatura.py
+
+      - name: Publicar en la rama miniaturas
+        if: always()
+        run: |
+          cd salida_miniatura
+          git init -q
+          git checkout -q -b miniaturas
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add .
+          git commit -q -m "Miniaturas"
+          git remote add origin "https://x-access-token:$GH_TOKEN@github.com/$GITHUB_REPOSITORY.git"
+          git push -f origin miniaturas
