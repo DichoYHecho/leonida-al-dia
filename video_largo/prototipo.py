@@ -90,6 +90,8 @@ BLOQUES = [
 TOTAL_CURIOSIDADES = 20
 TEMPO_VOZ = float(os.environ.get("TEMPO_VOZ", "1.12"))  # más ritmo sin cambiar el tono
 ACENTO = "&HA34FFF&"  # rosa de la marca (ASS usa el orden azul-verde-rojo)
+ALTO_DEGRADADO = 380  # franja oscura suave abajo, para que se lean bien los subtítulos
+CARPETA_FUENTES = "/usr/share/fonts/truetype/montserrat/"
 
 
 def run(cmd, **kw):
@@ -167,11 +169,49 @@ def sintetizar(texto):
 def leer_wav(ruta, tempo=1.0):
     """Lee un audio cualquiera como float32 estéreo a 48 kHz (lo pasa por ffmpeg)."""
     tmp = TMP / (pathlib.Path(ruta).stem + "_48k.wav")
-    run(["ffmpeg", "-y", "-loglevel", "error", "-i", ruta, "-af", f"atempo={tempo}", "-ar", SR, "-ac", 2,
+    filtro = f"highpass=f=90,atempo={tempo}" if tempo != 1.0 else "anull"
+    run(["ffmpeg", "-y", "-loglevel", "error", "-i", ruta, "-af", filtro, "-ar", SR, "-ac", 2,
          "-c:a", "pcm_s16le", tmp])
     with wave.open(str(tmp), "rb") as f:
         datos = np.frombuffer(f.readframes(f.getnframes()), dtype="<i2").astype(np.float32) / 32768
     return datos.reshape(-1, 2)
+
+
+def fundir(x, entrada, salida):
+    """Fundido de entrada y de salida (en segundos) a un audio estéreo: evita chasquidos en los cortes."""
+    n = len(x)
+    ne, ns = min(int(entrada * SR), n // 2), min(int(salida * SR), n // 2)
+    if ne:
+        x[:ne] *= (0.5 - 0.5 * np.cos(np.linspace(0, np.pi, ne)))[:, None]
+    if ns:
+        x[-ns:] *= (0.5 + 0.5 * np.cos(np.linspace(0, np.pi, ns)))[:, None]
+    return x
+
+
+def limpiar_voz(a):
+    """Quita el ruido y el chasquido del principio y del final de cada audio de voz y suaviza los bordes.
+    Devuelve (audio, segundos quitados del principio)."""
+    a = a - a.mean(axis=0, keepdims=True)
+    m = a.mean(axis=1)
+    hop = SR // 100
+    rms = np.sqrt(np.convolve(m ** 2, np.ones(hop) / hop, "same"))[::hop]
+    act = rms > 0.06 * (rms.max() + 1e-9)
+    tramos, i = [], 0
+    while i < len(act):
+        if act[i]:
+            j = i
+            while j < len(act) and act[j]:
+                j += 1
+            tramos.append((i, j))
+            i = j
+        else:
+            i += 1
+    largos = [t for t in tramos if t[1] - t[0] >= 10]  # solo cuenta lo que dura 100 ms o más (un chasquido corto no es voz)
+    if not largos:
+        return a, 0.0
+    ini = max(0, int((largos[0][0] * 0.01 - 0.03) * SR))
+    fin = min(len(a), int((largos[-1][1] * 0.01 + 0.15) * SR))
+    return fundir(a[ini:fin].copy(), 0.03, 0.15), ini / SR
 
 
 # ---------------------------------------------------------------- Whisper y tiempos de las palabras
@@ -346,6 +386,16 @@ def limpiar(txt):
     return txt.replace("{", "(").replace("}", ")")
 
 
+def armar(palabras, corte, activa=None):
+    """Texto de una frase de subtítulo; la palabra «activa» (la que suena) va en rosa."""
+    partes = []
+    for i, pw in enumerate(palabras):
+        partes.append(f"{{\\c{ACENTO}}}{pw}{{\\c&HFFFFFF&}}" if i == activa else pw)
+        if i + 1 < len(palabras):
+            partes.append("\\N" if corte is not None and i + 1 == corte else " ")
+    return "".join(partes)
+
+
 def escribir_ass(ruta, bloques, total):
     cab = f"""[Script Info]
 ScriptType: v4.00+
@@ -355,18 +405,18 @@ WrapStyle: 2
 
 [V4+ Styles]
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
-Style: Sub,Montserrat ExtraBold,62,&H00FFFFFF,&H000000FF,&H00000000,&H96000000,0,0,0,0,100,100,0,0,1,6,3,2,200,200,74,1
+Style: Sub,Montserrat ExtraBold,60,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,1,0,1,5,0,2,220,220,92,1
+Style: SubSombra,Montserrat ExtraBold,60,&H00000000,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,1,0,1,12,0,2,220,220,86,1
 Style: Num,Montserrat Black,132,&H00A34FFF,&H000000FF,&H00000000,&H90000000,0,0,0,0,100,100,0,0,1,0,4,7,0,0,0,1
 Style: Total,Montserrat ExtraBold,46,&H99FFFFFF,&H000000FF,&H00000000,&H90000000,0,0,0,0,100,100,0,0,1,0,3,7,0,0,0,1
 Style: Titulo,Bebas Neue Bold,74,&H00FFFFFF,&H000000FF,&H00000000,&H90000000,0,0,0,0,100,100,5,0,1,0,3,7,0,0,0,1
 Style: Gancho,Montserrat Black,112,&H00FFFFFF,&H000000FF,&H00000000,&H90000000,0,0,0,0,100,100,0,0,1,9,4,5,0,0,0,1
-Style: Marca,Montserrat ExtraBold,28,&H66FFFFFF,&H000000FF,&H00000000,&H90000000,0,0,0,0,100,100,7,0,1,0,2,9,0,60,50,1
 Style: Dibujo,Montserrat Black,20,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,0,0,7,0,0,0,1
 
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
 """
-    ev = [f"Dialogue: 0,{ass_t(0)},{ass_t(total)},Marca,,0,0,0,,{{\\fad(500,500)}}LEÓNIDA AL DÍA"]
+    ev = []
     for b in bloques:
         a, z = ass_t(b["ini"]), ass_t(b["fin"])
         if b["num"]:
@@ -395,19 +445,45 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
             for k, (w, ini, fin) in enumerate(frase):
                 sig = frase[k + 1][1] if k + 1 < len(frase) else fin + 0.12
                 fin_k = min(sig, fin + 0.45) if k + 1 < len(frase) else sig
-                partes = []
-                for i, pw in enumerate(palabras):
-                    if i == k:
-                        partes.append(f"{{\\c{ACENTO}}}{pw}{{\\c&HFFFFFF&}}")
-                    else:
-                        partes.append(pw)
-                    if corte is not None and i + 1 == corte and i + 1 < len(palabras):
-                        partes.append("\\N")
-                    elif i + 1 < len(palabras):
-                        partes.append(" ")
-                texto = "".join(partes).replace(" \\N ", "\\N").replace(" \\N", "\\N")
-                ev.append(f"Dialogue: 0,{ass_t(ini)},{ass_t(fin_k)},Sub,,0,0,0,,{texto}")
+                entra, sale = (90 if k == 0 else 0), (130 if k + 1 == len(frase) else 0)
+                fund = f"\\fad({entra},{sale})" if entra or sale else ""
+                ev.append(f"Dialogue: 0,{ass_t(ini)},{ass_t(fin_k)},SubSombra,,0,0,0,,"
+                          f"{{\\blur16\\alpha&H70&{fund}}}{armar(palabras, corte)}")
+                ev.append(f"Dialogue: 1,{ass_t(ini)},{ass_t(fin_k)},Sub,,0,0,0,,"
+                          f"{{\\blur1.2{fund}}}{armar(palabras, corte, k)}")
     pathlib.Path(ruta).write_text(cab + "\n".join(ev) + "\n", encoding="utf-8")
+
+
+def crear_marca(ruta):
+    """Marca de agua «LEÓNIDA AL DÍA» como imagen con transparencia, dibujada 4 veces más grande y reducida
+    después (bordes suaves, sin píxeles)."""
+    from PIL import Image, ImageDraw, ImageFilter, ImageFont
+    k = 4
+    fuente = ImageFont.truetype(CARPETA_FUENTES + "Montserrat-Black.ttf", 34 * k)
+    a, b = "LEÓNIDA", " AL DÍA"
+    medida = ImageDraw.Draw(Image.new("RGBA", (10, 10)))
+    wa, wb = medida.textlength(a, font=fuente), medida.textlength(b, font=fuente)
+    margen = 18 * k
+    ancho, alto = int(wa + wb) + 2 * margen, 92 * k
+    base = Image.new("RGBA", (ancho, alto), (0, 0, 0, 0))
+    sombra = Image.new("RGBA", (ancho, alto), (0, 0, 0, 0))
+    ds = ImageDraw.Draw(sombra)
+    ds.text((margen, 10 * k + 3 * k), a + b, font=fuente, fill=(0, 0, 0, 150))
+    base.alpha_composite(sombra.filter(ImageFilter.GaussianBlur(4 * k)))
+    d = ImageDraw.Draw(base)
+    d.text((margen, 10 * k), a, font=fuente, fill=(255, 255, 255, 245))
+    d.text((margen + wa, 10 * k), b, font=fuente, fill=(255, 79, 163, 255))
+    d.rounded_rectangle((margen, 66 * k, margen + 52 * k, 66 * k + 6 * k), radius=3 * k, fill=(255, 79, 163, 255))
+    base.resize((ancho // k, alto // k), Image.LANCZOS).save(ruta)
+
+
+def crear_degradado(ruta):
+    """Franja oscura suave en la parte de abajo (transparente arriba): da profesionalidad y ayuda a leer."""
+    from PIL import Image
+    alfa = (np.linspace(0, 1, ALTO_DEGRADADO) ** 1.7 * 165).astype(np.uint8)
+    arr = np.zeros((ALTO_DEGRADADO, W, 4), np.uint8)
+    arr[..., 3] = alfa[:, None]
+    Image.fromarray(arr, "RGBA").save(ruta)
 
 
 # ---------------------------------------------------------------- vídeo
@@ -535,6 +611,8 @@ def main():
             print(f"  se quitan los primeros {b['recorte']:.1f} s (no son del guion)", flush=True)
             b["audio"] = b["audio"][int(b["recorte"] * SR):]
             ws = [(w, a - b["recorte"], e - b["recorte"]) for w, a, e in ws if e > b["recorte"]]
+        b["audio"], desfase = limpiar_voz(b["audio"])
+        ws = [(w, a - desfase, e - desfase) for w, a, e in ws]
         b["ws"] = ws
         b["dur_voz"] = len(b["audio"]) / SR
         print(f"  {b['dur_voz']:.1f} s", flush=True)
@@ -611,7 +689,7 @@ def main():
         i0, i1 = int(b["orig_ini"] * SR), int(b["orig_fin"] * SR)
         silencio[i0:i1] = 0
         if "orig_wav" in b:
-            o = leer_wav(b["orig_wav"])
+            o = fundir(leer_wav(b["orig_wav"]), 0.06, 0.15)
             orig[i0:i0 + len(o)] += o[: n - i0] * 0.95
     silencio = suavizar(silencio, SR, 0.02, 0.04)
     mezcla = voz + (mus * ganancia * silencio)[:, None] + orig
@@ -624,9 +702,17 @@ def main():
     # 6) montaje final: ligero ajuste de color y nitidez, y encima los rótulos
     HQ.mkdir(exist_ok=True)
     final = HQ / "prototipo_hq.mp4"
-    vf = f"eq=contrast=1.04:saturation=1.08,unsharp=5:5:0.4:5:5:0.0,ass={TMP / 'rotulos.ass'}"
+    crear_marca(TMP / "marca.png")
+    crear_degradado(TMP / "degradado.png")
+    grafo = (f"[0:v]eq=contrast=1.04:saturation=1.08,unsharp=5:5:0.4:5:5:0.0[v0];"
+             f"[3:v]format=rgba[g];[v0][g]overlay=0:{H - ALTO_DEGRADADO}:shortest=1[v1];"
+             f"[2:v]format=rgba,fade=t=in:st=0.4:d=0.9:alpha=1[m];[v1][m]overlay=W-w-56:46:shortest=1[v2];"
+             f"[v2]ass={TMP / 'rotulos.ass'}[v]")
     run(["ffmpeg", "-y", "-loglevel", "error", "-i", TMP / "sin_audio.mp4", "-i", TMP / "mezcla.wav",
-         "-vf", vf, "-af", "loudnorm=I=-14:TP=-1.5:LRA=11", "-c:v", "libx264", "-crf", "17",
+         "-loop", "1", "-framerate", FPS, "-i", TMP / "marca.png",
+         "-loop", "1", "-framerate", FPS, "-i", TMP / "degradado.png",
+         "-filter_complex", grafo, "-map", "[v]", "-map", "1:a", "-af", "loudnorm=I=-14:TP=-1.5:LRA=11",
+         "-c:v", "libx264", "-crf", "17",
          "-preset", "medium", "-pix_fmt", "yuv420p", "-c:a", "aac", "-b:a", "192k", "-ar", SR,
          "-shortest", "-movflags", "+faststart", final])
     run(["ffmpeg", "-y", "-loglevel", "error", "-i", final, "-c:v", "libx264", "-crf", "23", "-maxrate", "7M",
