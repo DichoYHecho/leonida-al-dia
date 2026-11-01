@@ -79,6 +79,8 @@ BLOQUES = [
     },
 ]
 TOTAL_CURIOSIDADES = 20
+TEMPO_VOZ = float(os.environ.get("TEMPO_VOZ", "1.12"))  # más ritmo sin cambiar el tono
+HQ = pathlib.Path("salida_hq")
 
 
 def run(cmd, **kw):
@@ -137,10 +139,11 @@ def sintetizar(texto):
     return destino
 
 
-def leer_wav(ruta):
+def leer_wav(ruta, tempo=1.0):
     """Lee un audio cualquiera como float32 estéreo a 48 kHz (lo pasa por ffmpeg)."""
     tmp = TMP / (pathlib.Path(ruta).stem + "_48k.wav")
-    run(["ffmpeg", "-y", "-loglevel", "error", "-i", ruta, "-ar", SR, "-ac", 2, "-c:a", "pcm_s16le", tmp])
+    run(["ffmpeg", "-y", "-loglevel", "error", "-i", ruta, "-af", f"atempo={tempo}", "-ar", SR, "-ac", 2,
+         "-c:a", "pcm_s16le", tmp])
     with wave.open(str(tmp), "rb") as f:
         datos = np.frombuffer(f.readframes(f.getnframes()), dtype="<i2").astype(np.float32) / 32768
     return datos.reshape(-1, 2)
@@ -151,7 +154,7 @@ def tiempos_palabras(ruta_wav, texto, dur):
     """Tiempo (inicio, fin) de cada palabra del guion. Whisper si está; si no, a prorrata por letras."""
     pal = texto.split()
     ws = []
-    if not DRY:
+    if os.environ.get("USAR_WHISPER") == "1":
         try:
             from faster_whisper import WhisperModel
             modelo = WhisperModel("base", device="cpu", compute_type="int8")
@@ -174,6 +177,47 @@ def tiempos_palabras(ruta_wav, texto, dur):
         out.append((dur * acum / total, dur * (acum + l) / total))
         acum += l
     return out, "a prorrata"
+
+
+def tiempos_por_voz(audio, texto):
+    """Tiempo de cada palabra según dónde suena la voz (salta los silencios y las pausas)."""
+    x = audio.mean(axis=1)
+    hop = SR // 100
+    rms = np.sqrt(np.convolve(x ** 2, np.ones(hop) / hop, "same"))[::hop]
+    act = rms > 0.06 * (rms.max() + 1e-9)
+    segs, ini = [], None
+    for i, a in enumerate(act):
+        if a and ini is None:
+            ini = i
+        if not a and ini is not None:
+            segs.append([ini / 100, i / 100])
+            ini = None
+    if ini is not None:
+        segs.append([ini / 100, len(act) / 100])
+    unidos = []
+    for s in segs:
+        if unidos and s[0] - unidos[-1][1] < 0.25:
+            unidos[-1][1] = s[1]
+        else:
+            unidos.append(s)
+    if not unidos:
+        unidos = [[0.0, len(x) / SR]]
+    total = sum(b - a for a, b in unidos)
+
+    def real(seg):
+        for a, b in unidos:
+            if seg <= b - a:
+                return a + seg
+            seg -= b - a
+        return unidos[-1][1]
+
+    pal = texto.split()
+    pesos = [len(p) + 1 for p in pal]
+    suma, acum, out = sum(pesos), 0, []
+    for p in pesos:
+        out.append((real(total * acum / suma), real(total * (acum + p) / suma)))
+        acum += p
+    return out, "la voz (pausas)"
 
 
 def trozos_de_subtitulo(pal, tiempos, ini):
@@ -348,7 +392,7 @@ def main():
     for b in BLOQUES:
         print("Voz de", b["id"], flush=True)
         b["wav"] = sintetizar(b["texto"])
-        b["audio"] = leer_wav(b["wav"])
+        b["audio"] = leer_wav(b["wav"], TEMPO_VOZ)
         b["dur_voz"] = len(b["audio"]) / SR
         print(f"  {b['dur_voz']:.1f} s", flush=True)
     # 2) línea de tiempo
@@ -396,7 +440,7 @@ def main():
     # 4) subtítulos y rótulos
     for b in BLOQUES:
         pal = b["texto"].split()
-        tiempos, metodo = tiempos_palabras(b["wav"], b["texto"], b["dur_voz"])
+        tiempos, metodo = tiempos_por_voz(b["audio"], b["texto"])
         b["subs"] = trozos_de_subtitulo(pal, tiempos, b["voz_ini"])
         b["metodo"] = metodo
     escribir_ass(TMP / "rotulos.ass", BLOQUES, total)
@@ -433,16 +477,20 @@ def main():
         f.setframerate(SR)
         f.writeframes((mezcla * 32767).astype("<i2").tobytes())
     # 6) montaje final
-    final = OUT / "prototipo.mp4"
+    HQ.mkdir(exist_ok=True)
+    final = HQ / "prototipo_hq.mp4"
     vf = f"ass={TMP / 'rotulos.ass'}"
     run(["ffmpeg", "-y", "-loglevel", "error", "-i", TMP / "sin_audio.mp4", "-i", TMP / "mezcla.wav",
          "-vf", vf, "-af", "loudnorm=I=-14:TP=-1.5:LRA=11", "-c:v", "libx264", "-crf", "21",
          "-preset", "medium", "-pix_fmt", "yuv420p", "-c:a", "aac", "-b:a", "192k", "-ar", SR,
          "-shortest", "-movflags", "+faststart", final])
+    run(["ffmpeg", "-y", "-loglevel", "error", "-i", final, "-vf", "scale=1280:720", "-c:v", "libx264",
+         "-crf", "27", "-preset", "veryfast", "-c:a", "aac", "-b:a", "128k", "-movflags", "+faststart",
+         OUT / "prototipo.mp4"])
     run(["ffmpeg", "-y", "-loglevel", "error", "-i", final, "-vf", "fps=1/3,scale=480:-1,tile=5x4",
          "-frames:v", "1", "-q:v", "3", OUT / "hoja.jpg"])
     dur = float(run(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", final]).stdout)
-    informe = [f"Voz: {VOZ} ({MODELO})", f"Duración: {dur:.1f} s", f"Tamaño: {final.stat().st_size / 1e6:.1f} MB",
+    informe = [f"Voz: {VOZ} ({MODELO})", f"Duración: {dur:.1f} s", f"Tamaño: {final.stat().st_size / 1e6:.1f} MB (alta calidad), {(OUT / 'prototipo.mp4').stat().st_size / 1e6:.1f} MB (revisión)",
                f"Tiempo de montaje: {time.time() - t0:.0f} s", ""]
     for b in BLOQUES:
         informe.append(f"{b['id']}: voz {b['dur_voz']:.1f} s, {len(b['plan'])} planos, "
