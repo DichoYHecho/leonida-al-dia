@@ -1,0 +1,8 @@
+Voz: Orus (gemini-3.8-flash-lite-tts)
+Duración: 70.5 s
+Tamaño: 121.5 MB (alta calidad), 53.3 MB (revisión)
+Tiempo de montaje: 686 s
+
+hook: voz 13.4 s (se quitaron 0.37 s del final), 7 planos, subtítulos por Whisper
+c1: voz 24.1 s (se quitaron 0.23 s del final), 9 planos, subtítulos por Whisper
+c2: voz 27.6 s (se quitaron 0.29 s del final), 9 planos, subtítulos por Whisper, con sonido original
