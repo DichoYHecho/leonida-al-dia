@@ -1,0 +1,51 @@
+name: Miniatura minimalista
+
+on:
+  workflow_dispatch:
+    inputs:
+      frames:
+        description: "Candidatos: «vídeo:segundo» separados por comas (déjalo vacío si rellenas izq y der)"
+        default: "Mirada:789,Mirada:792,Mirada:795,Mirada:798,Mirada:801,Mirada:804,Mirada:807,Mirada:813,Mirada:1013,Mirada:1014.5,Trailer_2:27.5,Trailer_2:29,Trailer_2:30.5,Trailer_1:3,Trailer_1:8,Trailer_1:14,Trailer_1:20,Trailer_1:33,Trailer_1:40,Lanzamiento:8,Lanzamiento:14,Lanzamiento:20,Lanzamiento:26.5,Lanzamiento:33,Lanzamiento:45,Lanzamiento:60"
+      izq:
+        description: "Cara de la izquierda: vídeo:segundo:x:y:zoom (ejemplo Mirada4K:801:0.4:0.4:1.3)"
+        default: ""
+      der:
+        description: "Cara de la derecha: vídeo:segundo:x:y:zoom"
+        default: ""
+
+permissions:
+  contents: write
+
+jobs:
+  miniatura:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      FRAMES: ${{ inputs.frames }}
+      IZQ: ${{ inputs.izq }}
+      DER: ${{ inputs.der }}
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Instalar programas
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg fonts-montserrat
+          pip install pillow
+
+      - name: Componer
+        run: python3 video_largo/miniatura2.py
+
+      - name: Publicar en la rama miniaturas-2
+        if: always()
+        run: |
+          cd salida_miniatura2
+          git init -q
+          git checkout -q -b miniaturas-2
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add .
+          git commit -q -m "Miniatura minimalista"
+          git remote add origin "https://x-access-token:$GH_TOKEN@github.com/$GITHUB_REPOSITORY.git"
+          git push -f origin miniaturas-2
