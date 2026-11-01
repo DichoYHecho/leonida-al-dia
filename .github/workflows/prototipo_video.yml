@@ -2,6 +2,10 @@ name: Prototipo del vídeo largo
 
 on:
   workflow_dispatch:
+    inputs:
+      solo_audio:
+        description: "Prueba rápida de solo audio (si/no)"
+        default: "no"
 
 permissions:
   contents: write
@@ -44,6 +48,7 @@ jobs:
       - name: Montar el prototipo
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY_VIDEO || secrets.GEMINI_API_KEY }}
+          SOLO_AUDIO: ${{ inputs.solo_audio }}
         run: python video_largo/prototipo.py
 
       - name: Guardar las voces en la caché
@@ -61,14 +66,16 @@ jobs:
           path: salida_hq/
           if-no-files-found: warn
 
-      - name: Publicar en la rama prototipo-video-largo
+      - name: Publicar el resultado en su rama
+        env:
+          RAMA: ${{ inputs.solo_audio == 'si' && 'prueba-audio-video-largo' || 'prototipo-video-largo' }}
         run: |
           cd salida_prototipo
           git init -q
-          git checkout -q -b prototipo-video-largo
+          git checkout -q -b "$RAMA"
           git config user.name "github-actions"
           git config user.email "actions@github.com"
           git add .
           git commit -q -m "Prototipo del vídeo largo"
           git remote add origin "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git"
-          git push -f origin prototipo-video-largo
+          git push -f origin "$RAMA"
