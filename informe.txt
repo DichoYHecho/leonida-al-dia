@@ -1,0 +1,7 @@
+Modelo: gemini-3.8-flash-lite-tts
+
+ERROR 1_koda_relajada: voz Koda, FileNotFoundError: [Errno 2] No such file or directory: 'ffmpeg'
+ERROR 2_ludo_relajada: voz Ludo, FileNotFoundError: [Errno 2] No such file or directory: 'ffmpeg'
+ERROR 3_orus_relajada: voz Orus, FileNotFoundError: [Errno 2] No such file or directory: 'ffmpeg'
+ERROR 4_mako_relajada: voz Mako, FileNotFoundError: [Errno 2] No such file or directory: 'ffmpeg'
+ERROR 5_mako_estilo_shorts: voz Mako, FileNotFoundError: [Errno 2] No such file or directory: 'ffmpeg'
