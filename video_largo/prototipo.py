@@ -26,6 +26,7 @@ import wave
 import numpy as np
 
 DRY = os.environ.get("DRY") == "1"
+SOLO_AUDIO = os.environ.get("SOLO_AUDIO") == "si"  # prueba rápida: solo la mezcla de audio, sin vídeo
 CLAVE = os.environ.get("GEMINI_API_KEY", "").strip()
 MODELO = os.environ.get("MODELO_TTS", "gemini-3.8-flash-lite-tts").strip()
 VOZ = "Orus"
@@ -284,6 +285,23 @@ def inicio_guion(pal, ws):
             antes = sum(len(p) + 1 for p in pal[:j]) * 0.075
             return max(0.0, ws[i][1] - antes - 0.12)
     return 0.0
+
+
+def fin_guion(pal, ws):
+    """Segundo en el que acaba la última palabra del guion según Whisper (None si no se puede saber)."""
+    if not ws:
+        return None
+    oidas = [normalizar(w[0]) for w in ws]
+    for atras, margen in ((1, 0.0), (2, 0.45)):
+        if len(pal) < atras:
+            break
+        buscada = normalizar(pal[-atras])
+        if len(buscada) < 3:
+            continue
+        for i in range(len(ws) - 1, -1, -1):
+            if oidas[i] == buscada:
+                return ws[i][2] + margen
+    return None
 
 
 def alinear(pal, ws, dur):
@@ -589,6 +607,18 @@ def main():
             print(f"  se quitan los primeros {b['recorte']:.1f} s (no son del guion)", flush=True)
             b["audio"] = b["audio"][int(b["recorte"] * SR):]
             ws = [(w, a - b["recorte"], e - b["recorte"]) for w, a, e in ws if e > b["recorte"]]
+        dur_antes = len(b["audio"]) / SR
+        cola = [round(float(np.sqrt(np.mean(b["audio"][max(0, len(b["audio"]) - int((q + 1) * 0.1 * SR)):
+                                                      len(b["audio"]) - int(q * 0.1 * SR)].mean(axis=1) ** 2))), 3)
+                for q in range(8)]
+        fin_g = fin_guion(pal, ws)
+        b["cola_cortada"] = 0.0
+        if fin_g is not None and fin_g + 0.3 < dur_antes:
+            b["cola_cortada"] = dur_antes - (fin_g + 0.18)
+            b["audio"] = b["audio"][: int((fin_g + 0.18) * SR)]
+            print(f"  se quitan {b['cola_cortada']:.2f} s del final (después de la última palabra)", flush=True)
+        b["cola"] = cola
+        print("  final de la voz (RMS cada 100 ms, hacia atrás):", cola, flush=True)
         b["audio"], desfase = limpiar_voz(b["audio"])
         ws = [(w, a - desfase, e - desfase) for w, a, e in ws]
         b["ws"] = ws
@@ -618,6 +648,8 @@ def main():
         plan = planificar(b, b["vis_fin"] - b["ini"], tabla)
         b["plan"] = plan
         for nombre, dur, alargar in plan:
+            if SOLO_AUDIO:
+                break
             k += 1
             destino = str(carpeta / f"{k:02d}_{nombre}.mp4")
             cortar_plano(nombre, tabla[nombre], dur, destino, k % 2)
@@ -626,16 +658,18 @@ def main():
             k += 1
             o = tabla[b["original"]]
             destino = str(carpeta / f"{k:02d}_{b['original']}.mp4")
-            cortar_plano(b["original"], o, o["dur"], destino, 0)
-            lista_concat.append(destino)
+            if not SOLO_AUDIO:
+                cortar_plano(b["original"], o, o["dur"], destino, 0)
+                lista_concat.append(destino)
             if not DRY:
                 b["orig_wav"] = TMP / "original.wav"
                 run(["ffmpeg", "-y", "-loglevel", "error", "-ss", f"{o['ini']:.2f}", "-t", f"{o['dur']:.2f}",
                      "-user_agent", UA, "-i", VIDEOS[o["video"]], "-vn", "-ar", SR, "-ac", 2,
                      "-c:a", "pcm_s16le", b["orig_wav"]])
-    (TMP / "lista.txt").write_text("".join(f"file '{pathlib.Path(p).resolve()}'\n" for p in lista_concat))
-    run(["ffmpeg", "-y", "-loglevel", "error", "-f", "concat", "-safe", "0", "-i", TMP / "lista.txt",
-         "-c", "copy", TMP / "sin_audio.mp4"])
+    if not SOLO_AUDIO:
+        (TMP / "lista.txt").write_text("".join(f"file '{pathlib.Path(p).resolve()}'\n" for p in lista_concat))
+        run(["ffmpeg", "-y", "-loglevel", "error", "-f", "concat", "-safe", "0", "-i", TMP / "lista.txt",
+             "-c", "copy", TMP / "sin_audio.mp4"])
     # 4) subtítulos y rótulos
     for b in BLOQUES:
         pal = b["texto"].split()
@@ -677,6 +711,29 @@ def main():
         f.setsampwidth(2)
         f.setframerate(SR)
         f.writeframes((mezcla * 32767).astype("<i2").tobytes())
+    with wave.open(str(TMP / "solo_voz.wav"), "wb") as f:
+        f.setnchannels(2)
+        f.setsampwidth(2)
+        f.setframerate(SR)
+        f.writeframes((np.clip(voz, -1, 1) * 32767).astype("<i2").tobytes())
+    for nombre_wav, nombre_png in (("mezcla.wav", "espectro_mezcla.png"), ("solo_voz.wav", "espectro_voz.png")):
+        run(["ffmpeg", "-y", "-loglevel", "error", "-i", TMP / nombre_wav, "-lavfi",
+             "showspectrumpic=s=1920x600:legend=1:scale=log", "-frames:v", "1", OUT / nombre_png])
+    run(["ffmpeg", "-y", "-loglevel", "error", "-i", TMP / "mezcla.wav", "-codec:a", "libmp3lame", "-q:a", "3",
+         OUT / "audio.mp3"])
+    if SOLO_AUDIO:
+        informe = [f"PRUEBA SOLO AUDIO ({total:.1f} s)", ""]
+        for b in BLOQUES:
+            informe.append(f"{b['id']}: voz {b['dur_voz']:.2f} s, de {b['voz_ini']:.2f} s a {b['voz_fin']:.2f} s"
+                           + (f"; se quitaron {b['cola_cortada']:.2f} s del final" if b["cola_cortada"] else "")
+                           + f"; final (RMS/100 ms): {b['cola']}")
+        (OUT / "informe.txt").write_text("\n".join(informe), encoding="utf-8")
+        print("\n".join(informe))
+        resumen = os.environ.get("GITHUB_STEP_SUMMARY")
+        if resumen:
+            with open(resumen, "a", encoding="utf-8") as f:
+                f.write("### Prueba solo de audio\n\n" + "\n".join(informe).replace("\n", "  \n") + "\n")
+        return
     # 6) montaje final: ligero ajuste de color y nitidez, y encima los rótulos
     HQ.mkdir(exist_ok=True)
     final = HQ / "prototipo_hq.mp4"
@@ -703,6 +760,7 @@ def main():
     for b in BLOQUES:
         informe.append(f"{b['id']}: voz {b['dur_voz']:.1f} s"
                        + (f" (se quitaron {b['recorte']:.1f} s del principio)" if b["recorte"] else "")
+                       + (f" (se quitaron {b['cola_cortada']:.2f} s del final)" if b["cola_cortada"] else "")
                        + f", {len(b['plan'])} planos, subtítulos por {b['metodo']}"
                        + (", con sonido original" if b.get("original") else ""))
     texto = "\n".join(informe)
