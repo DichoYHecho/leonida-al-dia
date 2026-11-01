@@ -16,6 +16,8 @@ import re
 import subprocess
 import sys
 import time
+import difflib
+import unicodedata
 import urllib.error
 import urllib.request
 import wave
@@ -55,27 +57,31 @@ BLOQUES = [
                   "metido, hay un detalle que me tiene obsesionado: en este juego puedes mejorar tu "
                   "reputación criminal... tirando la basura al contenedor. Sí. Has oído bien."),
         "planos": ["Lanz_Paseo", "Lanz_Descapotable", "T1_Autopista", "Mirada_Skyline_Azotea", "Lanz_Playa",
-                   "T1_Neones", "Mirada_Autopista_1", "Lanz_Balcon", "T2_Jason_Conduce"],
+                   "T1_Neones", "Mirada_Autopista_1", "Lanz_Balcon", "T2_Jason_Conduce",
+                   "Mirada_Descapotable_1", "Lanz_Moto_Salto", "Mirada_Calles_2", "T1_Coches_Noche"],
     },
     {
-        "id": "c10", "num": 10, "titulo": "EL PRIMER COCHE", "overlay": "",
-        "texto": ("Número diez: el primer coche. En el Extended Look, el primero en el que se suben "
-                  "Jason y Lucía es un descapotable alemán de los ochenta. Parece la versión de "
-                  "Rockstar de un BMW Serie 3 clásico, aunque eso es suposición de la prensa: Rockstar "
-                  "nunca pone marcas reales. Y por dentro, los coches tienen tanto detalle que "
-                  "podrías pasar la ITV."),
-        "planos": ["Mirada_Descapotable_1", "Mirada_Descapotable_2", "Mirada_Autopista_2",
-                   "Mirada_Coche_Clasico", "Mirada_Calles_2", "Mirada_Furgoneta"],
+        "id": "c1", "num": 1, "titulo": "EL HERMANO MAYOR", "overlay": "",
+        "texto": ("Curiosidad número uno. Para entender GTA 6 hay que mirar a su hermano mayor. GTA 5 hizo "
+                  "más de 800 millones de dólares en su primer día. En un día. Y mil millones en solo "
+                  "tres, algo que ninguna película ni ningún juego había conseguido tan rápido: Avatar, "
+                  "por ejemplo, tardó 17 días. Hoy GTA 5 ha vendido más de 230 millones de copias. "
+                  "Y GTA 6 tiene que superar eso. Ni presión ni nada."),
+        "planos": ["Mirada_Vista_Aerea", "T1_Playa_Aerea", "Lanz_Cartel_Keys", "Mirada_Atardecer",
+                   "T1_Noche_Aerea", "Mirada_Puerto", "T1_Letras_Vice", "Mirada_Skyline_Azotea",
+                   "Mirada_Autopista_2", "T1_Neones"],
     },
     {
-        "id": "c12", "num": 12, "titulo": "CARRERAS", "overlay": "",
-        "texto": ("Número doce: carreras. El Extended Look enseña una pista de asfalto, otra de tierra "
-                  "y una carrera callejera que recuerda a Midnight Club, esa saga de carreras de "
-                  "Rockstar que lleva siglos dormida. Suma motos de cross, motos de agua y lanchas, "
-                  "y tienes el paraíso de cualquiera al que le guste hacer ruido."),
-        "planos": ["Mirada_Moto_Calle", "Mirada_Motocross", "Mirada_Hidrodeslizador",
-                   "Mirada_Mar_Atardecer", "Lanz_Moto_Salto", "T1_Lancha_Rapida"],
-        "original": "Mirada_Carrera",
+        "id": "c2", "num": 2, "titulo": "TRECE AÑOS", "overlay": "",
+        "texto": ("Número dos: trece años de espera. GTA 5 salió en septiembre de 2013. GTA 6 sale en "
+                  "noviembre de 2026. Hay gente que ha nacido, ha empezado el colegio y se ha sacado el "
+                  "carné de conducir mientras esperábamos. Por el camino se retrasó dos veces: iba a "
+                  "salir en 2025, luego el 26 de mayo de 2026, y al final: el 19 de noviembre. "
+                  "El 26 de mayo, por cierto, Rockstar no dijo ni mu, y los fans se cabrearon bastante."),
+        "planos": ["T2_Mar_Atardecer", "Lanz_Marina", "Mirada_Playa", "T2_Cayos_Aereo", "Mirada_Paracaidas",
+                   "T2_Gimnasio_Playa", "T1_Puente_Cayos", "Mirada_Moto_Calle", "T2_Casa_Pilotes",
+                   "Mirada_Skyline_Noche"],
+        "original": "Mirada_Skyline_Noche",
     },
 ]
 TOTAL_CURIOSIDADES = 20
@@ -150,26 +156,85 @@ def leer_wav(ruta, tempo=1.0):
 
 
 # ---------------------------------------------------------------- subtítulos
+def modelo_whisper():
+    """Baja el modelo de Whisper directamente (sin la librería de Hugging Face, que daba error)."""
+    d = pathlib.Path(os.environ.get("CACHE_WHISPER", "cache/whisper-base"))
+    d.mkdir(parents=True, exist_ok=True)
+    base = "https://huggingface.co/Systran/faster-whisper-base/resolve/main/"
+    for nombre, obligatorio in (("config.json", True), ("tokenizer.json", True), ("model.bin", True),
+                                ("vocabulary.txt", False)):
+        destino = d / nombre
+        if destino.exists() and destino.stat().st_size > 0:
+            continue
+        try:
+            pet = urllib.request.Request(base + nombre, headers={"User-Agent": UA})
+            with urllib.request.urlopen(pet, timeout=900) as r, open(destino, "wb") as f:
+                while True:
+                    bloque = r.read(1 << 20)
+                    if not bloque:
+                        break
+                    f.write(bloque)
+        except Exception:
+            if destino.exists():
+                destino.unlink()
+            if obligatorio:
+                raise
+    return str(d)
+
+
+def normalizar(p):
+    p = unicodedata.normalize("NFD", p.lower())
+    return re.sub(r"[^a-z0-9]", "", "".join(c for c in p if unicodedata.category(c) != "Mn"))
+
+
+def alinear(pal, ws, dur):
+    """Pone a cada palabra del guion el tiempo de la misma palabra en lo que ha oído Whisper
+    (ws = [(texto, inicio, fin)]); las que no coinciden se reparten entre las vecinas."""
+    a = [normalizar(w[0]) for w in ws]
+    b = [normalizar(p) for p in pal]
+    t = [None] * len(pal)
+    for i, j, n in difflib.SequenceMatcher(None, a, b, autojunk=False).get_matching_blocks():
+        for k in range(n):
+            t[j + k] = (ws[i + k][1], ws[i + k][2])
+    if sum(x is not None for x in t) < 0.4 * len(pal):
+        return None
+    i = 0
+    while i < len(t):
+        if t[i] is not None:
+            i += 1
+            continue
+        j = i
+        while j < len(t) and t[j] is None:
+            j += 1
+        ini = t[i - 1][1] if i > 0 else 0.0
+        fin = t[j][0] if j < len(t) else dur
+        fin = max(fin, ini + 0.05 * (j - i))
+        pesos = [len(p) + 1 for p in pal[i:j]]
+        acum = 0
+        for k in range(i, j):
+            p = pesos[k - i]
+            t[k] = (ini + (fin - ini) * acum / sum(pesos), ini + (fin - ini) * (acum + p) / sum(pesos))
+            acum += p
+        i = j
+    return t
+
+
 def tiempos_palabras(ruta_wav, texto, dur):
     """Tiempo (inicio, fin) de cada palabra del guion. Whisper si está; si no, a prorrata por letras."""
     pal = texto.split()
     ws = []
-    if os.environ.get("USAR_WHISPER") == "1":
+    if os.environ.get("USAR_WHISPER", "1") == "1" and not DRY:
         try:
             from faster_whisper import WhisperModel
-            modelo = WhisperModel("base", device="cpu", compute_type="int8")
+            modelo = WhisperModel(modelo_whisper(), device="cpu", compute_type="int8")
             segs, _ = modelo.transcribe(str(ruta_wav), language="es", word_timestamps=True)
-            ws = [(w.start, w.end) for s in segs for w in (s.words or [])]
+            ws = [(w.word, w.start, w.end) for s in segs for w in (s.words or [])]
         except Exception as e:  # noqa: BLE001
-            print("  Whisper no ha podido:", e, flush=True)
-    if len(ws) >= max(3, len(pal) // 3):
-        n_w, n_o = len(ws), len(pal)
-        out = []
-        for i in range(n_o):
-            a = min(n_w - 1, int(i * n_w / n_o))
-            b = min(n_w - 1, max(a, int((i + 1) * n_w / n_o) - 1))
-            out.append((ws[a][0], ws[b][1]))
-        return out, "Whisper"
+            print("  Whisper no ha podido:", type(e).__name__, e, flush=True)
+    if ws:
+        out = alinear(pal, ws, dur)
+        if out:
+            return out, "Whisper"
     letras = [len(p) + 1 for p in pal]
     total = sum(letras)
     acum, out = 0, []
@@ -288,11 +353,14 @@ def cortar_plano(nombre, t, dur, destino, sentido):
         pre = ["-ss", f"{t['ini']:.2f}", "-t", f"{dur:.2f}", "-user_agent", UA,
                "-reconnect", "1", "-reconnect_on_network_error", "1", "-reconnect_delay_max", "10"]
     x = f"(in_w-out_w)*t/{dur:.3f}" if sentido == 0 else f"(in_w-out_w)*(1-t/{dur:.3f})"
-    vf = f"scale=2112:1188:flags=lanczos,crop={W}:{H}:x='{x}':y='(in_h-out_h)/2',fps={FPS},format=yuv420p"
+    if t["video"] == "Mirada":  # fuente de 1080p: sin ampliar, para que no se vea borroso
+        vf = f"scale={W}:{H}:flags=lanczos,fps={FPS},format=yuv420p"
+    else:  # tráileres en 4K: ligero movimiento de cámara
+        vf = f"scale=2112:1188:flags=lanczos,crop={W}:{H}:x='{x}':y='(in_h-out_h)/2',fps={FPS},format=yuv420p"
     for _ in range(3):
         try:
             run(["ffmpeg", "-y", "-loglevel", "error", *pre, *fuente, "-t", f"{dur:.2f}", "-an", "-vf", vf,
-                 "-c:v", "libx264", "-crf", "17", "-preset", "veryfast", destino])
+                 "-c:v", "libx264", "-crf", "12", "-preset", "veryfast", destino])
             return
         except RuntimeError as e:
             print("  reintento", nombre, str(e)[-200:], flush=True)
@@ -391,7 +459,8 @@ def main():
     # 1) voz de cada bloque
     for b in BLOQUES:
         print("Voz de", b["id"], flush=True)
-        b["wav"] = sintetizar(b["texto"])
+        b["wav"] = sintetizar(b.get("voz", b["texto"]))
+        b["wav48"] = TMP / (pathlib.Path(b["wav"]).stem + "_48k.wav")
         b["audio"] = leer_wav(b["wav"], TEMPO_VOZ)
         b["dur_voz"] = len(b["audio"]) / SR
         print(f"  {b['dur_voz']:.1f} s", flush=True)
@@ -440,7 +509,9 @@ def main():
     # 4) subtítulos y rótulos
     for b in BLOQUES:
         pal = b["texto"].split()
-        tiempos, metodo = tiempos_por_voz(b["audio"], b["texto"])
+        tiempos, metodo = tiempos_palabras(b["wav48"], b["texto"], b["dur_voz"])
+        if metodo != "Whisper":
+            tiempos, metodo = tiempos_por_voz(b["audio"], b["texto"])
         b["subs"] = trozos_de_subtitulo(pal, tiempos, b["voz_ini"])
         b["metodo"] = metodo
     escribir_ass(TMP / "rotulos.ass", BLOQUES, total)
@@ -481,11 +552,10 @@ def main():
     final = HQ / "prototipo_hq.mp4"
     vf = f"ass={TMP / 'rotulos.ass'}"
     run(["ffmpeg", "-y", "-loglevel", "error", "-i", TMP / "sin_audio.mp4", "-i", TMP / "mezcla.wav",
-         "-vf", vf, "-af", "loudnorm=I=-14:TP=-1.5:LRA=11", "-c:v", "libx264", "-crf", "21",
+         "-vf", vf, "-af", "loudnorm=I=-14:TP=-1.5:LRA=11", "-c:v", "libx264", "-crf", "17",
          "-preset", "medium", "-pix_fmt", "yuv420p", "-c:a", "aac", "-b:a", "192k", "-ar", SR,
          "-shortest", "-movflags", "+faststart", final])
-    run(["ffmpeg", "-y", "-loglevel", "error", "-i", final, "-vf", "scale=1280:720", "-c:v", "libx264",
-         "-crf", "27", "-preset", "veryfast", "-c:a", "aac", "-b:a", "128k", "-movflags", "+faststart",
+    run(["ffmpeg", "-y", "-loglevel", "error", "-i", final, "-c:v", "libx264", "-crf", "22", "-maxrate", "9M", "-bufsize", "18M", "-preset", "fast", "-c:a", "aac", "-b:a", "128k", "-movflags", "+faststart",
          OUT / "prototipo.mp4"])
     run(["ffmpeg", "-y", "-loglevel", "error", "-i", final, "-vf", "fps=1/3,scale=480:-1,tile=5x4",
          "-frames:v", "1", "-q:v", "3", OUT / "hoja.jpg"])
