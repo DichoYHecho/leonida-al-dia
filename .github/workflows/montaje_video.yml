@@ -1,0 +1,74 @@
+name: Montaje del vídeo largo
+
+on:
+  workflow_dispatch:
+    inputs:
+      bloques:
+        description: "Solo estos bloques separados por comas (hook,c01,...); vacío = el vídeo entero"
+        default: ""
+
+permissions:
+  contents: write
+
+jobs:
+  montaje:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    env:
+      BLOQUES_SOLO: ${{ inputs.bloques }}
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Instalar programas
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg fonts-dejavu-core fonts-montserrat fonts-bebas-neue
+          pip install numpy pillow faster-whisper==1.2.1
+
+      - name: Trozos del stock nuevo
+        run: git show origin/stock-nuevo:gta/trozos.csv > video_largo/trozos.csv
+
+      - name: Recuperar las voces ya pedidas
+        uses: actions/cache/restore@v4
+        with:
+          path: cache/voz_vl
+          key: voz-vl-montaje
+          restore-keys: voz-vl-
+
+      - name: Recuperar el modelo de Whisper
+        uses: actions/cache@v4
+        with:
+          path: cache/whisper-base
+          key: whisper-base-directo-v1
+
+      - name: Montar el vídeo
+        run: python3 video_largo/montaje.py
+
+      - name: Guardar el vídeo en alta calidad
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: video-largo-alta-calidad
+          path: salida_hq/
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Publicar la previa en la rama montaje-vl
+        if: always()
+        run: |
+          cd salida_montaje
+          git init -q
+          git checkout -q -b montaje-vl
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add .
+          git commit -q -m "Montaje del vídeo largo"
+          git remote add origin "https://x-access-token:$GH_TOKEN@github.com/$GITHUB_REPOSITORY.git"
+          git push -f origin montaje-vl
