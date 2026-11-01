@@ -23,7 +23,7 @@ jobs:
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y -qq ffmpeg fonts-dejavu-core
-          pip install numpy faster-whisper==1.2.1
+          pip install numpy
 
       - name: Trozos del stock nuevo
         run: git show origin/stock-nuevo:gta/trozos.csv > video_largo/trozos.csv
@@ -52,6 +52,14 @@ jobs:
         with:
           path: cache/voz
           key: voz-video-largo-${{ github.run_id }}
+
+      - name: Guardar el vídeo en alta calidad
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: prototipo-alta-calidad
+          path: salida_hq/
+          if-no-files-found: warn
 
       - name: Publicar en la rama prototipo-video-largo
         run: |
