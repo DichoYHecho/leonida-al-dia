@@ -57,16 +57,17 @@ BLOQUES = [
                "tres ciudades: Liberty City, que es Nueva York; San Andreas, que es San Francisco; y Vice City, que es "
                "Miami. Seis niveles en total: dos por ciudad. Ahí está: la primera Vice City de la historia. Cuatro píxeles. Y antes de salir ya montó "
                "polémica: se habló de prohibirlo, en Brasil lo prohibieron, y el publicista Max Clifford usó todo ese "
-               "escándalo como publicidad gratis. ¿Funcionó? En 1999 ya iba por tres millones y medio."),
+               "escándalo como publicidad gratis. ¿Funcionó? En 1999 ya iba por tres millones y medio. Y en 2001, por seis millones. Nada mal para un juego en el que los coches eran rectángulos vistos desde un helicóptero."),
      "voz": ("Parada dos. 1997. El primer GTA sale en noviembre en Europa, con la cámara mirando desde el cielo y "
              "tres ciudades: Líberti Siti, que es Nueva York; San Andreas, que es San Francisco; y Vice City, que es "
              "Miami. Seis niveles en total: dos por ciudad. Ahí está: la primera Vice City de la historia. Cuatro píxeles. Y antes de salir ya montó "
              "polémica: se habló de prohibirlo, en Brasil lo prohibieron, y el publicista Max Clífor usó todo ese "
-             "escándalo como publicidad gratis. ¿Funcionó? En 1999 ya iba por tres millones y medio."),
+             "escándalo como publicidad gratis. ¿Funcionó? En 1999 ya iba por tres millones y medio. Y en 2001, por seis millones. Nada mal para un juego en el que los coches eran rectángulos vistos desde un helicóptero."),
      "rotulos": [{"en": "nueva", "texto": "LIBERTY CITY|= NUEVA YORK"},
                  {"en": "francisco", "texto": "SAN ANDREAS|= SAN FRANCISCO"},
                  {"en": "miami", "texto": "VICE CITY|= MIAMI"},
-                 {"en": "millones", "texto": "3,5 MILLONES|EN 1999"}],
+                 {"en": "millones", "texto": "3,5 MILLONES|EN 1999"},
+                 {"en": "2001", "texto": "6 MILLONES|EN 2001"}],
      "planos": ["Mirada_Vista_Aerea", "T1_Playa_Aerea", "T1_Noche_Aerea", "Lanz_Playa", "Mirada_Puerto",
                 "Mirada_Skyline_Azotea", "T1_Autopista", "Mirada_Atardecer"]},
 
@@ -181,15 +182,16 @@ BLOQUES = [
     {"id": "p10", "num": 10, "total": T, "titulo": "EL RÉCORD", "capitulo": "El récord", "overlay": "",
      "texto": ("Parada diez. ¿Y cómo le fue? Medio millón de copias en 24 horas. Un millón cuatrocientas mil en dos "
                "días: el juego que más rápido se había vendido hasta entonces. Fue el más vendido de 2002 en Estados "
-               "Unidos, y en 2008 ya iba por diecisiete millones y medio. Nota en Metacritic: 95. Seis premios BAFTA "
+               "Unidos, y en 2008 ya iba por diecisiete millones y medio. Solo en PlayStation 2, más de catorce millones. Nota en Metacritic: 95. Seis premios BAFTA "
                "y el Golden Joystick al juego del año. Vamos, que no salió mal."),
      "voz": ("Parada diez. ¿Y cómo le fue? Medio millón de copias en 24 horas. Un millón cuatrocientas mil en dos "
              "días: el juego que más rápido se había vendido hasta entonces. Fue el más vendido de 2002 en Estados "
-             "Unidos, y en 2008 ya iba por diecisiete millones y medio. Nota en Metacrític: noventa y cinco. Seis "
+             "Unidos, y en 2008 ya iba por diecisiete millones y medio. Solo en PlayStation 2, más de catorce millones. Nota en Metacrític: noventa y cinco. Seis "
              "premios Bafta y el Goulden Yóistik al juego del año. Vamos, que no salió mal."),
      "rotulos": [{"en": "medio", "texto": "500.000|EN 24 HORAS"},
                  {"en": "cuatrocientas", "texto": "1,4 MILLONES|EN 2 DÍAS"},
                  {"en": "diecisiete", "texto": "17,5 MILLONES|EN 2008"},
+                 {"en": "catorce", "texto": "14,2 MILLONES|SOLO EN PS2"},
                  {"en": "nota", "texto": "95|METACRITIC"},
                  {"en": "seis", "texto": "6 PREMIOS|BAFTA"}],
      "planos": ["VCA_Logo", "VCA_Trio", "VCA_Lanchas", "VCA_Helicoptero", "VCA_Grua", "VCA_Tiroteo", "VCA_Welcome"]},
@@ -216,15 +218,16 @@ BLOQUES = [
      "overlay": "",
      "texto": ("Parada doce. Y el cameo más ochentero de toda la saga: Phil Collins. Él mismo, haciendo de él mismo. En "
                "una misión tienes que protegerle de unos sicarios, antes y durante su concierto en Vice City. Vice City "
-               "Stories acabó vendiendo más de siete millones. Y quédate también con este nombre, Phil Collins, porque "
+               "Stories acabó vendiendo más de siete millones. Y trajo algo que Tommy nunca tuvo: Vic sabe nadar. En el original, caer al agua era morir. Además, podías hacer de socorrista en la playa. Y quédate también con este nombre, Phil Collins, porque "
                "en la parada diecisiete... reaparece."),
      "voz": ("Parada doce. Y el cameo más ochentero de toda la saga: Fil Colins. Él mismo, haciendo de él mismo. En "
              "una misión tienes que protegerle de unos sicarios, antes y durante su concierto en Vice City. Vice City "
-             "Stóris acabó vendiendo más de siete millones. Y quédate también con este nombre, Fil Colins, porque "
+             "Stóris acabó vendiendo más de siete millones. Y trajo algo que Tomi nunca tuvo: Vic sabe nadar. En el original, caer al agua era morir. Además, podías hacer de socorrista en la playa. Y quédate también con este nombre, Fil Colins, porque "
              "en la parada diecisiete... reaparece."),
      "rotulos": [{"en": "cameo", "texto": "PHIL COLLINS|COMO ÉL MISMO"},
                  {"en": "concierto", "texto": "UN CONCIERTO|CON SICARIOS"},
-                 {"en": "siete", "texto": "+7 MILLONES|VICE CITY STORIES"}],
+                 {"en": "siete", "texto": "+7 MILLONES|VICE CITY STORIES"},
+                 {"en": "nadar", "texto": "VIC SÍ SABE NADAR|Y HACE DE SOCORRISTA"}],
      "planos": ["VL_Disco_1", "VL_Disco_2", "VL_Azotea_2", "VL_Disco_3", "VL_Disco_4", "Mirada_Skyline_Noche",
                 "VL_Disco_0"]},
 
@@ -248,17 +251,18 @@ BLOQUES = [
      "overlay": "",
      "texto": ("Parada catorce. En 2002, Vice City era todo el juego. En GTA 6 es solo una parte. Ahora hay un estado "
                "entero: Leonida. Los cayos de Leonida, al sur; Grassrivers, el pantano de los caimanes, que Rockstar llama la joya indomable de Leonida; Port "
-               "Gellhorn, la costa olvidada; Ambrosia, con su refinería de azúcar; y el monte Kalaga, al norte. Es la "
+               "Gellhorn, la costa olvidada; Ambrosia, con su refinería de azúcar; y el monte Kalaga, al norte. Y las descripciones de Rockstar son oro: en los manglares de Grassrivers hay descubrimientos todavía más raros que los caimanes, y en los bosques del monte Kalaga viven, cito, místicos paletos y radicales paranoicos. Es la "
                "Florida de Rockstar. Y Vice City deja de ser el mapa... para ser la capital del vicio."),
      "voz": ("Parada catorce. En 2002, Vice City era todo el juego. En GTA 6 es solo una parte. Ahora hay un estado "
              "entero: Leonida. Los cayos de Leonida, al sur; Grasríver, el pantano de los caimanes, que Rockstar llama la joya indomable de Leonida; Port "
-             "Guélhorn, la costa olvidada; Ambrosia, con su refinería de azúcar; y el monte Kalaga, al norte. Es la "
+             "Guélhorn, la costa olvidada; Ambrosia, con su refinería de azúcar; y el monte Kalaga, al norte. Y las descripciones de Rockstar son oro: en los manglares de Grasríver hay descubrimientos todavía más raros que los caimanes, y en los bosques del monte Kalaga viven, cito, místicos paletos y radicales paranoicos. Es la "
              "Florida de Rockstar. Y Vice City deja de ser el mapa... para ser la capital del vicio."),
      "rotulos": [{"en": "cayos", "texto": "LEONIDA KEYS|"},
                  {"en": "pantano", "texto": "GRASSRIVERS|"},
                  {"en": "costa", "texto": "PORT GELLHORN|"},
                  {"en": "refinería", "texto": "AMBROSIA|"},
-                 {"en": "monte", "texto": "MOUNT KALAGA|"}],
+                 {"en": "monte", "texto": "MOUNT KALAGA|"},
+                 {"en": "místicos", "texto": "«MÍSTICOS PALETOS Y|RADICALES PARANOICOS»"}],
      "planos": ["Mirada_Vista_Aerea", "T1_Puente_Cayos", "T2_Cayos_Aereo", "Lanz_Cartel_Keys", "T1_Humedal",
                 "Mirada_Hidrodeslizador", "T2_Casa_Pilotes", "Mirada_Motocross", "Lanz_Marina", "Mirada_Atardecer"]},
     {"id": "p15", "num": 15, "total": T, "titulo": "OCEAN BEACH VUELVE", "capitulo": "Ocean Beach vuelve",
@@ -266,16 +270,17 @@ BLOQUES = [
      "texto": ("Parada quince. ¿Te acuerdas de los nombres de la parada siete? Rockstar describe en su web Ocean Beach, "
                "con hoteles art déco de colores pastel y arena blanquísima. El mismo nombre que en 2002. Hay un barrio "
                "cubano, Little Cuba, con sus panaderías, que recuerda al Little Havana del original. Y el puerto, que "
-               "Rockstar llama la capital mundial de los cruceros. Hasta en las reservas lo nombran: un garaje en "
+               "Rockstar llama la capital mundial de los cruceros. Y un mercadillo, el Tisha-Wocka, lleno de marcas piratas. Hasta en las reservas lo nombran: un garaje en "
                "Shore Court, a tiro de piedra de Ocean Beach."),
      "voz": ("Parada quince. ¿Te acuerdas de los nombres de la parada siete? Rockstar describe en su web Óushen Bich, "
              "con hoteles art déco de colores pastel y arena blanquísima. El mismo nombre que en 2002. Hay un barrio "
              "cubano, Lítel Cuba, con sus panaderías, que recuerda al Lítel Havana del original. Y el puerto, que "
-             "Rockstar llama la capital mundial de los cruceros. Hasta en las reservas lo nombran: un garaje en "
+             "Rockstar llama la capital mundial de los cruceros. Y un mercadillo, el Tisha Uóka, lleno de marcas piratas. Hasta en las reservas lo nombran: un garaje en "
              "Shor Cort, a tiro de piedra de Óushen Bich."),
      "rotulos": [{"en": "describe", "texto": "OCEAN BEACH|MISMO NOMBRE QUE EN 2002"},
                  {"en": "cubano", "texto": "LITTLE CUBA|"},
                  {"en": "cruceros", "texto": "VC PORT|CAPITAL DE LOS CRUCEROS"},
+                 {"en": "mercadillo", "texto": "TISHA-WOCKA|MARCAS PIRATAS"},
                  {"en": "garaje", "texto": "SHORE COURT|JUNTO A OCEAN BEACH"}],
      "planos": ["Mirada_Playa", "Lanz_Playa", "T1_Playa_Aerea", "T2_Gimnasio_Playa", "Mirada_Descapotable_2",
                 "Mirada_Puerto", "T1_Lancha_Rapida", "Mirada_Kayak"]},
@@ -284,17 +289,18 @@ BLOQUES = [
                "Pack. Y dentro hay un estampado para las armas inspirado... en la camisa de palmeras de Tommy Vercetti. "
                "Rockstar lo llama, tal cual, el capo original. Pero hay más: en la Ultimate Edition vienen dos "
                "revólveres sacados de la mansión Vercetti, y un Grotti Cheetah del 95 que Rockstar llama una oda a "
-               "Shore Drive. ¿Sale Tommy en GTA 6? Eso Rockstar no lo ha dicho. Pero su camisa, sí."),
+               "Shore Drive. Y hasta un taller para tunear coches en Vice City: Rideout Customs. ¿Sale Tommy en GTA 6? Eso Rockstar no lo ha dicho. Pero su camisa, sí."),
      "voz": ("Parada dieciséis. Y ahora, el guiño gordo. El regalo por reservar GTA 6 se llama Víntach Vice City "
              "Pak. Y dentro hay un estampado para las armas inspirado... en la camisa de palmeras de Tomi Verchéti. "
              "Rockstar lo llama, tal cual, el capo original. Pero hay más: en la Áltimet Edíshon vienen dos "
              "revólveres sacados de la mansión Verchéti, y un Grotti Chíta del 95 que Rockstar llama una oda a "
-             "Shor Dráiv. ¿Sale Tomi en GTA 6? Eso Rockstar no lo ha dicho. Pero su camisa, sí."),
+             "Shor Dráiv. Y hasta un taller para tunear coches en Vice City: Ráidaut Cástoms. ¿Sale Tomi en GTA 6? Eso Rockstar no lo ha dicho. Pero su camisa, sí."),
      "rotulos": [{"en": "regalo", "texto": "VINTAGE VICE CITY PACK|REGALO DE RESERVA"},
                  {"en": "camisa", "texto": "LA CAMISA DE PALMERAS|DE TOMMY VERCETTI"},
                  {"en": "capo", "texto": "«EL CAPO ORIGINAL»|"},
                  {"en": "mansión", "texto": "REVÓLVERES|DE LA MANSIÓN VERCETTI"},
-                 {"en": "oda", "texto": "GROTTI CHEETAH '95|«UNA ODA A SHORE DRIVE»"}],
+                 {"en": "oda", "texto": "GROTTI CHEETAH '95|«UNA ODA A SHORE DRIVE»"},
+                 {"en": "taller", "texto": "RIDEOUT CUSTOMS|TALLER EN VICE CITY"}],
      "planos": ["Portada_Animada", "Lanz_Descapotable", "Mirada_Coche_Clasico", "T1_Neones", "Mirada_Terraza",
                 "Lanz_Balcon", "Mirada_Logo"]},
     {"id": "p17", "num": 17, "total": T, "titulo": "LOS OCHENTA SIGUEN SONANDO",
@@ -302,15 +308,16 @@ BLOQUES = [
      "texto": ("Parada diecisiete. La música. El segundo tráiler, de mayo de 2025, va con Hot Together, de las Pointer "
                "Sisters. ¿De qué año es? De 1986. El mismo año en el que pasa Vice City. Casualidad... o no. Y en la "
                "mirada extendida de agosto, la de Netflix, suena Depeche Mode, People Are People; Def Leppard, Love Bites, "
-               "de 1988... y Phil Collins, Against All Odds. Sí: el mismo Phil Collins al que protegías en Vice City Stories."),
+               "de 1988... y Phil Collins, Against All Odds. Sí: el mismo Phil Collins al que protegías en Vice City Stories. Y hay más clásicos: Cliff Richard, Devil Woman, o los Bellamy Brothers, Let Your Love Flow. La lista parece la emisora Emotion 98.3."),
      "voz": ("Parada diecisiete. La música. El segundo tráiler, de mayo de 2025, va con Jot Tuguéder, de las Póinter "
              "Sísters. ¿De qué año es? De 1986. El mismo año en el que pasa Vice City. Casualidad... o no. Y en la "
              "mirada extendida de agosto, la de Netflix, suena Depésh Mod, Pípol ar Pípol; Def Lépard, Lov Báits, "
-             "de 1988... y Fil Colins, Eguénst ol Ods. Sí: el mismo Fil Colins al que protegías en Vice City Stóris."),
+             "de 1988... y Fil Colins, Eguénst ol Ods. Sí: el mismo Fil Colins al que protegías en Vice City Stóris. Y hay más clásicos: Cliff Ríchard, Dévil Gúman, o los Bélami Bráders, Let Yur Lov Flóu. La lista parece la emisora Imóushon noventa y ocho punto tres."),
      "rotulos": [{"en": "segundo", "texto": "HOT TOGETHER|POINTER SISTERS · 1986"},
                  {"en": "mismo", "texto": "VICE CITY|TAMBIÉN 1986"},
                  {"en": "netflix", "texto": "DEPECHE MODE|PEOPLE ARE PEOPLE"},
-                 {"en": "protegías", "texto": "PHIL COLLINS|AGAINST ALL ODDS"}],
+                 {"en": "protegías", "texto": "PHIL COLLINS|AGAINST ALL ODDS"},
+                 {"en": "clásicos", "texto": "CLIFF RICHARD|BELLAMY BROTHERS"}],
      "planos": ["T2_Mar_Atardecer", "T2_Muelle_Atardecer", "T2_Jason_Conduce", "Mirada_Azotea", "VL_Disco_2",
                 "Mirada_Jason_y_Lucia", "VL_Interior_1", "T2_Autopista"],
      "original": "T2_Musica_Hot"},
@@ -318,12 +325,12 @@ BLOQUES = [
      "texto": ("Parada dieciocho. ¿Y qué cambia? Lo primero, la época: de 1986 a hoy, con móviles y redes sociales. Lo "
                "segundo, los protagonistas: Tommy iba solo; ahora son dos, Jason y Lucía. Y lo tercero, la escala: en "
                "2002, Vice City era una ciudad de algo más de cuatro kilómetros cuadrados en una PS2. En 2026 es la "
-               "capital de un estado entero, en PS5 y Xbox Series. Y el dinero: Vice City costó unos cinco millones; lo que ha costado GTA 6, Rockstar no lo ha dicho. Lo que no cambia: el neón, las palmeras... y que en "
+               "capital de un estado entero, en PS5 y Xbox Series. Y la radio: de las nueve horas de música de 2002 a los pódcast a la carta de GTA 6. Y el dinero: Vice City costó unos cinco millones; lo que ha costado GTA 6, Rockstar no lo ha dicho. Lo que no cambia: el neón, las palmeras... y que en "
                "Vice City nadie es del todo inocente."),
      "voz": ("Parada dieciocho. ¿Y qué cambia? Lo primero, la época: de 1986 a hoy, con móviles y redes sociales. Lo "
              "segundo, los protagonistas: Tomi iba solo; ahora son dos, Yéison y Lucía. Y lo tercero, la escala: en "
              "2002, Vice City era una ciudad de algo más de cuatro kilómetros cuadrados en una pe ese dos. En 2026 es "
-             "la capital de un estado entero, en pe ese cinco y Xbox Series. Y el dinero: Vice City costó unos cinco millones; lo que ha costado GTA 6, Rockstar no lo ha dicho. Lo que no cambia: el neón, las "
+             "la capital de un estado entero, en pe ese cinco y Xbox Series. Y la radio: de las nueve horas de música de 2002 a los pódcast a la carta de GTA 6. Y el dinero: Vice City costó unos cinco millones; lo que ha costado GTA 6, Rockstar no lo ha dicho. Lo que no cambia: el neón, las "
              "palmeras... y que en Vice City nadie es del todo inocente."),
      "rotulos": [{"en": "época", "texto": "DE 1986|A HOY"},
                  {"en": "protagonistas", "texto": "DE TOMMY|A JASON Y LUCÍA"},
@@ -336,11 +343,11 @@ BLOQUES = [
      "texto": ("Y antes de cerrar, como has llegado hasta aquí, tres extra de regalo. Extra uno: Vice City nunca se fue "
                "del todo. Por su décimo aniversario, en diciembre de 2012, Rockstar lo sacó para móviles, con este "
                "tráiler que estás viendo. Y en 2021 llegó la Definitive Edition, con los gráficos rehechos. Mira: así "
-               "era en 2002... y así quedó en la remasterización. Las mismas palmeras, veinte años después. Y en diciembre de 2023 esa remasterización llegó también a los móviles."),
+               "era en 2002... y así quedó en la remasterización. Las mismas palmeras, veinte años después. Y en diciembre de 2023 esa remasterización llegó también a los móviles. Por cierto, las versiones para móvil de 2012 no las hizo Rockstar North, sino el estudio War Drum."),
      "voz": ("Y antes de cerrar, como has llegado hasta aquí, tres extra de regalo. Extra uno: Vice City nunca se fue "
              "del todo. Por su décimo aniversario, en diciembre de 2012, Rockstar lo sacó para móviles, con este "
              "tráiler que estás viendo. Y en 2021 llegó la Définitiv Edíshon, con los gráficos rehechos. Mira: así "
-             "era en 2002... y así quedó en la remasterización. Las mismas palmeras, veinte años después. Y en diciembre de 2023 esa remasterización llegó también a los móviles."),
+             "era en 2002... y así quedó en la remasterización. Las mismas palmeras, veinte años después. Y en diciembre de 2023 esa remasterización llegó también a los móviles. Por cierto, las versiones para móvil de 2012 no las hizo Rockstar North, sino el estudio Uor Drum."),
      "rotulos": [{"en": "aniversario", "texto": "10.º ANIVERSARIO|MÓVILES · DIC 2012"},
                  {"en": "gráficos", "texto": "DEFINITIVE EDITION|2021"},
                  {"en": "mira", "texto": "2002|ORIGINAL"},
@@ -349,11 +356,11 @@ BLOQUES = [
                 "VCC_Moto_Orig", "VCC_Moto_DE"]},
     {"id": "e2", "num": "E2", "total": 3, "titulo": "LOS FANS QUE LO DESMONTARON", "overlay": "",
      "texto": ("Extra dos: los fans que desmontaron Vice City. Un grupo de programadores reconstruyó el código de GTA 3 "
-               "y de Vice City pieza a pieza, para que funcionaran en más sitios, como la Switch o la Vita. Hacía falta "
+               "y de Vice City pieza a pieza, para que funcionaran en más sitios, como la Switch o la Vita. Su proyecto no llevaba ni gráficos ni sonidos de Rockstar: hacía falta "
                "tener tu propia copia del juego, pero a Take-Two no le hizo ni pizca de gracia: en 2021 denunció a "
                "catorce de ellos en California. En 2023, según NME, acabaron pactando. Moraleja: en Vice City, el código ni tocarlo."),
      "voz": ("Extra dos: los fans que desmontaron Vice City. Un grupo de programadores reconstruyó el código de GTA 3 "
-             "y de Vice City pieza a pieza, para que funcionaran en más sitios, como la Suich o la Vita. Hacía falta "
+             "y de Vice City pieza a pieza, para que funcionaran en más sitios, como la Suich o la Vita. Su proyecto no llevaba ni gráficos ni sonidos de Rockstar: hacía falta "
              "tener tu propia copia del juego, pero a Teik Tú no le hizo ni pizca de gracia: en 2021 denunció a "
              "catorce de ellos en California. En 2023, según Ene Eme E, acabaron pactando. Moraleja: en Vice City, el código ni tocarlo."),
      "rotulos": [{"en": "código", "texto": "RE3 Y REVC|EL CÓDIGO, PIEZA A PIEZA"},
@@ -365,11 +372,11 @@ BLOQUES = [
      "texto": ("Extra tres: murales de verdad. Según la revista Dazed, Rockstar contó con más de cincuenta artistas "
                "callejeros reales para pintar los murales de GTA 6, en sitios como el Stockyard de Vice City, inspirado "
                "en el barrio de Wynwood de Miami. O sea, que el grafiti que vas a ver mientras huyes de la policía... lo "
-               "ha pintado alguien de verdad."),
+               "ha pintado alguien de verdad. Y no es casualidad: Wynwood es famoso en Miami justo por sus murales al aire libre."),
      "voz": ("Extra tres: murales de verdad. Según la revista Déizd, Rockstar contó con más de cincuenta artistas "
              "callejeros reales para pintar los murales de GTA 6, en sitios como el Stokiard de Vice City, inspirado "
              "en el barrio de Güínwud de Miami. O sea, que el grafiti que vas a ver mientras huyes de la policía... lo "
-             "ha pintado alguien de verdad."),
+             "ha pintado alguien de verdad. Y no es casualidad: Güínwud es famoso en Miami justo por sus murales al aire libre."),
      "rotulos": [{"en": "cincuenta", "texto": "+50 ARTISTAS|CALLEJEROS REALES"},
                  {"en": "barrio", "texto": "STOCKYARD|= WYNWOOD, MIAMI"}],
      "planos": ["VL_Mural", "Mirada_Calles_1", "Mirada_Calles_2", "Mirada_Camiones", "Mirada_Moto_Calle",
@@ -380,16 +387,17 @@ BLOQUES = [
      "texto": ("Y para acabar, lo que todavía no sabemos. ¿Vuelve el Ocean View Hotel? Los fans creen haberlo visto en "
                "un tráiler, pero Rockstar no lo ha confirmado. ¿Vuelven Tommy, Lance o algún personaje del original? "
                "Ni una palabra. Lo que sí sabemos es la fecha: el 19 de noviembre volvemos a Vice City. Veinticuatro "
-               "años después. Y si jugaste al de 2002, cuéntame en los comentarios cuál era tu emisora: ¿Flash FM, Wave 103 o Emotion? Si te ha gustado el viaje, suscríbete, y si te perdiste las 20 curiosidades de GTA 6, "
+               "años después. Y si no puedes esperar: la predescarga empieza a medianoche del 12 de noviembre. Y si jugaste al de 2002, cuéntame en los comentarios cuál era tu emisora: ¿Flash FM, Wave 103 o Emotion? Si te ha gustado el viaje, suscríbete, y si te perdiste las 20 curiosidades de GTA 6, "
                "tienes el vídeo aquí. Nos vemos en Leonida."),
      "voz": ("Y para acabar, lo que todavía no sabemos. ¿Vuelve el Óushen Viu Hotel? Los fans creen haberlo visto en "
              "un tráiler, pero Rockstar no lo ha confirmado. ¿Vuelven Tomi, Lans o algún personaje del original? "
              "Ni una palabra. Lo que sí sabemos es la fecha: el 19 de noviembre volvemos a Vice City. Veinticuatro "
-             "años después. Y si jugaste al de 2002, cuéntame en los comentarios cuál era tu emisora: ¿Flash Efe Eme, Uéiv ciento tres o Imóushon? Si te ha gustado el viaje, suscríbete, y si te perdiste las 20 curiosidades de GTA 6, "
+             "años después. Y si no puedes esperar: la predescarga empieza a medianoche del 12 de noviembre. Y si jugaste al de 2002, cuéntame en los comentarios cuál era tu emisora: ¿Flash Efe Eme, Uéiv ciento tres o Imóushon? Si te ha gustado el viaje, suscríbete, y si te perdiste las 20 curiosidades de GTA 6, "
              "tienes el vídeo aquí. Nos vemos en Leonida."),
      "rotulos": [{"en": "hotel", "texto": "¿OCEAN VIEW HOTEL?|SIN CONFIRMAR"},
                  {"en": "palabra", "texto": "¿VUELVE ALGUIEN?|NI UNA PALABRA"},
-                 {"en": "fecha", "texto": "19 NOV|VOLVEMOS A VICE CITY"}],
+                 {"en": "fecha", "texto": "19 NOV|VOLVEMOS A VICE CITY"},
+                 {"en": "predescarga", "texto": "PREDESCARGA|12 NOV, MEDIANOCHE"}],
      "planos": ["VL_Hidroavion", "VL_Atardecer_Final", "VL_Lancha_Pareja", "Mirada_Paracaidas", "Lanz_Paseo",
                 "Mirada_Logo", "VL_Fecha"],
      "original": "Lanz_Final_19N"},
