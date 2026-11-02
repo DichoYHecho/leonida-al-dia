@@ -167,6 +167,32 @@ def rms_50hz(x):
     return np.sqrt(np.mean(x[:n * hop].reshape(n, hop) ** 2, axis=1))
 
 
+def fin_por_energia(x):
+    """Segundo en que acaba la voz mirando el volumen (por si Whisper no oye las últimas palabras).
+
+    Si lo último que suena es un golpe corto después de un silencio (el estallido de Gemini), no cuenta."""
+    m = x if x.ndim == 1 else x.mean(axis=1)
+    f = int(0.02 * SR)
+    n = len(m) // f
+    if n < 20:
+        return None
+    rms = np.sqrt((m[: n * f].reshape(n, f).astype(np.float64) ** 2).mean(axis=1))
+    voz = rms >= max(0.01, 0.05 * float(np.percentile(rms, 95)))
+    i = n - 1
+    while i >= 0 and not voz[i]:
+        i -= 1
+    fin = i
+    while i >= 0 and voz[i]:
+        i -= 1
+    ini = i + 1
+    j = i
+    while j >= 0 and not voz[j]:
+        j -= 1
+    if j > 0 and (fin - ini + 1) * 0.02 <= 0.35 and (i - j) * 0.02 >= 0.08:
+        fin = j
+    return (fin + 1) * 0.02
+
+
 def hms(s):
     s = int(round(s))
     return f"{s // 3600}:{s % 3600 // 60:02d}:{s % 60:02d}" if s >= 3600 else f"{s // 60}:{s % 60:02d}"
@@ -196,6 +222,10 @@ def main():
         dur_antes = len(b["audio"]) / SR
         fin_g = P.fin_guion(pal, ws)
         b["cola_cortada"] = 0.0
+        fin_e = fin_por_energia(b["audio"])
+        if fin_g is not None and fin_e is not None and fin_e + 0.08 > fin_g + 0.18:
+            print(f"  Whisper acaba en {fin_g:.2f} s pero la voz sigue hasta {fin_e:.2f} s", flush=True)
+            fin_g = fin_e - 0.1
         if fin_g is not None and fin_g + 0.3 < dur_antes:
             b["cola_cortada"] = dur_antes - (fin_g + 0.18)
             b["audio"] = b["audio"][: int((fin_g + 0.18) * SR)]
