@@ -1,0 +1,44 @@
+name: Buscar la música de los tráileres
+
+on:
+  push:
+    branches: [vice-city]
+    paths: ["video_largo/buscar_musica.py", ".github/workflows/buscar_musica.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  buscar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Instalar programas
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          pip install numpy pillow faster-whisper==1.2.1
+
+      - name: Recuperar el modelo de Whisper
+        uses: actions/cache@v4
+        with:
+          path: cache/whisper-base
+          key: whisper-base-directo-v1
+
+      - name: Buscar la música
+        run: python3 video_largo/buscar_musica.py
+
+      - name: Guardar la transcripción
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: musica-trailers
+          path: musica.txt
+          if-no-files-found: warn
