@@ -185,6 +185,44 @@ BLOQUES = [
      "planos": ["VL_Baloncesto", "VL_Pesas", "Mirada_Buceo", "Mirada_Mar_Atardecer", "VL_Moto_Agua", "Mirada_Paracaidas",
                 "Mirada_Motocross", "VL_Espejo_1", "VL_Nevera", "VL_Tele_1"],
      "original": "VL_Tele_Audio"},
+    {"id": "e1", "num": "E1", "total": 3, "titulo": "UN ZOO ENTERO", "overlay": "",
+     "texto": ("Y antes de cerrar, como has llegado hasta aquí, tres curiosidades extra de regalo. Extra uno: un zoo "
+               "entero. Según la revista Game Informer, GTA 6 tiene más de 170 especies de animales, y algunas nunca se "
+               "habían visto en un juego de Rockstar: flamencos, manatíes, pelícanos, caimanes... Como en la Florida de "
+               "verdad, hay hasta especies invasoras: iguanas verdes, sapos de caña y monos macacos. Hay animales raros, "
+               "otros que hay que descubrir y otros legendarios, y Rockstar no ha querido decir cuáles. Y en una captura "
+               "oficial de un bar de los cayos, los fans encontraron a una mujer con una iguana al hombro... y la iguana "
+               "parece llevar su propia ropa. Más estilo que yo, la iguana."),
+     "voz": ("Y antes de cerrar, como has llegado hasta aquí, tres curiosidades extra de regalo. Extra uno: un zoo "
+               "entero. Según la revista Gueim Informer, GTA 6 tiene más de 170 especies de animales, y algunas nunca se "
+               "habían visto en un juego de Rockstar: flamencos, manatíes, pelícanos, caimanes... Como en la Florida de "
+               "verdad, hay hasta especies invasoras: iguanas verdes, sapos de caña y monos macacos. Hay animales raros, "
+               "otros que hay que descubrir y otros legendarios, y Rockstar no ha querido decir cuáles. Y en una captura "
+               "oficial de un bar de los cayos, los fans encontraron a una mujer con una iguana al hombro... y la iguana "
+               "parece llevar su propia ropa. Más estilo que yo, la iguana."),
+     "planos": ["Mirada_Hidrodeslizador", "T2_Cayos_Aereo", "Mirada_Kayak", "Mirada_Buceo", "T1_Puente_Cayos",
+                "Mirada_Mar_Atardecer", "Lanz_Marina", "Mirada_Playa"]},
+    {"id": "e2", "num": "E2", "total": 3, "titulo": "EL CUERPO CAMBIA", "overlay": "",
+     "texto": ("Extra dos: el cuerpo cambia. Según la revista Dazed, si comes de más, Jason y Lucía engordan, y si vas "
+               "al gimnasio, se ponen fuertes. Y el pelo: según Rob Nelson, solo te lo puedes cortar o rapar en los pisos "
+               "francos. La pareja también hay que cuidarla: la relación mejora si pasan tiempo juntos, jugando al "
+               "billar, al minigolf, en kayak... o atracando bancos. Y si ignoras sus mensajes de buenas noches, lo vas a "
+               "pagar. Vamos, como en la vida real, pero con más atracos."),
+     "voz": ("Extra dos: el cuerpo cambia. Según la revista Déised, si comes de más, Jason y Lucía engordan, y si vas "
+               "al gimnasio, se ponen fuertes. Y el pelo: según Rob Nelson, solo te lo puedes cortar o rapar en los pisos "
+               "francos. La pareja también hay que cuidarla: la relación mejora si pasan tiempo juntos, jugando al "
+               "billar, al minigolf, en kayak... o atracando bancos. Y si ignoras sus mensajes de buenas noches, lo vas a "
+               "pagar. Vamos, como en la vida real, pero con más atracos."),
+     "planos": ["VL_Pesas", "T2_Gimnasio_Playa", "VL_Espejo_1", "VL_Dormitorio", "Mirada_Jason_y_Lucia",
+                "Mirada_Kayak", "VL_Interior_1", "VL_Atraco_1"]},
+    {"id": "e3", "num": "E3", "total": 3, "titulo": "UN ESPAÑOL YA LO HA VISTO", "overlay": "",
+     "texto": ("Extra tres: un español que ya lo ha visto. En julio, Rockstar invitó a varios creadores a su estudio de "
+               "Edimburgo para enseñarles GTA 6 antes que a nadie. Y uno de ellos fue El Rubius, que pasó unas tres horas "
+               "viendo el juego. Lo contó en un vídeo el 27 de agosto, el mismo día de la mirada extendida. Con él "
+               "estaban creadores de Australia, Brasil e Italia. Así que, si alguien en España sabe ya cómo es GTA 6 de "
+               "verdad... es él. Rubius, si nos ves: ¿qué tal el perro?"),
+     "planos": ["Mirada_Vista_Aerea", "Mirada_Skyline_Noche", "VL_Mural", "Mirada_Calles_1", "Lanz_Paseo",
+                "Mirada_Skyline_Azotea", "Mirada_Puerto", "Mirada_Atardecer"]},
     {"id": "cierre", "num": None, "titulo": "", "overlay": "",
      "texto": ("Y, como te prometí, las tres cosas que Rockstar todavía no ha contado. Uno: el PC. GTA 6 sale en PS5 "
                "y Xbox Series, y de PC no hay nada oficial. La historia dice que GTA 5 tardó 19 meses en llegar al "
