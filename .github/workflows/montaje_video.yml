@@ -6,6 +6,9 @@ on:
       bloques:
         description: "Solo estos bloques separados por comas (hook,c01,...); vacío = el vídeo entero"
         default: ""
+      guion:
+        description: "Guion: guion_vl (vídeo 1) o guion_vc (vídeo 2, Vice City)"
+        default: "guion_vl"
 
 permissions:
   contents: write
@@ -16,6 +19,8 @@ jobs:
     timeout-minutes: 180
     env:
       BLOQUES_SOLO: ${{ inputs.bloques }}
+      GUION: ${{ inputs.guion }}
+      RAMA: ${{ inputs.guion == 'guion_vc' && 'montaje-vc' || 'montaje-vl' }}
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v4
@@ -55,7 +60,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: video-largo-alta-calidad
+          name: ${{ inputs.guion == 'guion_vc' && 'video-largo-vc-alta-calidad' || 'video-largo-alta-calidad' }}
           path: salida_hq/
           if-no-files-found: warn
           retention-days: 14
@@ -65,10 +70,10 @@ jobs:
         run: |
           cd salida_montaje
           git init -q
-          git checkout -q -b montaje-vl
+          git checkout -q -b "$RAMA"
           git config user.name "github-actions"
           git config user.email "actions@github.com"
           git add .
           git commit -q -m "Montaje del vídeo largo"
           git remote add origin "https://x-access-token:$GH_TOKEN@github.com/$GITHUB_REPOSITORY.git"
-          git push -f origin montaje-vl
+          git push -f origin "$RAMA"

@@ -2,6 +2,10 @@ name: Voces del vídeo largo
 
 on:
   workflow_dispatch:
+    inputs:
+      guion:
+        description: "Guion: guion_vl (vídeo 1) o guion_vc (vídeo 2, Vice City)"
+        default: "guion_vl"
 
 permissions:
   contents: write
@@ -28,6 +32,7 @@ jobs:
       - name: Pedir las voces que faltan
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY_VIDEO }}
+          GUION: ${{ inputs.guion }}
         run: python3 video_largo/voces.py
 
       - name: Guardar las voces en la caché
@@ -41,13 +46,14 @@ jobs:
         if: always()
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RAMA: ${{ inputs.guion == 'guion_vc' && 'voces-vc' || 'voces-vl' }}
         run: |
           cd salida_voces
           git init -q
-          git checkout -q -b voces-vl
+          git checkout -q -b "$RAMA"
           git config user.name "github-actions"
           git config user.email "actions@github.com"
           git add .
           git commit -q -m "Voces del vídeo largo"
           git remote add origin "https://x-access-token:$GH_TOKEN@github.com/$GITHUB_REPOSITORY.git"
-          git push -f origin voces-vl
+          git push -f origin "$RAMA"
