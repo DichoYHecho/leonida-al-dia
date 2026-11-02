@@ -1,0 +1,27 @@
+Voces listas: 25 de 25 (esta vez se pidieron 3)
+hook: ya estaba
+c01: ya estaba
+c02: ya estaba
+c03: ya estaba
+c04: ya estaba
+c05: ya estaba
+c06: ya estaba
+c07: ya estaba
+c08: ya estaba
+c09: ya estaba
+c10: ya estaba
+c11: ya estaba
+c12: ya estaba
+c13: ya estaba
+c14: ya estaba
+c15: ya estaba
+c16: ya estaba
+c17: ya estaba
+c18: ya estaba
+c19: ya estaba
+c20: ya estaba
+e1: hecho con gemini-3.8-flash-lite-tts (40.7 s)
+e2: hecho con gemini-3.8-flash-lite-tts (32.8 s)
+e3: ERROR gemini-3.8-flash-lite-tts RemoteDisconnected
+e3: hecho con gemini-3.8-flash-tts (28.3 s)
+cierre: ya estaba
