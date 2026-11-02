@@ -22,7 +22,10 @@ YT_CATEGORIA = "20"  # Videojuegos
 MODELOS_TEXTO = ["gemini-3.5-flash-lite", "gemini-3.1-flash-lite"]
 MODELOS_VOZ = ["gemini-3.8-flash-tts", "gemini-3.8-flash-lite-tts"]
 VOZ = "Mako"
-ESTILO_VOZ = "High energy, elongated vowels"  # estilo «Promote» de AI Studio (elegido el 20 oct)
+# 2 nov: la voz se pasaba al inglés a mitad de algunos vídeos; se le pide español de España de principio a fin
+ESTILO_VOZ = ("Habla todo el texto en español de España, de principio a fin, sin pasar nunca al inglés "
+              "(los nombres en inglés se dicen tal cual, sin cambiar de idioma). "
+              "High energy, elongated vowels")  # estilo «Promote» de AI Studio (elegido el 20 oct)
 
 # Calendario
 LANZAMIENTO = date(2026, 11, 19)
