@@ -1,6 +1,9 @@
 name: Comprobar guion del vídeo largo
 
 on:
+  push:
+    branches: [vice-city]
+    paths: ["video_largo/**", ".github/workflows/comprobar_guion_vl.yml"]
   workflow_dispatch:
     inputs:
       guion:
@@ -15,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     env:
-      GUION: ${{ inputs.guion }}
+      GUION: ${{ inputs.guion || 'guion_vc' }}
     steps:
       - uses: actions/checkout@v4
         with:
