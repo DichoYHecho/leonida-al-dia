@@ -439,8 +439,8 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
     for b in bloques:
         a, z = ass_t(b["ini"]), ass_t(b["fin"])
         if b["num"]:
-            ev.append(f"Dialogue: 1,{a},{z},Num,,0,0,0,,{{\\move(30,26,70,26,0,350)\\fad(250,250)}}{b['num']:02d}")
-            ev.append(f"Dialogue: 1,{a},{z},Total,,0,0,0,,{{\\pos(196,100)\\fad(400,250)}}/{TOTAL_CURIOSIDADES}")
+            ev.append(f"Dialogue: 1,{a},{z},Num,,0,0,0,,{{\\move(30,26,70,26,0,350)\\fad(250,250)}}{b['num'] if isinstance(b['num'], str) else format(b['num'], '02d')}")
+            ev.append(f"Dialogue: 1,{a},{z},Total,,0,0,0,,{{\\pos(196,100)\\fad(400,250)}}/{b.get('total', TOTAL_CURIOSIDADES)}")
             ev.append(f"Dialogue: 1,{a},{z},Dibujo,,0,0,0,,{{\\pos(76,170)\\c{ACENTO}\\p1\\fad(350,250)"
                       f"\\t(0,450,\\fscx100)}}m 0 0 l 96 0 96 7 0 7")
             ev.append(f"Dialogue: 1,{a},{z},Titulo,,0,0,0,,{{\\move(40,184,76,184,0,350)\\fad(350,250)}}"
