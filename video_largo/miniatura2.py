@@ -83,11 +83,15 @@ def candidatos():
 
 def panel(param, ancho, alto):
     """Primer plano de una cara: recorta alrededor de (x, y) con el zoom indicado y lo lleva a ancho × alto."""
-    v, t, x, y, zoom = param.split(":")
+    partes = param.split(":")
+    v, t, x, y, zoom = partes[:5]
+    gamma = float(partes[5]) if len(partes) > 5 else 1.0  # menos de 1 aclara las sombras
     tmp = SALIDA / f"panel_{v}_{t}.png"
     sacar(v, float(t), tmp)
     im = Image.open(tmp).convert("RGB")
     tmp.unlink()
+    if gamma != 1.0:
+        im = im.point([int(255 * (p / 255) ** gamma) for p in range(256)] * 3)
     x, y, zoom = float(x), float(y), float(zoom)
     rel = ancho / alto
     ch = im.height / zoom
