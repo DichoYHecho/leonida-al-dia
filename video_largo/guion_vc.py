@@ -242,7 +242,8 @@ BLOQUES = [
                  {"en": "suena", "texto": "TOM PETTY|LOVE IS A LONG ROAD (1989)"},
                  {"en": "oscuro", "dur": 3.6, "texto": "THE DARKEST SIDE OF|THE SUNNIEST PLACE IN AMERICA"}],
      "planos": ["T1_Autopista", "T1_Playa_Aerea", "T1_Humedal", "T1_Lancha_Rapida", "T1_Coches_Noche", "T1_Camioneta",
-                "T1_Noche_Aerea", "T1_Neones", "T1_Letras_Vice"]},
+                "T1_Noche_Aerea", "T1_Neones", "T1_Letras_Vice"],
+     "original": "T1_Musica_Petty"},
     {"id": "p14", "num": 14, "total": T, "titulo": "DE CIUDAD A ESTADO", "capitulo": "De ciudad a estado",
      "overlay": "",
      "texto": ("Parada catorce. En 2002, Vice City era todo el juego. En GTA 6 es solo una parte. Ahora hay un estado "
@@ -311,7 +312,8 @@ BLOQUES = [
                  {"en": "netflix", "texto": "DEPECHE MODE|PEOPLE ARE PEOPLE"},
                  {"en": "protegías", "texto": "PHIL COLLINS|AGAINST ALL ODDS"}],
      "planos": ["T2_Mar_Atardecer", "T2_Muelle_Atardecer", "T2_Jason_Conduce", "Mirada_Azotea", "VL_Disco_2",
-                "Mirada_Jason_y_Lucia", "VL_Interior_1", "T2_Autopista"]},
+                "Mirada_Jason_y_Lucia", "VL_Interior_1", "T2_Autopista"],
+     "original": "T2_Musica_Hot"},
     {"id": "p18", "num": 18, "total": T, "titulo": "LO QUE CAMBIA", "capitulo": "Lo que cambia", "overlay": "",
      "texto": ("Parada dieciocho. ¿Y qué cambia? Lo primero, la época: de 1986 a hoy, con móviles y redes sociales. Lo "
                "segundo, los protagonistas: Tommy iba solo; ahora son dos, Jason y Lucía. Y lo tercero, la escala: en "
@@ -389,5 +391,6 @@ BLOQUES = [
                  {"en": "palabra", "texto": "¿VUELVE ALGUIEN?|NI UNA PALABRA"},
                  {"en": "fecha", "texto": "19 NOV|VOLVEMOS A VICE CITY"}],
      "planos": ["VL_Hidroavion", "VL_Atardecer_Final", "VL_Lancha_Pareja", "Mirada_Paracaidas", "Lanz_Paseo",
-                "Mirada_Logo", "VL_Fecha"]},
+                "Mirada_Logo", "VL_Fecha"],
+     "original": "Lanz_Final_19N"},
 ]

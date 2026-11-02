@@ -31,3 +31,6 @@ VCC_Moto_Orig,Vice_City_2002,16.0,3.2,Moto por Ocean Drive con los gráficos de 
 VCC_Moto_DE,Vice_City_2002,20.0,3.6,Moto por Ocean Drive (Definitive Edition),0.5,principal,no,0:20 (remaster),VC_Comp,1
 VCC_Bahia_Orig,Vice_City_2002,24.0,1.6,Bahía al atardecer con los gráficos de 2002,0.5,principal,no,0:24 (original),VC_Comp,1
 VCC_Bahia_DE,Vice_City_2002,26.0,3.6,Bahía con palmeras (Definitive Edition),0.5,principal,no,0:26 (remaster),VC_Comp,1
+T1_Musica_Petty,Vice_City,51.2,5.0,Tráiler 1 con el estribillo de Love Is a Long Road,0.5,principal,si,0:51 con sonido (Whisper),Trailer_1,1
+T2_Musica_Hot,Vice_City,40.0,4.0,Tráiler 2 con Hot Together,0.5,principal,si,0:40 con sonido (sin diálogo de 0:25 a 0:50),Trailer_2,1
+Lanz_Final_19N,Cierre,79.2,4.4,Final del tráiler de lanzamiento: coming November 19th,0.5,principal,si,1:19 con sonido (Whisper),Lanzamiento,1
