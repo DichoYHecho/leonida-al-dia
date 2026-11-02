@@ -16,7 +16,9 @@ import urllib.request
 import wave
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
-import guion_vl  # noqa: E402
+import importlib  # noqa: E402
+
+guion_vl = importlib.import_module(os.environ.get("GUION", "guion_vl"))  # guion_vc = vídeo 2 (Vice City)
 
 CLAVE = os.environ.get("GEMINI_API_KEY", "").strip()
 MODELOS = ["gemini-3.8-flash-lite-tts", "gemini-3.8-flash-tts"]

@@ -20,7 +20,9 @@ import numpy as np
 
 AQUI = pathlib.Path(__file__).resolve().parent
 sys.path.insert(0, str(AQUI))
-import guion_vl  # noqa: E402
+import importlib  # noqa: E402
+
+guion_vl = importlib.import_module(os.environ.get("GUION", "guion_vl"))  # guion_vc = vídeo 2 (Vice City)
 import prototipo as P  # noqa: E402
 import voces as V  # noqa: E402
 
@@ -30,6 +32,7 @@ TMP, OUT, HQ = P.TMP, pathlib.Path("salida_montaje"), pathlib.Path("salida_hq")
 FUENTES = pathlib.Path(os.environ.get("DIR_FUENTES", "fuentes"))
 SOLO = [x.strip() for x in os.environ.get("BLOQUES_SOLO", "").split(",") if x.strip()]
 URL_ZIP = P._V + "GTAVI_Videos.zip"
+P.VIDEOS.update(getattr(guion_vl, "VIDEOS_EXTRA", {}))  # vídeos oficiales que añade el guion
 for d in (OUT, HQ, FUENTES):
     d.mkdir(parents=True, exist_ok=True)
 
@@ -67,7 +70,9 @@ def fuente(video):
 
 def tabla():
     out = {}
-    for nombre in ("trozos.csv", "trozos_vl.csv"):
+    for nombre in ("trozos.csv", "trozos_vl.csv", "trozos_vc.csv"):
+        if not (AQUI / nombre).exists():
+            continue
         with open(AQUI / nombre, encoding="utf-8") as f:
             for r in csv.DictReader(f):
                 out[r["Trozo"]] = {"ini": float(r["Inicio (s)"]), "dur": float(r["Duración (s)"]),
@@ -158,6 +163,47 @@ def anadir_cta(ruta, bloques):
         ev.append(f"Dialogue: 3,{a},{z},CtaFondo,,0,0,0,,{{\\pos(550,40)\\fad(350,350)\\p1}}{forma}")
         ev.append(f"Dialogue: 4,{a},{z},CtaTit,,0,0,0,,{{\\an5\\pos(960,82)\\fad(350,350)}}SUSCRÍBETE A LEÓNIDA AL DÍA")
         ev.append(f"Dialogue: 4,{a},{z},CtaSub,,0,0,0,,{{\\an5\\pos(960,124)\\fad(350,350)}}Noticias nuevas de GTA 6 cada día")
+    pathlib.Path(ruta).write_text(txt.rstrip("\n") + "\n" + "\n".join(ev) + "\n", encoding="utf-8")
+
+
+def anadir_rotulos(ruta, bloques):
+    """Datos grandes en el centro (clave «rotulos» del guion): salen cuando la voz dice la palabra «en».
+
+    Si Whisper no oye la palabra, se coloca según su posición en el texto. Sin «rotulos» no cambia nada."""
+    ev = []
+    for b in bloques:
+        if not b.get("rotulos"):
+            continue
+        pal_txt = [P.normalizar(w) for w in b["texto"].split()]
+        ws = b.get("ws") or []
+        for r in b["rotulos"]:
+            clave, n = P.normalizar(r["en"]), r.get("n", 1)
+            t, vistos = None, 0
+            for w, a, _ in ws:
+                if P.normalizar(w).startswith(clave):
+                    vistos += 1
+                    if vistos == n:
+                        t = a
+                        break
+            if t is None:
+                idx = [i for i, w in enumerate(pal_txt) if w.startswith(clave)]
+                frac = idx[min(n, len(idx)) - 1] / max(1, len(pal_txt)) if idx else 0.5
+                t = frac * b["dur_voz"]
+            t0 = b["voz_ini"] + max(0.0, t - 0.15)
+            t1 = min(t0 + r.get("dur", 2.8), b["fin"])
+            if t1 - t0 < 0.8:
+                continue
+            l1, l2 = (r["texto"].split("|") + [""])[:2]
+            linea2 = f"\\N{{\\c{P.ACENTO}}}{P.limpiar(l2)}" if l2 else ""
+            ev.append(f"Dialogue: 2,{P.ass_t(t0)},{P.ass_t(t1)},Dato,,0,0,0,,"
+                      f"{{\\an5\\pos(960,440)\\fad(150,220)\\fscx80\\fscy80\\t(0,250,\\fscx100\\fscy100)}}"
+                      f"{P.limpiar(l1)}{linea2}")
+    if not ev:
+        return
+    txt = pathlib.Path(ruta).read_text(encoding="utf-8")
+    estilo = ("Style: Dato,Montserrat Black,84,&H00FFFFFF,&H000000FF,&H00000000,&H90000000,0,0,0,0,100,100,0,0,1,7,4,5,"
+              "0,0,0,1\n")
+    txt = txt.replace("Style: Dibujo,", estilo + "Style: Dibujo,", 1)
     pathlib.Path(ruta).write_text(txt.rstrip("\n") + "\n" + "\n".join(ev) + "\n", encoding="utf-8")
 
 
@@ -291,6 +337,7 @@ def main():
         b["subs"] = P.frases_de_subtitulo(pal, tiempos, b["voz_ini"])
     P.escribir_ass(TMP / "rotulos.ass", bloques, total)
     anadir_cta(TMP / "rotulos.ass", bloques)
+    anadir_rotulos(TMP / "rotulos.ass", bloques)
     # 5) audio: voz + música que baja con la voz + sonidos originales
     n = int(total * SR)
     voz = np.zeros((n, 2), np.float32)
@@ -348,9 +395,9 @@ def main():
         elif isinstance(b["num"], str):
             continue
         elif b["num"]:
-            caps.append(f"{hms(b['ini'])} {b['num']}. {b['titulo'].capitalize()}")
+            caps.append(f"{hms(b['ini'])} {b['num']}. {b.get('capitulo') or b['titulo'].capitalize()}")
         elif b["id"] == "cierre":
-            caps.append(f"{hms(b['ini'])} Lo que Rockstar aún no ha contado")
+            caps.append(f"{hms(b['ini'])} {b.get('capitulo') or 'Lo que Rockstar aún no ha contado'}")
     (OUT / "capitulos.txt").write_text("\n".join(caps), encoding="utf-8")
     informe = [f"Duración: {dur:.1f} s ({hms(dur)})", f"Tamaño: {final.stat().st_size / 1e6:.0f} MB (alta calidad), "
                f"{sum(p.stat().st_size for p in OUT.glob('previa_*.mp4')) / 1e6:.0f} MB (previa en partes de 5 min)", f"Tiempo de montaje: {time.time() - t0:.0f} s", ""]
