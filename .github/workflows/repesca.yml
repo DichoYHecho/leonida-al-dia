@@ -22,6 +22,10 @@ on:
         description: "Webs o imágenes donde buscar también (separadas por espacios)"
         required: false
         default: ""
+      revisar_voz:
+        description: "Comprobar con Whisper las voces y rehacer las que no siguen el guion (p. ej., se pasan al inglés)"
+        type: boolean
+        default: false
 
 concurrency:
   group: videos
@@ -68,6 +72,7 @@ jobs:
       GOOGLE_REFRESH_TOKEN: ${{ secrets.GOOGLE_REFRESH_TOKEN }}
       LIMITE: ${{ inputs.limite || '5' }}
       LIMPIAR: ${{ inputs.limpiar }}
+      REVISAR_VOZ: ${{ inputs.revisar_voz }}
       BUSCAR_IMAGEN: ${{ inputs.buscar_imagen }}
       PAGINAS_EXTRA: ${{ inputs.paginas_extra }}
     steps:
