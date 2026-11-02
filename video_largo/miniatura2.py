@@ -104,13 +104,13 @@ def panel(param, ancho, alto):
     return im.crop((int(x0), int(y0), int(x0 + cw), int(y0 + ch))).resize((ancho, alto), Image.LANCZOS)
 
 
-def degradado_h(ancho, alto, sentido, desde=0.55):
+def degradado_h(ancho, alto, sentido, desde=0.55, curva=1.6):
     """Máscara horizontal: opaca hasta «desde» y se desvanece hacia el borde (sentido 1: a la derecha)."""
     m = Image.new("L", (ancho, alto), 0)
     px = m.load()
     for xx in range(ancho):
         u = xx / (ancho - 1) if sentido == 1 else 1 - xx / (ancho - 1)
-        a = 255 if u <= desde else int(255 * (1 - (u - desde) / (1 - desde)) ** 1.6)
+        a = 255 if u <= desde else int(255 * (1 - (u - desde) / (1 - desde)) ** curva)
         for yy in range(alto):
             px[xx, yy] = a
     return m
@@ -144,13 +144,9 @@ def miniatura():
     izq = panel(os.environ["IZQ"], ancho_p, h)
     der = panel(os.environ["DER"], ancho_p, h)
     base.paste(izq, (0, 0))  # Lucía entera, sin fundido: no queda franja oscura
-    base.paste(der, (w - ancho_p, 0), degradado_h(ancho_p, h, 0, 0.62))  # Jason se funde sobre Lucía
+    base.paste(der, (w - ancho_p, 0), degradado_h(ancho_p, h, 0, 0.62, 1.0))  # Jason se funde sobre Lucía
     im = base.convert("RGBA")
-    # columna central un poco más oscura para que el «20» y el texto se lean limpios
-    sombra = Image.new("RGBA", (w, h), (0, 0, 0, 0))
-    ImageDraw.Draw(sombra).ellipse((w * 0.5 - 330 * SS, h * 0.5 - 280 * SS, w * 0.5 + 330 * SS, h * 0.5 + 280 * SS),
-                                   fill=(6, 5, 14, 70))
-    im.alpha_composite(sombra.filter(ImageFilter.GaussianBlur(90 * SS)))
+    # sin sombra en el centro: las dos fotos se funden directamente (el texto lleva su propia sombra suave)
     f20 = ImageFont.truetype(CARPETA + "Montserrat-Black.ttf", 500 * SS)
     f1 = ImageFont.truetype(CARPETA + "Montserrat-ExtraBold.ttf", 64 * SS)
     f2 = ImageFont.truetype(CARPETA + "Montserrat-ExtraBold.ttf", 62 * SS)
