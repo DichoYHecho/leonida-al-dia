@@ -31,7 +31,7 @@ def main():
         wav = pathlib.Path(f"audio_{video}.wav")
         subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-user_agent", P.UA, "-i", P.VIDEOS[video], "-vn",
                         "-ac", "1", "-ar", "16000", str(wav)], check=True)
-        segs = list(modelo.transcribe(str(wav), language="en", word_timestamps=True, vad_filter=False)[0])
+        segs = list(modelo.transcribe(P.audio_16k(wav), language="en", word_timestamps=True, vad_filter=False)[0])
         inf.append(f"## {video}")
         for s in segs:
             inf.append(f"{s.start:7.2f}-{s.end:7.2f} {s.text.strip()}")
