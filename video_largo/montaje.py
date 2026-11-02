@@ -139,6 +139,28 @@ def ajustar_frase_lucia(tb):
         print("No se ha podido afinar la frase de Lucía:", type(e).__name__, e, flush=True)
 
 
+def anadir_cta(ruta, bloques):
+    """Cartel «SUSCRÍBETE A LEÓNIDA AL DÍA» arriba en el centro, a mitad del vídeo y en el cierre."""
+    tramos = [(b["voz_ini"], b["voz_fin"] + 0.6) for b in bloques if b.get("cta")]
+    cierre = [b for b in bloques if b["id"] == "cierre"]
+    if cierre:
+        tramos.append((max(cierre[0]["voz_ini"], cierre[0]["voz_fin"] - 17), cierre[0]["voz_fin"] + 0.5))
+    txt = pathlib.Path(ruta).read_text(encoding="utf-8")
+    estilos = ("Style: CtaTit,Montserrat Black,38,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,1,0,1,0,0,5,0,0,0,1\n"
+               "Style: CtaSub,Montserrat ExtraBold,26,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,1,0,1,0,0,5,0,0,0,1\n"
+               "Style: CtaFondo,Montserrat Black,20,&H00A34FFF,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,0,0,7,0,0,0,1\n")
+    txt = txt.replace("Style: Dibujo,", estilos + "Style: Dibujo,", 1)
+    forma = ("m 24 0 l 796 0 b 810 0 820 10 820 24 l 820 96 b 820 110 810 120 796 120 l 24 120 b 10 120 0 110 0 96 "
+             "l 0 24 b 0 10 10 0 24 0")
+    ev = []
+    for t0, t1 in tramos:
+        a, z = P.ass_t(t0), P.ass_t(t1)
+        ev.append(f"Dialogue: 3,{a},{z},CtaFondo,,0,0,0,,{{\\pos(550,40)\\fad(350,350)\\p1}}{forma}")
+        ev.append(f"Dialogue: 4,{a},{z},CtaTit,,0,0,0,,{{\\an5\\pos(960,82)\\fad(350,350)}}SUSCRÍBETE A LEÓNIDA AL DÍA")
+        ev.append(f"Dialogue: 4,{a},{z},CtaSub,,0,0,0,,{{\\an5\\pos(960,124)\\fad(350,350)}}Noticias nuevas de GTA 6 cada día")
+    pathlib.Path(ruta).write_text(txt.rstrip("\n") + "\n" + "\n".join(ev) + "\n", encoding="utf-8")
+
+
 def rms_50hz(x):
     hop = SR // 50
     n = len(x) // hop
@@ -238,6 +260,7 @@ def main():
             tiempos, b["metodo"] = P.tiempos_por_voz(b["audio"], b["texto"]), "la voz (pausas)"
         b["subs"] = P.frases_de_subtitulo(pal, tiempos, b["voz_ini"])
     P.escribir_ass(TMP / "rotulos.ass", bloques, total)
+    anadir_cta(TMP / "rotulos.ass", bloques)
     # 5) audio: voz + música que baja con la voz + sonidos originales
     n = int(total * SR)
     voz = np.zeros((n, 2), np.float32)
