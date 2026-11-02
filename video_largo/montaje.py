@@ -313,7 +313,11 @@ def main():
     dur = float(P.run(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", final]).stdout)
     caps = ["0:00 Introducción"] if bloques and bloques[0]["id"] == "hook" else []
     for b in bloques:
-        if b["num"]:
+        if b["num"] == "E1":
+            caps.append(f"{hms(b['ini'])} Tres extra de regalo")
+        elif isinstance(b["num"], str):
+            continue
+        elif b["num"]:
             caps.append(f"{hms(b['ini'])} {b['num']}. {b['titulo'].capitalize()}")
         elif b["id"] == "cierre":
             caps.append(f"{hms(b['ini'])} Lo que Rockstar aún no ha contado")
