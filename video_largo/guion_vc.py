@@ -318,12 +318,12 @@ BLOQUES = [
      "texto": ("Parada dieciocho. ¿Y qué cambia? Lo primero, la época: de 1986 a hoy, con móviles y redes sociales. Lo "
                "segundo, los protagonistas: Tommy iba solo; ahora son dos, Jason y Lucía. Y lo tercero, la escala: en "
                "2002, Vice City era una ciudad de algo más de cuatro kilómetros cuadrados en una PS2. En 2026 es la "
-               "capital de un estado entero, en PS5 y Xbox Series. Lo que no cambia: el neón, las palmeras... y que en "
+               "capital de un estado entero, en PS5 y Xbox Series. Y el dinero: Vice City costó unos cinco millones; lo que ha costado GTA 6, Rockstar no lo ha dicho. Lo que no cambia: el neón, las palmeras... y que en "
                "Vice City nadie es del todo inocente."),
      "voz": ("Parada dieciocho. ¿Y qué cambia? Lo primero, la época: de 1986 a hoy, con móviles y redes sociales. Lo "
              "segundo, los protagonistas: Tomi iba solo; ahora son dos, Yéison y Lucía. Y lo tercero, la escala: en "
              "2002, Vice City era una ciudad de algo más de cuatro kilómetros cuadrados en una pe ese dos. En 2026 es "
-             "la capital de un estado entero, en pe ese cinco y Xbox Series. Lo que no cambia: el neón, las "
+             "la capital de un estado entero, en pe ese cinco y Xbox Series. Y el dinero: Vice City costó unos cinco millones; lo que ha costado GTA 6, Rockstar no lo ha dicho. Lo que no cambia: el neón, las "
              "palmeras... y que en Vice City nadie es del todo inocente."),
      "rotulos": [{"en": "época", "texto": "DE 1986|A HOY"},
                  {"en": "protagonistas", "texto": "DE TOMMY|A JASON Y LUCÍA"},
@@ -336,11 +336,11 @@ BLOQUES = [
      "texto": ("Y antes de cerrar, como has llegado hasta aquí, tres extra de regalo. Extra uno: Vice City nunca se fue "
                "del todo. Por su décimo aniversario, en diciembre de 2012, Rockstar lo sacó para móviles, con este "
                "tráiler que estás viendo. Y en 2021 llegó la Definitive Edition, con los gráficos rehechos. Mira: así "
-               "era en 2002... y así quedó en la remasterización. Las mismas palmeras, veinte años después."),
+               "era en 2002... y así quedó en la remasterización. Las mismas palmeras, veinte años después. Y en diciembre de 2023 esa remasterización llegó también a los móviles."),
      "voz": ("Y antes de cerrar, como has llegado hasta aquí, tres extra de regalo. Extra uno: Vice City nunca se fue "
              "del todo. Por su décimo aniversario, en diciembre de 2012, Rockstar lo sacó para móviles, con este "
              "tráiler que estás viendo. Y en 2021 llegó la Définitiv Edíshon, con los gráficos rehechos. Mira: así "
-             "era en 2002... y así quedó en la remasterización. Las mismas palmeras, veinte años después."),
+             "era en 2002... y así quedó en la remasterización. Las mismas palmeras, veinte años después. Y en diciembre de 2023 esa remasterización llegó también a los móviles."),
      "rotulos": [{"en": "aniversario", "texto": "10.º ANIVERSARIO|MÓVILES · DIC 2012"},
                  {"en": "gráficos", "texto": "DEFINITIVE EDITION|2021"},
                  {"en": "mira", "texto": "2002|ORIGINAL"},
@@ -351,11 +351,11 @@ BLOQUES = [
      "texto": ("Extra dos: los fans que desmontaron Vice City. Un grupo de programadores reconstruyó el código de GTA 3 "
                "y de Vice City pieza a pieza, para que funcionaran en más sitios, como la Switch o la Vita. Hacía falta "
                "tener tu propia copia del juego, pero a Take-Two no le hizo ni pizca de gracia: en 2021 denunció a "
-               "catorce de ellos en California. Moraleja: en Vice City, el código ni tocarlo."),
+               "catorce de ellos en California. En 2023, según NME, acabaron pactando. Moraleja: en Vice City, el código ni tocarlo."),
      "voz": ("Extra dos: los fans que desmontaron Vice City. Un grupo de programadores reconstruyó el código de GTA 3 "
              "y de Vice City pieza a pieza, para que funcionaran en más sitios, como la Suich o la Vita. Hacía falta "
              "tener tu propia copia del juego, pero a Teik Tú no le hizo ni pizca de gracia: en 2021 denunció a "
-             "catorce de ellos en California. Moraleja: en Vice City, el código ni tocarlo."),
+             "catorce de ellos en California. En 2023, según Ene Eme E, acabaron pactando. Moraleja: en Vice City, el código ni tocarlo."),
      "rotulos": [{"en": "código", "texto": "RE3 Y REVC|EL CÓDIGO, PIEZA A PIEZA"},
                  {"en": "sitios", "texto": "SWITCH · WII U · VITA|"},
                  {"en": "catorce", "texto": "14 PROGRAMADORES|DEMANDADOS EN 2021"}],
@@ -380,12 +380,12 @@ BLOQUES = [
      "texto": ("Y para acabar, lo que todavía no sabemos. ¿Vuelve el Ocean View Hotel? Los fans creen haberlo visto en "
                "un tráiler, pero Rockstar no lo ha confirmado. ¿Vuelven Tommy, Lance o algún personaje del original? "
                "Ni una palabra. Lo que sí sabemos es la fecha: el 19 de noviembre volvemos a Vice City. Veinticuatro "
-               "años después. Si te ha gustado el viaje, suscríbete, y si te perdiste las 20 curiosidades de GTA 6, "
+               "años después. Y si jugaste al de 2002, cuéntame en los comentarios cuál era tu emisora: ¿Flash FM, Wave 103 o Emotion? Si te ha gustado el viaje, suscríbete, y si te perdiste las 20 curiosidades de GTA 6, "
                "tienes el vídeo aquí. Nos vemos en Leonida."),
      "voz": ("Y para acabar, lo que todavía no sabemos. ¿Vuelve el Óushen Viu Hotel? Los fans creen haberlo visto en "
              "un tráiler, pero Rockstar no lo ha confirmado. ¿Vuelven Tomi, Lans o algún personaje del original? "
              "Ni una palabra. Lo que sí sabemos es la fecha: el 19 de noviembre volvemos a Vice City. Veinticuatro "
-             "años después. Si te ha gustado el viaje, suscríbete, y si te perdiste las 20 curiosidades de GTA 6, "
+             "años después. Y si jugaste al de 2002, cuéntame en los comentarios cuál era tu emisora: ¿Flash Efe Eme, Uéiv ciento tres o Imóushon? Si te ha gustado el viaje, suscríbete, y si te perdiste las 20 curiosidades de GTA 6, "
              "tienes el vídeo aquí. Nos vemos en Leonida."),
      "rotulos": [{"en": "hotel", "texto": "¿OCEAN VIEW HOTEL?|SIN CONFIRMAR"},
                  {"en": "palabra", "texto": "¿VUELVE ALGUIEN?|NI UNA PALABRA"},
