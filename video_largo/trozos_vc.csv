@@ -1,1 +1,33 @@
 Trozo,Grupo,Inicio (s),Duración (s),Qué se ve,Foco (0 izquierda - 1 derecha),Uso,Sonido,Notas,Vídeo,Lento
+VCA_Diner,Vice_City_2002,8.2,2.2,Baile en un diner,0.5,principal,no,Tráiler del aniversario 0:08,VC_Aniv,1.2
+VCA_Rockstar_North,Vice_City_2002,15.0,2.0,A Rockstar North production sobre Vice City al atardecer,0.5,principal,no,0:15,VC_Aniv,1.2
+VCA_Coche_Aeropuerto,Vice_City_2002,17.6,1.6,Coche blanco en el aeropuerto,0.5,principal,no,0:18,VC_Aniv,1.2
+VCA_Logo,Vice_City_2002,21.4,1.5,Logo de GTA Vice City,0.5,principal,no,0:21,VC_Aniv,1.2
+VCA_Moto_Atardecer,Vice_City_2002,23.4,1.8,Moto al atardecer,0.5,principal,no,0:23,VC_Aniv,1.2
+VCA_Tommy_Yate,Vice_City_2002,25.4,1.8,Tommy en un yate,0.5,principal,no,0:25,VC_Aniv,1.2
+VCA_Tommy_Yate_2,Vice_City_2002,27.3,1.7,Tommy en el yate señalando,0.5,principal,no,0:27,VC_Aniv,1.2
+VCA_Barco,Vice_City_2002,29.4,1.4,Barco en el muelle,0.5,principal,no,0:29,VC_Aniv,1.2
+VCA_Despacho,Vice_City_2002,31.4,1.4,Despacho oscuro de una mansión,0.5,principal,no,0:31,VC_Aniv,1.2
+VCA_Mesa,Vice_City_2002,33.4,1.5,Hombre en una mesa con la ciudad detrás,0.5,principal,no,0:33,VC_Aniv,1.2
+VCA_Tommy_Lance,Vice_City_2002,35.4,1.4,Tommy con camisa hawaiana y un hombre de traje blanco,0.5,principal,no,0:35,VC_Aniv,1.2
+VCA_Calle,Vice_City_2002,37.4,1.4,Tommy en una calle,0.5,principal,no,0:37,VC_Aniv,1.2
+VCA_Salon,Vice_City_2002,39.4,1.4,Salón de una casa,0.5,principal,no,0:39,VC_Aniv,1.2
+VCA_Coches_Noche,Vice_City_2002,41.4,1.4,Coches de noche,0.5,principal,no,0:41,VC_Aniv,1.2
+VCA_Tommy_Silla,Vice_City_2002,43.4,1.4,Tommy en una silla de director,0.5,principal,no,0:43,VC_Aniv,1.2
+VCA_Helicoptero,Vice_City_2002,45.4,1.4,Helicóptero y Tommy,0.5,principal,no,0:45,VC_Aniv,1.2
+VCA_Tommy_Bar,Vice_City_2002,47.4,1.4,Tommy al teléfono en un bar,0.5,principal,no,0:47,VC_Aniv,1.2
+VCA_Estudio_1,Vice_City_2002,51.0,2.8,Tommy en un estudio de cine,0.5,principal,no,0:51,VC_Aniv,1.2
+VCA_Estudio_2,Vice_City_2002,55.4,1.4,Equipo de rodaje con cámara,0.5,principal,no,0:55,VC_Aniv,1.2
+VCA_Grua,Vice_City_2002,57.1,1.2,Tommy junto a una grúa,0.5,principal,no,0:57,VC_Aniv,1.2
+VCA_Lanchas,Vice_City_2002,58.6,1.5,Persecución de lanchas con explosión,0.5,principal,no,0:58,VC_Aniv,1.2
+VCA_Tiroteo,Vice_City_2002,61.6,1.0,Tiroteo en la calle,0.5,principal,no,1:01,VC_Aniv,1.2
+VCA_Trio,Vice_City_2002,63.0,1.5,Tres hombres bajando unas escaleras,0.5,principal,no,1:03,VC_Aniv,1.2
+VCA_Welcome,Vice_City_2002,65.0,2.6,Rótulo Welcome back to Vice City,0.5,principal,no,1:05,VC_Aniv,1
+VCA_Welcome_Son,Vice_City_2002,64.6,3.4,Rótulo Welcome back to Vice City con su sonido,0.5,principal,si,1:04 con sonido,VC_Aniv,1
+VCA_Aniversario,Vice_City_2002,67.6,1.2,Rótulo 10th Anniversary,0.5,principal,no,1:07,VC_Aniv,1
+VCC_Tommy_Lance_Orig,Vice_City_2002,5.4,2.2,Tommy y Lance con los gráficos de 2002,0.5,principal,no,Comparación 0:05 (original),VC_Comp,1
+VCC_Tommy_Lance_DE,Vice_City_2002,10.0,4.4,Tommy y Lance disparando (Definitive Edition),0.5,principal,no,0:10 (remaster),VC_Comp,1
+VCC_Moto_Orig,Vice_City_2002,16.0,3.2,Moto por Ocean Drive con los gráficos de 2002,0.5,principal,no,0:16 (original),VC_Comp,1
+VCC_Moto_DE,Vice_City_2002,20.0,3.6,Moto por Ocean Drive (Definitive Edition),0.5,principal,no,0:20 (remaster),VC_Comp,1
+VCC_Bahia_Orig,Vice_City_2002,24.0,1.6,Bahía al atardecer con los gráficos de 2002,0.5,principal,no,0:24 (original),VC_Comp,1
+VCC_Bahia_DE,Vice_City_2002,26.0,3.6,Bahía con palmeras (Definitive Edition),0.5,principal,no,0:26 (remaster),VC_Comp,1

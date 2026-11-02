@@ -5,12 +5,15 @@ Mismo formato que guion_vl.py (se elige con GUION=guion_vc). Claves nuevas, opci
   capitulo  -> texto del capítulo en capitulos.txt (si no, el título en minúsculas)
   rotulos   -> datos grandes en el centro: {"en": palabra que dice la voz, "n": vez que sale, "texto": "LÍNEA 1|LÍNEA 2"}
   cta       -> cartel de «Suscríbete» durante ese bloque
-Sin sonido original de los tráileres: sus canciones tienen derechos (riesgo de Content ID).
-Los planos de los juegos antiguos (VC_...) se añaden en trozos_vc.csv cuando estén las fuentes oficiales.
+Con sonido original de los tráileres (pedido por mí, aunque sus canciones tienen derechos).
+Planos de Vice City 2002 (VCA_..., VCC_...) en trozos_vc.csv, de los vídeos oficiales de Rockstar.
 """
 
-# Vídeos oficiales extra (se rellenan en VC2 con las URL oficiales de Rockstar)
-VIDEOS_EXTRA = {}
+# Vídeos oficiales de Rockstar de Vice City (rockstargames.com/videos/tror41c2 y /videos/ao1c441c)
+VIDEOS_EXTRA = {
+    "VC_Aniv": "https://videos-rockstargames-com.akamaized.net/v4/tror41c2/flv/en-us-720p.mp4",
+    "VC_Comp": "https://videos-rockstargames-com.akamaized.net/v4/ao1c441c/flv/en-us-1080p60.mp4",
+}
 
 T = 18
 
@@ -28,9 +31,10 @@ BLOQUES = [
              "en un juego en el que al principio... ibas a ser policía. Hoy te cuento la historia entera de Vice City "
              "en 18 paradas: de 1997 a GTA 6, lo que vuelve, lo que cambia, y el guiño a Tomi Verchéti que Rockstar "
              "ha metido en las reservas. Arrancamos."),
-     "planos": ["Lanz_Playa", "T1_Neones", "Mirada_Vista_Aerea", "T1_Letras_Vice", "Lanz_Descapotable",
-                "Mirada_Skyline_Noche", "T1_Coches_Noche", "Mirada_Playa", "Lanz_Balcon", "T1_Noche_Aerea",
-                "VL_Poli_2", "Mirada_Descapotable_1", "T1_Autopista", "Mirada_Atardecer"]},
+     "planos": ["VCA_Logo", "VCA_Tommy_Yate", "VCC_Moto_Orig", "VCA_Lanchas", "Lanz_Playa", "T1_Neones",
+                "Mirada_Vista_Aerea", "T1_Letras_Vice", "VL_Poli_2", "Lanz_Descapotable", "Mirada_Skyline_Noche",
+                "T1_Coches_Noche", "Mirada_Descapotable_1", "T1_Autopista"],
+     "original": "VCA_Welcome_Son"},
 
     # ---------------------------------------------------------------- A. 1997 · EL ORIGEN
     {"id": "p01", "num": 1, "total": T, "titulo": "1995 · IBAS A SER POLICÍA", "capitulo": "Ibas a ser policía",
@@ -81,8 +85,8 @@ BLOQUES = [
                  {"en": "cinco", "texto": "5 MILLONES $|DESARROLLO"},
                  {"en": "trece", "texto": "13 MILLONES $|PUBLICIDAD"},
                  {"en": "aquí", "texto": "8 NOV 2002|EUROPA · PS2"}],
-     "planos": ["T1_Letras_Vice", "Mirada_Skyline_Noche", "T1_Neones", "Lanz_Playa", "Mirada_Descapotable_2",
-                "T1_Coches_Noche", "Mirada_Autopista_1", "T1_Noche_Aerea"]},
+     "planos": ["VCA_Rockstar_North", "VCA_Logo", "VCA_Coche_Aeropuerto", "VCC_Bahia_Orig", "VCA_Moto_Atardecer",
+                "VCA_Tommy_Yate", "VCC_Moto_Orig", "VCA_Barco"]},
     {"id": "p04", "num": 4, "total": T, "titulo": "UNA PELI DE LOS OCHENTA", "capitulo": "Una peli de los ochenta",
      "overlay": "",
      "texto": ("Parada cuatro. Vice City no pasa en 2002: pasa en 1986. Y Rockstar no lo escondió. Las referencias son "
@@ -97,8 +101,8 @@ BLOQUES = [
                  {"en": "precio", "texto": "EL PRECIO DEL PODER|1983"},
                  {"en": "atrapado", "texto": "ATRAPADO POR SU PASADO|1993"},
                  {"en": "serie", "texto": "CORRUPCIÓN EN MIAMI|1984-1989"}],
-     "planos": ["T1_Neones", "Mirada_Coche_Clasico", "VL_Disco_0", "Mirada_Descapotable_1", "VL_Disco_3",
-                "T1_Coches_Noche", "Mirada_Atardecer", "VL_Espejo_1"]},
+     "planos": ["VCA_Diner", "VCA_Tommy_Yate_2", "VCA_Despacho", "VCA_Mesa", "VCA_Coches_Noche", "VCA_Salon",
+                "VCA_Lanchas", "VCA_Tommy_Bar"]},
     {"id": "p05", "num": 5, "total": T, "titulo": "TOMMY VERCETTI", "capitulo": "Tommy Vercetti", "overlay": "",
      "texto": ("Parada cinco. El protagonista: Tommy Vercetti. Se come quince años de cárcel por culpa de su jefe, "
                "Sonny Forelli, y nada más salir lo mandan a Vice City a hacer negocios con droga. El primer trato sale "
@@ -113,8 +117,8 @@ BLOQUES = [
      "rotulos": [{"en": "quince", "texto": "15 AÑOS|DE CÁRCEL"},
                  {"en": "emboscada", "texto": "EMBOSCADA|EN EL PRIMER TRATO"},
                  {"en": "voz", "texto": "RAY LIOTTA|LA VOZ DE TOMMY"}],
-     "planos": ["T1_Lancha_Rapida", "Mirada_Puerto", "VL_Atraco_1", "VL_Poli_3", "T1_Camioneta", "VL_Atraco_3",
-                "Mirada_Skyline_Noche", "T1_Neones"]},
+     "planos": ["VCC_Tommy_Lance_Orig", "VCA_Tommy_Silla", "VCA_Barco", "VCA_Tiroteo", "VCA_Tommy_Bar", "VCA_Helicoptero",
+                "VCA_Tommy_Yate", "VCA_Calle"]},
     {"id": "p06", "num": 6, "total": T, "titulo": "UN REPARTO DE CINE", "capitulo": "Un reparto de cine", "overlay": "",
      "texto": ("Parada seis. Y Liotta no vino solo. En el reparto están Burt Reynolds, Tom Sizemore, Luis Guzmán, "
                "Danny Dyer... Pero el detalle bueno es este: Lance Vance, el socio de Tommy, lo dobla Philip Michael "
@@ -127,8 +131,8 @@ BLOQUES = [
      "rotulos": [{"en": "reparto", "texto": "BURT REYNOLDS · TOM SIZEMORE|LUIS GUZMÁN · DANNY DYER"},
                  {"en": "dobla", "texto": "LANCE VANCE|= PHILIP MICHAEL THOMAS"},
                  {"en": "compañero", "texto": "TUBBS|CORRUPCIÓN EN MIAMI"}],
-     "planos": ["Mirada_Terraza", "Mirada_Azotea", "VL_Interior_1", "Mirada_Jason_Calle", "VL_Negro_1",
-                "VL_Interior_2", "Mirada_Jason_Patio", "VL_Negro_2"]},
+     "planos": ["VCA_Tommy_Lance", "VCC_Tommy_Lance_Orig", "VCA_Trio", "VCA_Mesa", "VCC_Tommy_Lance_DE", "VCA_Diner",
+                "VCA_Tommy_Yate_2"]},
     {"id": "p07", "num": 7, "total": T, "titulo": "EL MAPA DE 1986", "capitulo": "El mapa de 1986", "overlay": "",
      "texto": ("Parada siete. El mapa. Dos islas grandes y unas cuantas pequeñas, casi el doble que la Liberty City de "
                "GTA 3. Al principio no puedes cruzar: los puentes están cerrados porque se acerca un huracán, Hermione. "
@@ -145,8 +149,8 @@ BLOQUES = [
                  {"en": "playa", "texto": "OCEAN BEACH|= SOUTH BEACH"},
                  {"en": "medio", "texto": "STARFISH ISLAND|= STAR ISLAND"},
                  {"en": "primera", "texto": "OCEAN VIEW HOTEL|TU PRIMERA CASA"}],
-     "planos": ["Mirada_Vista_Aerea", "T1_Puente_Cayos", "T1_Playa_Aerea", "Mirada_Playa", "Mirada_Puerto",
-                "Lanz_Playa", "Mirada_Kayak", "T1_Noche_Aerea"]},
+     "planos": ["VCC_Bahia_Orig", "VCC_Moto_Orig", "VCA_Moto_Atardecer", "VCA_Coche_Aeropuerto", "VCA_Calle",
+                "VCA_Coches_Noche", "VCA_Barco", "VCA_Lanchas"]},
     {"id": "p08", "num": 8, "total": T, "titulo": "NUEVE HORAS DE RADIO", "capitulo": "Nueve horas de radio",
      "overlay": "",
      "texto": ("Parada ocho. Si Vice City es famoso por algo, es por la radio. Más de 113 canciones y anuncios: unas "
@@ -162,8 +166,8 @@ BLOQUES = [
                  {"en": "caja", "texto": "7 DISCOS|EPIC RECORDS"},
                  {"en": "suena", "texto": "EMOTION 98.3|CROCKETT'S THEME"},
                  {"en": "triple", "texto": "x3|RADIO HABLADA"}],
-     "planos": ["VL_Negro_1", "T2_Jason_Conduce", "VL_Interior_1", "Mirada_Autopista_2", "VL_Negro_3",
-                "Lanz_Descapotable", "VL_Interior_2", "VL_Negro_4"]},
+     "planos": ["VCA_Moto_Atardecer", "VCC_Moto_Orig", "VCA_Coches_Noche", "VCA_Diner", "VCA_Coche_Aeropuerto",
+                "VCA_Calle", "VCC_Bahia_Orig"]},
     {"id": "p09", "num": 9, "total": T, "titulo": "EL DUEÑO DE LA CIUDAD", "capitulo": "El dueño de la ciudad",
      "overlay": "", "cta": True,
      "texto": ("Parada nueve. Y luego está lo de comprar la ciudad. Pisos para guardar coches y partidas, pero también "
@@ -172,8 +176,8 @@ BLOQUES = [
                "dos paradas."),
      "rotulos": [{"en": "estudio", "texto": "ESTUDIO DE CINE|TAXIS · CLUBES"},
                  {"en": "recadero", "texto": "DE RECADERO|A DUEÑO"}],
-     "planos": ["Mirada_Skyline_Azotea", "VL_Azotea_1", "VL_Joyeria", "VL_Disco_1", "Mirada_Furgoneta",
-                "VL_Azotea_3", "Mirada_Camiones", "Mirada_Atardecer"]},
+     "planos": ["VCA_Estudio_1", "VCA_Estudio_2", "VCA_Tommy_Silla", "VCA_Despacho", "VCA_Salon", "VCA_Mesa",
+                "VCA_Tommy_Bar"]},
     {"id": "p10", "num": 10, "total": T, "titulo": "EL RÉCORD", "capitulo": "El récord", "overlay": "",
      "texto": ("Parada diez. ¿Y cómo le fue? Medio millón de copias en 24 horas. Un millón cuatrocientas mil en dos "
                "días: el juego que más rápido se había vendido hasta entonces. Fue el más vendido de 2002 en Estados "
@@ -188,8 +192,7 @@ BLOQUES = [
                  {"en": "diecisiete", "texto": "17,5 MILLONES|EN 2008"},
                  {"en": "nota", "texto": "95|METACRITIC"},
                  {"en": "seis", "texto": "6 PREMIOS|BAFTA"}],
-     "planos": ["T1_Letras_Vice", "Mirada_Paracaidas", "T1_Neones", "Lanz_Moto_Salto", "Mirada_Skyline_Noche",
-                "Mirada_Carrera", "T1_Noche_Aerea"]},
+     "planos": ["VCA_Logo", "VCA_Trio", "VCA_Lanchas", "VCA_Helicoptero", "VCA_Grua", "VCA_Tiroteo", "VCA_Welcome"]},
 
     # ---------------------------------------------------------------- C. 2006 · VICE CITY STORIES
     {"id": "p11", "num": 11, "total": T, "titulo": "2006 · EL HERMANO DE LA EMBOSCADA",
@@ -207,8 +210,8 @@ BLOQUES = [
      "rotulos": [{"en": "vuelve", "texto": "VICE CITY STORIES|2006 · PSP"},
                  {"en": "protagonista", "texto": "VICTOR VANCE|1984"},
                  {"en": "emboscada", "texto": "EL HERMANO|DE LA EMBOSCADA"}],
-     "planos": ["Mirada_Jason_Calle", "T2_Jason_Tejado", "VL_Atraco_2", "Mirada_Jason_Patio", "VL_Poli_1",
-                "T2_Jason_Conduce", "Mirada_Calles_2", "VL_Fuego"]},
+     "planos": ["VCA_Barco", "VCA_Tommy_Lance", "VCA_Lanchas", "Mirada_Jason_Calle", "VL_Atraco_2", "VCA_Calle",
+                "VL_Poli_1", "VCA_Tiroteo"]},
     {"id": "p12", "num": 12, "total": T, "titulo": "PHIL COLLINS EN VICE CITY", "capitulo": "Phil Collins en Vice City",
      "overlay": "",
      "texto": ("Parada doce. Y el cameo más ochentero de toda la saga: Phil Collins. Él mismo, haciendo de él mismo. En "
@@ -323,8 +326,52 @@ BLOQUES = [
      "rotulos": [{"en": "época", "texto": "DE 1986|A HOY"},
                  {"en": "protagonistas", "texto": "DE TOMMY|A JASON Y LUCÍA"},
                  {"en": "escala", "texto": "DE PS2|A PS5 Y XBOX SERIES"}],
-     "planos": ["Mirada_Jason_y_Lucia", "Lanz_Paseo", "VL_Interior_2", "Mirada_Skyline_Noche", "Lanz_Balcon",
-                "Mirada_Atardecer", "T1_Neones", "Mirada_Calles_2"]},
+     "planos": ["VCC_Moto_Orig", "Mirada_Jason_y_Lucia", "VCA_Tommy_Yate", "Lanz_Paseo", "VCC_Bahia_Orig",
+                "Mirada_Skyline_Noche", "Lanz_Balcon", "Mirada_Atardecer", "T1_Neones"]},
+
+    # ---------------------------------------------------------------- TRES EXTRA DE REGALO
+    {"id": "e1", "num": "E1", "total": 3, "titulo": "VICE CITY NUNCA SE FUE", "overlay": "",
+     "texto": ("Y antes de cerrar, como has llegado hasta aquí, tres extra de regalo. Extra uno: Vice City nunca se fue "
+               "del todo. Por su décimo aniversario, en diciembre de 2012, Rockstar lo sacó para móviles, con este "
+               "tráiler que estás viendo. Y en 2021 llegó la Definitive Edition, con los gráficos rehechos. Mira: así "
+               "era en 2002... y así quedó en la remasterización. Las mismas palmeras, veinte años después."),
+     "voz": ("Y antes de cerrar, como has llegado hasta aquí, tres extra de regalo. Extra uno: Vice City nunca se fue "
+             "del todo. Por su décimo aniversario, en diciembre de 2012, Rockstar lo sacó para móviles, con este "
+             "tráiler que estás viendo. Y en 2021 llegó la Définitiv Edíshon, con los gráficos rehechos. Mira: así "
+             "era en 2002... y así quedó en la remasterización. Las mismas palmeras, veinte años después."),
+     "rotulos": [{"en": "aniversario", "texto": "10.º ANIVERSARIO|MÓVILES · DIC 2012"},
+                 {"en": "gráficos", "texto": "DEFINITIVE EDITION|2021"},
+                 {"en": "mira", "texto": "2002|ORIGINAL"},
+                 {"en": "remasterización", "texto": "2021|REMASTERIZADO"}],
+     "planos": ["VCA_Aniversario", "VCA_Welcome", "VCA_Trio", "VCA_Logo", "VCC_Bahia_Orig", "VCC_Bahia_DE",
+                "VCC_Moto_Orig", "VCC_Moto_DE"]},
+    {"id": "e2", "num": "E2", "total": 3, "titulo": "LOS FANS QUE LO DESMONTARON", "overlay": "",
+     "texto": ("Extra dos: los fans que desmontaron Vice City. Un grupo de programadores reconstruyó el código de GTA 3 "
+               "y de Vice City pieza a pieza, para que funcionaran en más sitios, como la Switch o la Vita. Hacía falta "
+               "tener tu propia copia del juego, pero a Take-Two no le hizo ni pizca de gracia: en 2021 denunció a "
+               "catorce de ellos en California. Moraleja: en Vice City, el código ni tocarlo."),
+     "voz": ("Extra dos: los fans que desmontaron Vice City. Un grupo de programadores reconstruyó el código de GTA 3 "
+             "y de Vice City pieza a pieza, para que funcionaran en más sitios, como la Suich o la Vita. Hacía falta "
+             "tener tu propia copia del juego, pero a Teik Tú no le hizo ni pizca de gracia: en 2021 denunció a "
+             "catorce de ellos en California. Moraleja: en Vice City, el código ni tocarlo."),
+     "rotulos": [{"en": "código", "texto": "RE3 Y REVC|EL CÓDIGO, PIEZA A PIEZA"},
+                 {"en": "sitios", "texto": "SWITCH · WII U · VITA|"},
+                 {"en": "catorce", "texto": "14 PROGRAMADORES|DEMANDADOS EN 2021"}],
+     "planos": ["VCC_Tommy_Lance_Orig", "VCA_Despacho", "VCA_Tommy_Silla", "VCA_Tommy_Bar", "VCA_Tiroteo",
+                "VCA_Helicoptero", "VCA_Calle"]},
+    {"id": "e3", "num": "E3", "total": 3, "titulo": "MURALES DE VERDAD", "overlay": "",
+     "texto": ("Extra tres: murales de verdad. Según la revista Dazed, Rockstar contó con más de cincuenta artistas "
+               "callejeros reales para pintar los murales de GTA 6, en sitios como el Stockyard de Vice City, inspirado "
+               "en el barrio de Wynwood de Miami. O sea, que el grafiti que vas a ver mientras huyes de la policía... lo "
+               "ha pintado alguien de verdad."),
+     "voz": ("Extra tres: murales de verdad. Según la revista Déizd, Rockstar contó con más de cincuenta artistas "
+             "callejeros reales para pintar los murales de GTA 6, en sitios como el Stokiard de Vice City, inspirado "
+             "en el barrio de Güínwud de Miami. O sea, que el grafiti que vas a ver mientras huyes de la policía... lo "
+             "ha pintado alguien de verdad."),
+     "rotulos": [{"en": "cincuenta", "texto": "+50 ARTISTAS|CALLEJEROS REALES"},
+                 {"en": "barrio", "texto": "STOCKYARD|= WYNWOOD, MIAMI"}],
+     "planos": ["VL_Mural", "Mirada_Calles_1", "Mirada_Calles_2", "Mirada_Camiones", "Mirada_Moto_Calle",
+                "Mirada_Coche_Clasico", "Mirada_Jason_Calle"]},
 
     # ---------------------------------------------------------------- FINAL
     {"id": "cierre", "num": None, "titulo": "", "overlay": "", "capitulo": "Lo que Rockstar aún no ha dicho",
