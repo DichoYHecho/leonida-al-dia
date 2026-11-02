@@ -144,8 +144,8 @@ def miniatura():
     im = base.convert("RGBA")
     # columna central un poco más oscura para que el «20» y el texto se lean limpios
     sombra = Image.new("RGBA", (w, h), (0, 0, 0, 0))
-    ImageDraw.Draw(sombra).ellipse((w * 0.5 - 520 * SS, h * 0.5 - 420 * SS, w * 0.5 + 520 * SS, h * 0.5 + 420 * SS),
-                                   fill=(6, 5, 14, 175))
+    ImageDraw.Draw(sombra).ellipse((w * 0.5 - 430 * SS, h * 0.5 - 380 * SS, w * 0.5 + 430 * SS, h * 0.5 + 380 * SS),
+                                   fill=(6, 5, 14, 120))
     im.alpha_composite(sombra.filter(ImageFilter.GaussianBlur(90 * SS)))
     f20 = ImageFont.truetype(CARPETA + "Montserrat-Black.ttf", 500 * SS)
     f1 = ImageFont.truetype(CARPETA + "Montserrat-ExtraBold.ttf", 64 * SS)
