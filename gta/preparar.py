@@ -231,7 +231,7 @@ def datos(regs_todas, carpeta):
     regs = airtable.listar(T_PUB, ["Estado", "Orden dato"], formula="{Tipo}='Dato'")
     usados = {int(r["fields"]["Orden dato"]) for r in regs if r["fields"].get("Orden dato") is not None}
     pendientes = sum(1 for r in regs if r["fields"].get("Estado") in ("Por Revisar", "Aprobado"))
-    falta = DATOS_EN_COLA - pendientes
+    falta = int(os.environ.get("COLA") or DATOS_EN_COLA) - pendientes   # COLA: a mano, para preparar más datos
     nota(f"Datos pendientes de publicar: {pendientes}; se preparan {max(falta, 0)}")
     if falta <= 0:
         return []
