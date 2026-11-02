@@ -324,14 +324,14 @@ def main():
     del voz, mus, orig, mezcla
     # 6) montaje final
     P.crear_degradado(TMP / "degradado.png")
-    grafo = (f"[0:v]eq=contrast=1.04:saturation=1.08,unsharp=5:5:0.4:5:5:0.0[v0];"
+    grafo = (f"[0:v]tpad=stop_mode=clone:stop_duration=3,eq=contrast=1.04:saturation=1.08,unsharp=5:5:0.4:5:5:0.0[v0];"
              f"[2:v]format=rgba[g];[v0][g]overlay=0:{H - P.ALTO_DEGRADADO}:shortest=1[v1];"
              f"[v1]ass={TMP / 'rotulos.ass'}[v]")
     final = HQ / "video_largo.mp4"
     P.run(["ffmpeg", "-y", "-loglevel", "error", "-i", TMP / "sin_audio.mp4", "-i", TMP / "mezcla.wav",
            "-loop", "1", "-framerate", FPS, "-i", TMP / "degradado.png", "-filter_complex", grafo, "-map", "[v]",
            "-map", "1:a", "-af", "loudnorm=I=-14:TP=-1.5:LRA=11", "-c:v", "libx264", "-crf", "19", "-preset", "medium",
-           "-pix_fmt", "yuv420p", "-c:a", "aac", "-b:a", "192k", "-ar", SR, "-shortest", "-movflags", "+faststart",
+           "-pix_fmt", "yuv420p", "-c:a", "aac", "-b:a", "192k", "-ar", SR, "-t", f"{total:.2f}", "-movflags", "+faststart",
            final])
     print(f"Vídeo final listo ({time.time() - t0:.0f} s)", flush=True)
     P.run(["ffmpeg", "-y", "-loglevel", "error", "-i", final, "-vf", "scale=1280:720", "-c:v", "libx264", "-crf", "27",
