@@ -51,12 +51,14 @@ jobs:
                       errores.append(f"{b['id']}: el plano {p} no está en los CSV de trozos")
               palabras += len(b["texto"].split())
               b["dur_voz"] = len(b["texto"].split()) / 2.37
-              b["voz_ini"], b["ws"] = t + 0.5, []
+              b["ini"], b["voz_ini"], b["ws"] = t, t + 0.5, []
               b["fin"] = b["voz_ini"] + b["dur_voz"] + 0.4
               t = b["fin"]
           ass = pathlib.Path("prueba.ass")
           ass.write_text("[V4+ Styles]\nStyle: Dibujo,x\n\n[Events]\n", encoding="utf-8")
           M.anadir_rotulos(ass, G.BLOQUES)
+          mus = M.musica_del_guion(G.BLOQUES, 30.0)
+          print("Música de prueba:", len(mus) / M.SR, "s")
           rot = sum(1 for l in ass.read_text(encoding="utf-8").splitlines() if ",Dato," in l)
           caps = [b.get("capitulo") or b["titulo"].capitalize() for b in G.BLOQUES if b["num"]]
           inf = [f"Guion: {os.environ['GUION']}", f"Bloques: {len(G.BLOQUES)}", f"Palabras: {palabras}",
