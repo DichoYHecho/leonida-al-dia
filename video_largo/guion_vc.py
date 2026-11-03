@@ -15,10 +15,18 @@ VIDEOS_EXTRA = {
     "VC_Comp": "https://videos-rockstargames-com.akamaized.net/v4/ao1c441c/flv/en-us-1080p60.mp4",
 }
 
+# Logos y carteles que van quietos (sin movimiento de cámara)
+PLANOS_FIJOS = {"VCA_Logo", "VCA_Welcome", "VCA_Welcome_Son", "VCA_Aniversario", "VCA_Rockstar_North", "Mirada_Logo",
+                "VL_Fecha", "VL_Rotulo_PS5", "Portada_Animada", "Lanz_Final_19N", "T1_Letras_Vice"}
+
+# Música: el estilo cambia al empezar estos bloques (4 estilos, ver ESTILOS_MUSICA en montaje.py)
+MUSICA = {"hook": 0, "p03": 1, "p07": 0, "p11": 2, "p13": 3, "p16": 1, "e1": 2, "cierre": 3}
+
 T = 18
 
 BLOQUES = [
-    {"id": "hook", "num": None, "titulo": "", "overlay": "DE 2002|A 2026",
+    {"id": "hook", "num": None, "titulo": "", "overlay": "",
+     "rotulos": [{"t": 0.0, "dur": 2.6, "negro": True, "texto": "DE 2002|A 2026"}],
      "texto": ("El 8 de noviembre de 2002 llegó a las tiendas de España un juego con camisas hawaianas, neón y música "
                "de los ochenta. Se llamaba Vice City. Veinticuatro años después, el 19 de noviembre, Rockstar nos "
                "devuelve allí con GTA 6. Pero Vice City no nació en 2002. Nació cinco años antes, vista desde arriba, "

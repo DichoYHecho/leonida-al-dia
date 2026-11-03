@@ -33,6 +33,7 @@ FUENTES = pathlib.Path(os.environ.get("DIR_FUENTES", "fuentes"))
 SOLO = [x.strip() for x in os.environ.get("BLOQUES_SOLO", "").split(",") if x.strip()]
 URL_ZIP = P._V + "GTAVI_Videos.zip"
 P.VIDEOS.update(getattr(guion_vl, "VIDEOS_EXTRA", {}))  # vídeos oficiales que añade el guion
+FIJOS = set(getattr(guion_vl, "PLANOS_FIJOS", ()))  # logos y carteles: sin movimiento de cámara
 for d in (OUT, HQ, FUENTES):
     d.mkdir(parents=True, exist_ok=True)
 
@@ -91,6 +92,8 @@ def cortar(nombre, t, dur_out, destino, sentido):
         pre = ["-ss", f"{t['ini']:.2f}", "-t", f"{dur_in:.2f}"]
         entrada = ["-i", str(fuente(t["video"]))]
     x = f"(in_w-out_w)*t/{dur_out:.3f}" if sentido == 0 else f"(in_w-out_w)*(1-t/{dur_out:.3f})"
+    if nombre in FIJOS:
+        x = "(in_w-out_w)/2"
     vf = (f"setpts={lento}*PTS,fps={FPS},scale=2112:1188:flags=lanczos:force_original_aspect_ratio=increase,"
           f"crop={W}:{H}:x='{x}':y='(in_h-out_h)/2',format=yuv420p")
     for _ in range(3):
@@ -167,44 +170,160 @@ def anadir_cta(ruta, bloques):
 
 
 def anadir_rotulos(ruta, bloques):
-    """Datos grandes en el centro (clave «rotulos» del guion): salen cuando la voz dice la palabra «en».
+    """Datos grandes en el centro (clave «rotulos» del guion), sobre una caja negra para que se lean bien.
 
-    Si Whisper no oye la palabra, se coloca según su posición en el texto. Sin «rotulos» no cambia nada."""
+    Salen cuando la voz dice la palabra «en» (o en el segundo «t» del bloque) y no se pisan entre ellos.
+    Con «negro»: True ocupan toda la pantalla en negro (para el gancho). Sin «rotulos» no cambia nada."""
     ev = []
     for b in bloques:
         if not b.get("rotulos"):
             continue
         pal_txt = [P.normalizar(w) for w in b["texto"].split()]
         ws = b.get("ws") or []
+        lista = []
         for r in b["rotulos"]:
-            clave, n = P.normalizar(r["en"]), r.get("n", 1)
-            t, vistos = None, 0
-            for w, a, _ in ws:
-                if P.normalizar(w).startswith(clave):
-                    vistos += 1
-                    if vistos == n:
-                        t = a
-                        break
-            if t is None:
-                idx = [i for i, w in enumerate(pal_txt) if w.startswith(clave)]
-                frac = idx[min(n, len(idx)) - 1] / max(1, len(pal_txt)) if idx else 0.5
-                t = frac * b["dur_voz"]
-            t0 = b["voz_ini"] + max(0.0, t - 0.15)
-            t1 = min(t0 + r.get("dur", 2.8), b["fin"])
+            if "t" in r:
+                t0 = b["ini"] + float(r["t"])
+            else:
+                clave, n = P.normalizar(r["en"]), r.get("n", 1)
+                t, vistos = None, 0
+                for w, a, _ in ws:
+                    if P.normalizar(w).startswith(clave):
+                        vistos += 1
+                        if vistos == n:
+                            t = a
+                            break
+                if t is None:
+                    idx = [i for i, w in enumerate(pal_txt) if w.startswith(clave)]
+                    frac = idx[min(n, len(idx)) - 1] / max(1, len(pal_txt)) if idx else 0.5
+                    t = frac * b["dur_voz"]
+                t0 = b["voz_ini"] + max(0.0, t - 0.15)
+            lista.append([t0, t0 + r.get("dur", 2.6), r])
+        lista.sort(key=lambda x: x[0])
+        for k in range(1, len(lista)):  # que no se pisen: el anterior se acorta o el nuevo espera
+            ant = lista[k - 1]
+            if lista[k][0] < ant[1] + 0.08:
+                ant[1] = max(ant[0] + 1.3, lista[k][0] - 0.08)
+                lista[k][0] = max(lista[k][0], ant[1] + 0.08)
+                lista[k][1] = max(lista[k][1], lista[k][0] + 1.3)
+        for t0, t1, r in lista:
+            t1 = min(t1, b["fin"])
             if t1 - t0 < 0.8:
                 continue
             l1, l2 = (r["texto"].split("|") + [""])[:2]
-            linea2 = f"\\N{{\\c{P.ACENTO}}}{P.limpiar(l2)}" if l2 else ""
-            ev.append(f"Dialogue: 2,{P.ass_t(t0)},{P.ass_t(t1)},Dato,,0,0,0,,"
-                      f"{{\\an5\\pos(960,440)\\fad(150,220)\\fscx80\\fscy80\\t(0,250,\\fscx100\\fscy100)}}"
+            negro = r.get("negro")
+            g1, g2 = (124, 72) if negro else (84, 52)
+            a, z = P.ass_t(t0), P.ass_t(t1)
+            if negro:
+                ev.append(f"Dialogue: 0,{a},{z},Dibujo,,0,0,0,,{{\\pos(0,0)\\c&H000000&\\fad(0,250)\\p1}}"
+                          "m 0 0 l 1920 0 1920 1080 0 1080")
+            else:
+                w = min(1840, int(max(len(l1) * g1, len(l2) * g2) * 0.66) + 110)
+                h = g1 + (g2 + 24 if l2 else 0) + 64
+                ev.append(f"Dialogue: 2,{a},{z},Dibujo,,0,0,0,,{{\\pos({960 - w // 2},{440 - h // 2})\\c&H000000&"
+                          f"\\alpha&H28&\\fad(150,200)\\p1}}m 0 0 l {w} 0 {w} {h} 0 {h}")
+            linea2 = f"\\N{{\\fs{g2}\\c{P.ACENTO}}}{P.limpiar(l2)}" if l2 else ""
+            ev.append(f"Dialogue: 3,{a},{z},Dato,,0,0,0,,{{\\an5\\pos(960,440)\\fad(150,200)\\fs{g1}\\c&H0000D7FF&}}"
                       f"{P.limpiar(l1)}{linea2}")
     if not ev:
         return
     txt = pathlib.Path(ruta).read_text(encoding="utf-8")
-    estilo = ("Style: Dato,Montserrat Black,84,&H00FFFFFF,&H000000FF,&H00000000,&H90000000,0,0,0,0,100,100,0,0,1,7,4,5,"
+    estilo = ("Style: Dato,Montserrat Black,84,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,1,0,1,0,0,5,"
               "0,0,0,1\n")
     txt = txt.replace("Style: Dibujo,", estilo + "Style: Dibujo,", 1)
     pathlib.Path(ruta).write_text(txt.rstrip("\n") + "\n" + "\n".join(ev) + "\n", encoding="utf-8")
+
+
+ESTILOS_MUSICA = [  # (bpm, bajos, acordes, octava del arpegio, filtro en Hz)
+    (104, [55.0, 43.65, 65.41, 49.0], [(220.0, 261.63, 329.63), (174.61, 220.0, 261.63), (261.63, 329.63, 392.0),
+                                       (196.0, 246.94, 293.66)], 2, 5500),
+    (112, [73.42, 58.27, 87.31, 65.41], [(293.66, 349.23, 440.0), (233.08, 293.66, 349.23), (349.23, 440.0, 523.25),
+                                         (261.63, 329.63, 392.0)], 2, 6500),
+    (94, [41.2, 65.41, 49.0, 73.42], [(164.81, 196.0, 246.94), (130.81, 164.81, 196.0), (196.0, 246.94, 293.66),
+                                      (146.83, 185.0, 220.0)], 1, 4200),
+    (120, [46.25, 73.42, 55.0, 82.41], [(185.0, 220.0, 277.18), (146.83, 185.0, 220.0), (220.0, 277.18, 329.63),
+                                        (164.81, 207.65, 246.94)], 2, 7000),
+]
+
+
+def musica_estilo(dur, bpm, raices, acordes, oct_arp, corte):
+    """Como P.musica, pero con tempo, acordes y brillo propios (para cambiar de canción durante el vídeo)."""
+    n = int(dur * SR)
+    beat = 60 / bpm
+    mus = np.zeros(n)
+    corchea = beat / 2
+    for k in range(int(dur / corchea) + 1):
+        a = int(k * corchea * SR)
+        b = min(n, a + int(corchea * SR))
+        if a >= n:
+            break
+        f = raices[(int(k * corchea / (4 * beat))) % 4]
+        tt = np.arange(b - a) / SR
+        mus[a:b] += 0.30 * (2 * ((f * tt) % 1) - 1) * np.exp(-tt * 7)
+    for k in range(int(dur / (4 * beat)) + 1):
+        a = int(k * 4 * beat * SR)
+        b = min(n, int((k + 1) * 4 * beat * SR))
+        if a >= n:
+            break
+        tt = np.arange(b - a) / SR
+        pad = np.zeros(b - a)
+        for f in acordes[k % 4]:
+            for det in (0.995, 1.0, 1.005):
+                pad += 2 * ((f * det * tt) % 1) - 1
+        mus[a:b] += 0.05 * pad * np.minimum(1, tt * 4) * np.minimum(1, (4 * beat - tt) * 4)
+    for k in range(int(dur / (beat / 4)) + 1):
+        a = int(k * beat / 4 * SR)
+        b = min(n, a + int(beat / 4 * SR))
+        if a >= n:
+            break
+        f = acordes[(int(k * beat / 4 / (4 * beat))) % 4][k % 3] * oct_arp
+        tt = np.arange(b - a) / SR
+        mus[a:b] += 0.05 * np.sign(np.sin(2 * np.pi * f * tt)) * np.exp(-tt * 14)
+    for k in range(int(dur / beat) + 1):
+        a = int(k * beat * SR)
+        b = min(n, a + int(0.2 * SR))
+        if a >= n:
+            break
+        tt = np.arange(b - a) / SR
+        mus[a:b] += 0.55 * np.sin(2 * np.pi * (45 * tt + 75 * (1 - np.exp(-tt * 28)) / 28)) * np.exp(-tt * 14)
+        a2 = int((k + 0.5) * beat * SR)
+        b2 = min(n, a2 + int(0.05 * SR))
+        if a2 < n:
+            ruido = np.random.RandomState(k).randn(b2 - a2)
+            mus[a2:b2] += 0.05 * np.diff(ruido, prepend=0) * np.exp(-np.arange(b2 - a2) / SR * 60)
+    esp = np.fft.rfft(mus)
+    frec = np.fft.rfftfreq(n, 1 / SR)
+    esp *= 1 / (1 + (frec / corte) ** 4)
+    mus = np.fft.irfft(esp, n)
+    mus /= np.max(np.abs(mus)) + 1e-9
+    return (mus * 0.9).astype(np.float32)
+
+
+def musica_del_guion(bloques, total):
+    """Música que cambia de estilo donde lo diga el guion (MUSICA = {id del bloque: estilo}), con fundidos de 1,5 s."""
+    estilos = getattr(guion_vl, "MUSICA", None)
+    if not estilos:
+        return P.musica(total + 1)
+    n = int((total + 1) * SR)
+    mus = np.zeros(n, np.float32)
+    cambios = [(b["ini"], estilos[b["id"]]) for b in bloques if b["id"] in estilos]
+    if not cambios or cambios[0][0] > 0.5:
+        cambios.insert(0, (0.0, cambios[0][1] if cambios else 0))
+    for k, (t0, e) in enumerate(cambios):
+        t1 = cambios[k + 1][0] if k + 1 < len(cambios) else total + 1
+        a, z = max(0, int((t0 - 0.75) * SR)), min(n, int((t1 + 0.75) * SR))
+        if z <= a:
+            continue
+        trozo = musica_estilo((z - a) / SR + 0.1, *ESTILOS_MUSICA[e % len(ESTILOS_MUSICA)])[: z - a]
+        env = np.ones(z - a, np.float32)
+        f = min(int(1.5 * SR), (z - a) // 2)
+        if a > 0:
+            env[:f] = np.linspace(0, 1, f)
+        if z < n:
+            env[-f:] = np.minimum(env[-f:], np.linspace(1, 0, f))
+        mus[a:z] += trozo[: z - a] * env
+    print("Música: " + ", ".join(f"{hms(t)} estilo {e + 1}" for t, e in cambios), flush=True)
+    return mus
 
 
 def rms_50hz(x):
@@ -223,7 +342,7 @@ def fin_por_energia(x):
     if n < 20:
         return None
     rms = np.sqrt((m[: n * f].reshape(n, f).astype(np.float64) ** 2).mean(axis=1))
-    voz = rms >= max(0.01, 0.05 * float(np.percentile(rms, 95)))
+    voz = rms >= max(0.008, 0.03 * float(np.percentile(rms, 95)))
     i = n - 1
     while i >= 0 and not voz[i]:
         i -= 1
@@ -234,7 +353,7 @@ def fin_por_energia(x):
     j = i
     while j >= 0 and not voz[j]:
         j -= 1
-    if j > 0 and (fin - ini + 1) * 0.02 <= 0.35 and (i - j) * 0.02 >= 0.08:
+    if j > 0 and (fin - ini + 1) * 0.02 <= 0.35 and (i - j) * 0.02 >= 0.45:
         fin = j
     return (fin + 1) * 0.02
 
@@ -275,9 +394,26 @@ def main():
         if fin_g is not None and fin_g + 0.3 < dur_antes:
             b["cola_cortada"] = dur_antes - (fin_g + 0.18)
             b["audio"] = b["audio"][: int((fin_g + 0.18) * SR)]
+        antes_lv = b["audio"]
         b["audio"], desfase = P.limpiar_voz(b["audio"])
+        fin_lv = desfase + len(b["audio"]) / SR
+        fin_real = fin_por_energia(antes_lv)
+        if fin_real and fin_real > fin_lv + 0.05:  # limpiar_voz no puede comerse la última palabra
+            seg = antes_lv[int(desfase * SR):int(min(len(antes_lv) / SR, fin_real + 0.2) * SR)]
+            seg = seg - seg.mean(axis=0, keepdims=True)
+            f_in, f_out = int(0.01 * SR), min(int(0.12 * SR), len(seg) // 4)
+            env = np.ones(len(seg))
+            env[:f_in] = np.linspace(0, 1, f_in)
+            env[len(seg) - f_out:] = np.linspace(1, 0, f_out)
+            b["audio"] = (seg * (env[:, None] if seg.ndim == 2 else env)).astype(np.float32)
+            print(f"  Final de la voz recuperado: {fin_real - fin_lv:.2f} s", flush=True)
         b["ws"] = [(w, a - desfase, e - desfase) for w, a, e in ws]
         b["dur_voz"] = len(b["audio"]) / SR
+        ult = [P.normalizar(w) for w in b["texto"].split()[-2:]]
+        oidas = [P.normalizar(w[0]) for w in b["ws"] if w[1] < b["dur_voz"]][-6:]
+        b["aviso_final"] = bool(b["ws"]) and not any(u in oidas for u in ult if len(u) >= 3)
+        if b["aviso_final"]:
+            print("  AVISO: Whisper no oye el final del guion en la voz montada", flush=True)
         print(f"  {b['dur_voz']:.1f} s (final recortado {b['cola_cortada']:.2f} s)", flush=True)
     ajustar_frase_lucia(tb)
     # 2) línea de tiempo (la pausa de después compensa lo recortado del final de la voz, para mantener el ritmo)
@@ -345,7 +481,7 @@ def main():
         a = b["audio"] / (np.max(np.abs(b["audio"])) + 1e-9) * 0.9
         i0 = int(b["voz_ini"] * SR)
         voz[i0:i0 + len(a)] += a[: n - i0]
-    mus = P.musica(total + 1)[:n]
+    mus = musica_del_guion(bloques, total)[:n]
     rms = rms_50hz(voz.mean(axis=1))
     habla = P.suavizar((rms > 0.02).astype(float), 50, 0.06, 0.5)
     tt = np.arange(n) / SR
@@ -403,7 +539,8 @@ def main():
                f"{sum(p.stat().st_size for p in OUT.glob('previa_*.mp4')) / 1e6:.0f} MB (previa en partes de 5 min)", f"Tiempo de montaje: {time.time() - t0:.0f} s", ""]
     for b in bloques:
         informe.append(f"{b['id']}: voz {b['dur_voz']:.1f} s, {len(b['plan'])} planos, subtítulos por {b['metodo']}"
-                       + (f", sonido original {b['original']}" if b.get("original") else ""))
+                       + (f", sonido original {b['original']}" if b.get("original") else "")
+                       + (", AVISO: revisar el final de la voz" if b.get("aviso_final") else ""))
     (OUT / "informe.txt").write_text("\n".join(informe), encoding="utf-8")
     print("\n".join(informe))
     resumen = os.environ.get("GITHUB_STEP_SUMMARY")
