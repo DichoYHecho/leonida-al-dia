@@ -24,7 +24,7 @@ BANDA_MAX = 0.78   # opacidad máxima de la banda oscura
 CAMBIAR = 0.40     # la zona solo cambia si la media pasa de esto…
 MEJORA = 0.15      # …y la otra es al menos esto más limpia
 TAPADO = 0.85      # nota tan alta que ni con la banda se garantiza la lectura → aviso
-ENCOGER_LOGO = (0.72, -260)  # trozos con el logo de GTA VI: tamaño y desplazamiento vertical (sube)
+ENCOGER_LOGO = (0.56, -420)  # trozos con el logo de GTA VI: tamaño y desplazamiento vertical (sube). 4 nov: el logo queda por encima de los subtítulos
 
 
 def es_logo(ruta):
