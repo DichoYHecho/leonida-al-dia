@@ -3,7 +3,7 @@
 - Se publica solo, sin aprobación: los números los calcula GitHub y el dato del día es el texto tal cual de un
   dato del banco (textos ya aprobados), sin pasar por Gemini.
 - Cuenta hasta el jueves 19 de noviembre a las 00:00, hora de España: Rockstar no ha confirmado la hora de salida.
-  La precarga digital empieza el 12 de noviembre (nota de prensa de Rockstar del 24 de junio de 2026).
+  La precarga digital empieza el 10 de noviembre (nota de prensa de Rockstar del 24 de junio de 2026).
 - El dato del día se coge empezando por el final del banco, para no pisar a los datos de cada día (que van por
   orden desde el principio). Queda en Airtable como «Publicado» (Tipo Dato, etiqueta CUENTA ATRÁS).
 - Desde el 19 de noviembre ya no hay cuenta atrás: a las 17:00 se publica la aprobada, como a las otras horas.
@@ -16,7 +16,7 @@ import airtable, gemini, guion, medios, publicar, video
 from config import AQUI, MADRID, T_PUB, HASHTAGS_FIJOS, PIE_POST
 
 SALIDA = datetime(2026, 11, 19, 0, 0, tzinfo=MADRID)
-PRECARGA = datetime(2026, 11, 12, 0, 0, tzinfo=MADRID)
+PRECARGA = datetime(2026, 11, 10, 1, 0, tzinfo=MADRID)
 PREGUNTAS = ["¿Lo vas a jugar el primer día?", "¿Cuántas horas vas a jugar el primer día?",
              "¿Qué es lo primero que vas a hacer en Vice City?", "¿Con quién tienes más ganas de jugar, Jason o Lucía?",
              "¿Qué es lo que más ganas tienes de ver?", "¿Coche, moto o lancha para recorrer Leónida?",
@@ -125,14 +125,14 @@ def textos(hoy, ahora, d):
     dias, horas = resto.days, resto.seconds // 3600
     gancho = "¡GTA 6 sale mañana!" if n == 1 else f"¡Faltan {n} días para GTA 6!"
     if p > 1:
-        precarga, corta = f"La precarga digital empieza en {p} días, el 12 de noviembre.", f"Precarga: 12 de noviembre (faltan {p} días)"
+        precarga, corta = f"La precarga digital empieza en {p} días, el 10 de noviembre.", f"Precarga: 10 de noviembre (faltan {p} días)"
     elif p == 1:
-        precarga, corta = "La precarga digital empieza mañana, el 12 de noviembre.", "Precarga: mañana, 12 de noviembre"
+        precarga, corta = "La precarga digital empieza mañana, el 10 de noviembre.", "Precarga: mañana, 10 de noviembre"
     elif p == 0:
         precarga, corta = "¡Hoy empieza la precarga digital!", "¡Hoy empieza la precarga!"
     else:
-        precarga, corta = "La precarga digital ya está abierta.", "Precarga abierta desde el 12 de noviembre"
-    voz_precarga = ("La precarga digital, el 12 de noviembre." if p > 1 else "¡La precarga digital empieza mañana!" if p == 1
+        precarga, corta = "La precarga digital ya está abierta.", "Precarga abierta desde el 10 de noviembre"
+    voz_precarga = ("La precarga digital, el 10 de noviembre." if p > 1 else "¡La precarga digital empieza mañana!" if p == 1
                     else "¡Hoy empieza la precarga digital!" if p == 0 else "La precarga digital ya está abierta.")
     # 30 oct: el dato es el gancho (y el título); los días que faltan van pequeños en la esquina y al final de la voz
     inicio = gancho_gemini(d["Dato"])
@@ -182,7 +182,7 @@ def main():
     intro = foto_del_dia(hoy)
     extra = {"cuenta_atras": {"de": n + 1, "a": n, "abajo": "DÍA PARA GTA 6" if n == 1 else "DÍAS PARA GTA 6",
                               "fecha": "JUEVES 19 DE NOVIEMBRE",
-                              "precarga": "PRECARGA: 12 DE NOVIEMBRE" if (PRECARGA.date() - hoy).days >= 0 else "PRECARGA ABIERTA",
+                              "precarga": "PRECARGA: 10 DE NOVIEMBRE" if (PRECARGA.date() - hoy).days >= 0 else "PRECARGA ABIERTA",
                               "trozos_intro": 1, "trozo_dato": 1, "fondo_intro": medios.ruta(intro),
                               "foco_intro": medios.CAPTURAS[intro]["foco"]}}
     print(f"Foto del día: {intro}", flush=True)
