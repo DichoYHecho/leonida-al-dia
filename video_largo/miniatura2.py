@@ -156,14 +156,37 @@ def miniatura():
     f1 = ImageFont.truetype(CARPETA + "Montserrat-ExtraBold.ttf", 64 * SS)
     f2 = ImageFont.truetype(CARPETA + "Montserrat-ExtraBold.ttf", 62 * SS)
     cx = w / 2
-    grande = os.environ.get("GRANDE") or "20"
-    tam = int(os.environ.get("TAM") or 500)
-    if tam != 500:
-        f20 = ImageFont.truetype(CARPETA + "Montserrat-Black.ttf", tam * SS)
-    y_grande = float(os.environ.get("Y_GRANDE") or -56)
-    texto(im, cx, y_grande * SS, grande, f20, ROSA, tracking=-8 * SS)
-    texto(im, cx, 452 * SS, os.environ.get("L1") or "CURIOSIDADES", f1, BLANCO, tracking=7 * SS)
-    texto(im, cx, 546 * SS, os.environ.get("L2") or "DE GTA 6", f2, ROSA, tracking=9 * SS)
+    logos = os.environ.get("LOGOS", "").strip()
+    if logos:  # antes y después: un logo en cada mitad, abajo
+        for k, url in enumerate(logos.split("|")[:2]):
+            ruta = SALIDA / f"logo_{k}.png"
+            subprocess.run(["curl", "-sSfL", "-A", UA, "-o", str(ruta), url.strip()], check=True)
+            lg = Image.open(ruta).convert("RGBA")
+            ruta.unlink()
+            alto_l = int(h * float(os.environ.get("ALTO_LOGO") or 0.36))
+            lg = lg.resize((max(1, int(lg.width * alto_l / lg.height)), alto_l), Image.LANCZOS)
+            if lg.width > w * 0.40:
+                lg = lg.resize((int(w * 0.40), max(1, int(lg.height * w * 0.40 / lg.width))), Image.LANCZOS)
+            x = int(w * (0.25 if k == 0 else 0.75) - lg.width / 2)
+            y = int(h * 0.95 - lg.height)
+            sombra = Image.new("RGBA", im.size, (0, 0, 0, 0))
+            sombra.paste((0, 0, 0, 200), (x, y + 6 * SS, x + lg.width, y + 6 * SS + lg.height), lg.split()[3])
+            im.alpha_composite(sombra.filter(ImageFilter.GaussianBlur(12 * SS)))
+            im.alpha_composite(lg, (x, y))
+        f_a = ImageFont.truetype(CARPETA + "Montserrat-Black.ttf", 96 * SS)
+        if os.environ.get("L1"):
+            texto(im, w * 0.25, 30 * SS, os.environ["L1"], f_a, BLANCO, tracking=4 * SS)
+        if os.environ.get("L2"):
+            texto(im, w * 0.75, 30 * SS, os.environ["L2"], f_a, ROSA, tracking=4 * SS)
+    else:
+        grande = os.environ.get("GRANDE") or "20"
+        tam = int(os.environ.get("TAM") or 500)
+        if tam != 500:
+            f20 = ImageFont.truetype(CARPETA + "Montserrat-Black.ttf", tam * SS)
+        y_grande = float(os.environ.get("Y_GRANDE") or -56)
+        texto(im, cx, y_grande * SS, grande, f20, ROSA, tracking=-8 * SS)
+        texto(im, cx, 452 * SS, os.environ.get("L1") or "CURIOSIDADES", f1, BLANCO, tracking=7 * SS)
+        texto(im, cx, 546 * SS, os.environ.get("L2") or "DE GTA 6", f2, ROSA, tracking=9 * SS)
     rgb = im.convert("RGB").resize((W, H), Image.LANCZOS)
     rgb = ImageEnhance.Contrast(rgb).enhance(1.06)
     destino = SALIDA / "miniatura_nueva.jpg"
