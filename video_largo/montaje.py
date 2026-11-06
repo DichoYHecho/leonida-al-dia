@@ -79,13 +79,14 @@ def fuente(video):
 
 def tabla():
     out = {}
-    for nombre in ("trozos.csv", "trozos_vl.csv", "trozos_vc.csv"):
+    for nombre in ("trozos.csv", "trozos_vl.csv", "trozos_vc.csv", "trozos_auto.csv"):
         if not (AQUI / nombre).exists():
             continue
         with open(AQUI / nombre, encoding="utf-8") as f:
             for r in csv.DictReader(f):
                 out[r["Trozo"]] = {"ini": float(r["Inicio (s)"]), "dur": float(r["Duración (s)"]),
-                                   "video": (r.get("Vídeo") or "Mirada").strip(), "lento": float(r.get("Lento") or 1)}
+                                   "video": (r.get("Vídeo") or "Mirada").strip(), "lento": float(r.get("Lento") or 1),
+                                   "grupo": (r.get("Grupo") or "").strip()}
     return out
 
 
@@ -415,6 +416,70 @@ def fin_por_energia(x):
     return (fin + 1) * 0.02
 
 
+def fin_oido(b, ws):
+    """Segundo en que Whisper oye acabar la última palabra del guion (texto o voz fonética); None si no la oye."""
+    claves = set()
+    for txt in (b["texto"], b.get("voz") or ""):
+        claves |= {P.normalizar(w) for w in txt.split()[-2:]}
+    claves = {c for c in claves if len(c) >= 3}
+    for w, a, e in reversed(ws[-8:]):
+        n = P.normalizar(w)
+        if len(n) >= 3 and any(n == c or n[:4] == c[:4] for c in claves):
+            return e
+    return None
+
+
+def silencio_tras(x, desde, margen=0.7):
+    """Primer silencio de 0,12 s después de «desde»: ahí acaba de verdad la última palabra (lo de después es ruido)."""
+    m = x if x.ndim == 1 else x.mean(axis=1)
+    f = int(0.01 * SR)
+    ini, fin = int(desde * SR), min(len(m), int((desde + margen) * SR))
+    if fin - ini < 3 * f:
+        return min(len(m) / SR, desde + 0.25)
+    ref = float(np.percentile(np.abs(m), 99)) or 1.0
+    seg = m[ini:fin]
+    n = len(seg) // f
+    rms = np.sqrt((seg[: n * f].reshape(n, f).astype(np.float64) ** 2).mean(axis=1))
+    seguidos = 0
+    for i, v in enumerate(rms < max(0.006, 0.04 * ref)):
+        seguidos = seguidos + 1 if v else 0
+        if seguidos >= 12:
+            return desde + (i - 11) * 0.01 + 0.03
+    return desde + margen
+
+
+def expandir_grupos(bloques, tb):
+    """«@Grupo» en planos o planos_en = trozos automáticos de ese grupo, repartidos sin repetir hasta agotarlos."""
+    import random
+    grupos = {}
+    for n in sorted(tb):
+        grupos.setdefault("@" + tb[n].get("grupo", ""), []).append(n)
+    for lista in grupos.values():
+        random.Random(7).shuffle(lista)
+    usados = {}
+
+    def siguiente(g):
+        lista = grupos.get(g) or []
+        if not lista:
+            return None
+        i = usados.get(g, 0)
+        usados[g] = i + 1
+        return lista[i % len(lista)]
+
+    for b in bloques:
+        nuevos = []
+        for p in b["planos"]:
+            if p.startswith("@"):
+                nuevos += [x for x in (siguiente(p) for _ in range(5)) if x]
+            else:
+                nuevos.append(p)
+        b["planos"] = nuevos or [p for p in b["planos"] if not p.startswith("@")] or ["VCA_Logo"]
+        for r in b.get("planos_en", []):
+            if r["plano"].startswith("@"):
+                r["plano"] = siguiente(r["plano"]) or b["planos"][0]
+        b["planos_en"] = [r for r in b.get("planos_en", []) if r["plano"] in tb]
+
+
 def hms(s):
     s = int(round(s))
     return f"{s // 3600}:{s % 3600 // 60:02d}:{s % 60:02d}" if s >= 3600 else f"{s // 60}:{s % 60:02d}"
@@ -424,6 +489,7 @@ def main():
     t0 = time.time()
     tb = tabla()
     bloques = [b for b in guion_vl.BLOQUES if not SOLO or b["id"] in SOLO]
+    expandir_grupos(bloques, tb)
     faltan = [b["id"] for b in bloques if not V.ruta_wav(b).exists()]
     if faltan:
         print("Faltan voces:", faltan)
@@ -444,17 +510,22 @@ def main():
         dur_antes = len(b["audio"]) / SR
         fin_g = P.fin_guion(pal, ws)
         b["cola_cortada"] = 0.0
-        fin_e = fin_por_energia(b["audio"])
-        if fin_g is not None and fin_e is not None and fin_e + 0.08 > fin_g + 0.18:
-            print(f"  Whisper acaba en {fin_g:.2f} s pero la voz sigue hasta {fin_e:.2f} s", flush=True)
-            fin_g = fin_e - 0.1
+        oido = fin_oido(b, ws)
+        if oido is not None:  # se oye la última palabra: se corta en el silencio que la sigue (fuera el ruido de después)
+            fin_g = silencio_tras(b["audio"], oido) - 0.1
+            print(f"  Última palabra a los {oido:.2f} s; corte en {fin_g + 0.18:.2f} s", flush=True)
+        else:
+            fin_e = fin_por_energia(b["audio"])
+            if fin_g is not None and fin_e is not None and fin_e + 0.08 > fin_g + 0.18:
+                print(f"  Whisper acaba en {fin_g:.2f} s pero la voz sigue hasta {fin_e:.2f} s", flush=True)
+                fin_g = fin_e - 0.1
         if fin_g is not None and fin_g + 0.3 < dur_antes:
             b["cola_cortada"] = dur_antes - (fin_g + 0.18)
             b["audio"] = b["audio"][: int((fin_g + 0.18) * SR)]
         antes_lv = b["audio"]
         b["audio"], desfase = P.limpiar_voz(b["audio"])
         fin_lv = desfase + len(b["audio"]) / SR
-        fin_real = fin_por_energia(antes_lv)
+        fin_real = (len(antes_lv) / SR - 0.12) if oido is not None else fin_por_energia(antes_lv)
         if fin_real and fin_real > fin_lv + 0.05:  # limpiar_voz no puede comerse la última palabra
             seg = antes_lv[int(desfase * SR):int(min(len(antes_lv) / SR, fin_real + 0.2) * SR)]
             seg = seg - seg.mean(axis=0, keepdims=True)
@@ -464,9 +535,15 @@ def main():
             env[len(seg) - f_out:] = np.linspace(1, 0, f_out)
             b["audio"] = (seg * (env[:, None] if seg.ndim == 2 else env)).astype(np.float32)
             print(f"  Final de la voz recuperado: {fin_real - fin_lv:.2f} s", flush=True)
+        b["audio"] = np.array(b["audio"], dtype=np.float32)
+        n_f = min(int(0.06 * SR), len(b["audio"]) // 4)
+        if n_f > 0:  # final siempre suave
+            env = np.linspace(1, 0, n_f, dtype=np.float32)
+            b["audio"][-n_f:] *= env[:, None] if b["audio"].ndim == 2 else env
         b["ws"] = [(w, a - desfase, e - desfase) for w, a, e in ws]
         b["dur_voz"] = len(b["audio"]) / SR
         ult = [P.normalizar(w) for w in b["texto"].split()[-2:]]
+        ult += [P.normalizar(w) for w in (b.get("voz") or "").split()[-2:]]
         oidas = [P.normalizar(w[0]) for w in b["ws"] if w[1] < b["dur_voz"]][-6:]
         b["aviso_final"] = bool(b["ws"]) and not any(u in oidas for u in ult if len(u) >= 3)
         if b["aviso_final"]:

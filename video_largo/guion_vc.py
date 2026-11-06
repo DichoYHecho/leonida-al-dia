@@ -15,6 +15,9 @@ VIDEOS_EXTRA = {
     "VC_Comp": "https://videos-rockstargames-com.akamaized.net/v4/ao1c441c/flv/en-us-1080p60.mp4",
     "VC_Tril": "https://videos-rockstargames-com.akamaized.net/v4/8ta2r546/flv/en-us-1080p60.mp4",
 }
+from fuentes_vc import FUENTES as _FUENTES  # noqa: E402  (tráileres y gameplays de archivo de cada juego)
+
+VIDEOS_EXTRA.update({k: v["url"] for k, v in _FUENTES.items() if k not in VIDEOS_EXTRA})
 
 # Logos y carteles que van quietos (sin movimiento de cámara)
 PLANOS_FIJOS = {"VCA_Logo", "IMG_GTA1", "IMG_GTA1_Caja", "IMG_RaceNChase", "VCA_Welcome", "VCA_Welcome_Son", "VCA_Aniversario", "VCA_Rockstar_North", "Mirada_Logo",
