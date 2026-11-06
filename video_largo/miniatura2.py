@@ -156,7 +156,7 @@ def texto(capa, cx, y, s, font, color, tracking=0, sombra=True):
 def miniatura():
     w, h = W * SS, H * SS
     base = Image.new("RGB", (w, h), FONDO)
-    ancho_p = int(w * 0.62)
+    ancho_p = int(w * float(os.environ.get("ANCHO_IZQ") or 0.62))
     izq = panel(os.environ["IZQ"], ancho_p, h)
     ancho_d = int(w * float(os.environ.get("ANCHO_DER") or 0.62))
     der = panel(os.environ["DER"], ancho_d, h)
