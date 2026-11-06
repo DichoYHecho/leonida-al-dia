@@ -30,7 +30,12 @@ VIDEOS = {
     "VC_Aniv": "https://videos-rockstargames-com.akamaized.net/v4/tror41c2/flv/en-us-720p.mp4",
     "VC_Comp": "https://videos-rockstargames-com.akamaized.net/v4/ao1c441c/flv/en-us-1080p60.mp4",
     "VC02_Trailer3": "https://archive.org/download/vicecity480x360_ph3/vicecity480x360_ph3.mp4",
+    # Imagen oficial del bonus por reservar (Jason con el arma con el estampado de la camisa de Tommy)
+    "Reserva_Jason": "https://www.rockstargames.com/VI/_next/static/media/VINTAGE_VICE_CITY_PACK_EXCLUSIVE_LOOKS_03.0au1tphsftqm5.jpg?akim=1&imdensity=1&imwidth=3840",
 }
+for _par in os.environ.get("AJUSTES", "").split(";"):  # p. ej. ANCHO_DER=0.7;MEZCLA=0.85;POS_LOGOS=0.18|0.74
+    if "=" in _par:
+        os.environ[_par.split("=", 1)[0].strip()] = _par.split("=", 1)[1].strip()
 CARPETA = "/usr/share/fonts/truetype/montserrat/"
 ROSA = (255, 79, 163)
 BLANCO = (255, 255, 255)
@@ -57,6 +62,12 @@ def sacar(video, t, destino, escala=None):
         im = Image.new("RGB", (1920, 1080), (50 + int(t) % 120, 80, 130))
         d = ImageDraw.Draw(im)
         d.ellipse((760, 200, 1160, 700), fill=(215, 160, 130))
+        im.save(destino, quality=95)
+        return
+    if "/media/" in VIDEOS.get(video, "") or VIDEOS.get(video, "").split("?")[0].endswith((".jpg", ".png")):
+        im = Image.open(fuente(video)).convert("RGB")  # imagen fija
+        if escala:
+            im = im.resize(tuple(int(v) for v in escala.split(":")), Image.LANCZOS)
         im.save(destino, quality=95)
         return
     vf = ["-vf", f"scale={escala}"] if escala else []
@@ -147,9 +158,10 @@ def miniatura():
     base = Image.new("RGB", (w, h), FONDO)
     ancho_p = int(w * 0.62)
     izq = panel(os.environ["IZQ"], ancho_p, h)
-    der = panel(os.environ["DER"], ancho_p, h)
+    ancho_d = int(w * float(os.environ.get("ANCHO_DER") or 0.62))
+    der = panel(os.environ["DER"], ancho_d, h)
     base.paste(izq, (0, 0))  # Lucía entera, sin fundido: no queda franja oscura
-    base.paste(der, (w - ancho_p, 0), degradado_h(ancho_p, h, 0, 0.62, 1.0))  # Jason se funde sobre Lucía
+    base.paste(der, (w - ancho_d, 0), degradado_h(ancho_d, h, 0, float(os.environ.get("MEZCLA") or 0.62), 1.0))  # Jason se funde sobre Lucía
     im = base.convert("RGBA")
     # sin sombra en el centro: las dos fotos se funden directamente (el texto lleva su propia sombra suave)
     f20 = ImageFont.truetype(CARPETA + "Montserrat-Black.ttf", 500 * SS)
@@ -167,7 +179,8 @@ def miniatura():
             lg = lg.resize((max(1, int(lg.width * alto_l / lg.height)), alto_l), Image.LANCZOS)
             if lg.width > w * 0.40:
                 lg = lg.resize((int(w * 0.40), max(1, int(lg.height * w * 0.40 / lg.width))), Image.LANCZOS)
-            x = int(w * (0.25 if k == 0 else 0.75) - lg.width / 2)
+            pos = [float(p) for p in (os.environ.get("POS_LOGOS") or "0.25|0.75").split("|")]
+            x = int(w * pos[k] - lg.width / 2)
             y = int(h * 0.95 - lg.height)
             sombra = Image.new("RGBA", im.size, (0, 0, 0, 0))
             sombra.paste((0, 0, 0, 200), (x, y + 6 * SS, x + lg.width, y + 6 * SS + lg.height), lg.split()[3])
@@ -175,9 +188,9 @@ def miniatura():
             im.alpha_composite(lg, (x, y))
         f_a = ImageFont.truetype(CARPETA + "Montserrat-Black.ttf", 96 * SS)
         if os.environ.get("L1"):
-            texto(im, w * 0.25, 30 * SS, os.environ["L1"], f_a, BLANCO, tracking=4 * SS)
+            texto(im, w * float((os.environ.get("POS_LOGOS") or "0.25|0.75").split("|")[0]), 30 * SS, os.environ["L1"], f_a, BLANCO, tracking=4 * SS)
         if os.environ.get("L2"):
-            texto(im, w * 0.75, 30 * SS, os.environ["L2"], f_a, ROSA, tracking=4 * SS)
+            texto(im, w * float((os.environ.get("POS_LOGOS") or "0.25|0.75").split("|")[1]), 30 * SS, os.environ["L2"], f_a, ROSA, tracking=4 * SS)
     else:
         grande = os.environ.get("GRANDE") or "20"
         tam = int(os.environ.get("TAM") or 500)
