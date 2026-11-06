@@ -15,6 +15,9 @@ on:
       logos:
         description: "Antes y después: URL del logo izquierdo|URL del logo derecho (vacío = sin logos)"
         default: ""
+      ajustes:
+        description: "Ajustes: ANCHO_DER=0.7;MEZCLA=0.85;POS_LOGOS=0.18|0.74 (vacío = como el vídeo 1)"
+        default: ""
       textos:
         description: "Texto: GRANDE|línea 1|línea 2|tamaño|y (vacío = 20 CURIOSIDADES DE GTA 6)"
         default: ""
@@ -32,6 +35,7 @@ jobs:
       DER: ${{ inputs.der }}
       TEXTOS: ${{ inputs.textos }}
       LOGOS: ${{ inputs.logos }}
+      AJUSTES: ${{ inputs.ajustes }}
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v4
