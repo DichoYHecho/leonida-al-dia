@@ -212,8 +212,97 @@ def miniatura():
     print("miniatura_nueva.jpg", f"{destino.stat().st_size / 1e3:.0f} KB", flush=True)
 
 
+def bajar_logo(k):
+    ruta = SALIDA / f"logo_{k}.png"
+    if not ruta.exists():
+        url = os.environ["LOGOS"].split("|")[k].strip()
+        subprocess.run(["curl", "-sSfL", "-A", UA, "-o", str(ruta), url], check=True)
+    return Image.open(ruta).convert("RGBA")
+
+
+def poner_logo(im, k, cx, alto, y_abajo, ancho_max):
+    lg = bajar_logo(k)
+    lg = lg.resize((max(1, int(lg.width * alto / lg.height)), int(alto)), Image.LANCZOS)
+    if lg.width > ancho_max:
+        lg = lg.resize((int(ancho_max), max(1, int(lg.height * ancho_max / lg.width))), Image.LANCZOS)
+    x, y = int(cx - lg.width / 2), int(y_abajo - lg.height)
+    sombra = Image.new("RGBA", im.size, (0, 0, 0, 0))
+    sombra.paste((0, 0, 0, 200), (x, y + 6 * SS, x + lg.width, y + 6 * SS + lg.height), lg.split()[3])
+    im.alpha_composite(sombra.filter(ImageFilter.GaussianBlur(12 * SS)))
+    im.alpha_composite(lg, (x, y))
+
+
+def etiqueta(im, cx, y, s, fondo, color, font):
+    ancho = texto_ancho(font, s, 4 * SS) + 64 * SS
+    alto = font.size + 34 * SS
+    ImageDraw.Draw(im).rounded_rectangle((cx - ancho / 2, y, cx + ancho / 2, y + alto), radius=alto / 2, fill=fondo)
+    texto(im, cx, y + 9 * SS, s, font, color, tracking=4 * SS, sombra=False)
+
+
+def guardar(im, nombre):
+    rgb = ImageEnhance.Contrast(im.convert("RGB").resize((W, H), Image.LANCZOS)).enhance(1.06)
+    rgb.save(SALIDA / f"miniatura_{nombre}.jpg", quality=92, subsampling=0, optimize=True)
+    return rgb
+
+
+def variantes():
+    """Varias propuestas de antes y después a la vez (ESTILOS=marco,corte,etiquetas,diagonal) y una hoja para compararlas."""
+    w, h = W * SS, H * SS
+    izq, der = os.environ["IZQ"], os.environ["DER"]
+    f_et = ImageFont.truetype(CARPETA + "Montserrat-Black.ttf", 50 * SS)
+    cian = (64, 224, 208)
+    hechas = []
+    for est in [e.strip() for e in os.environ["ESTILOS"].split(",") if e.strip()]:
+        if est == "marco":
+            im = Image.new("RGBA", (w, h), FONDO + (255,))
+            m, top = 22 * SS, 96 * SS
+            pw, ph = (w - 3 * m) // 2, h - top - m
+            d = ImageDraw.Draw(im)
+            for k, (p, col) in enumerate(((izq, cian), (der, ROSA))):
+                x = m + k * (pw + m)
+                d.rounded_rectangle((x - 7 * SS, top - 7 * SS, x + pw + 7 * SS, top + ph + 7 * SS), radius=22 * SS, fill=col)
+                mask = Image.new("L", (pw, ph), 0)
+                ImageDraw.Draw(mask).rounded_rectangle((0, 0, pw, ph), radius=16 * SS, fill=255)
+                im.paste(panel(p, pw, ph), (x, top), mask)
+                poner_logo(im, k, x + pw / 2, ph * 0.34, top + ph - 18 * SS, pw * 0.7)
+            texto(im, m + pw / 2, 12 * SS, "ANTES", f_et, cian, tracking=8 * SS)
+            texto(im, 2 * m + pw * 1.5, 12 * SS, "DESPUÉS", f_et, ROSA, tracking=8 * SS)
+        elif est in ("corte", "etiquetas"):
+            im = Image.new("RGBA", (w, h))
+            im.paste(panel(izq, w // 2, h), (0, 0))
+            im.paste(panel(der, w - w // 2, h), (w // 2, 0))
+            ImageDraw.Draw(im).rectangle((w // 2 - 4 * SS, 0, w // 2 + 4 * SS, h), fill=BLANCO)
+            poner_logo(im, 0, w * 0.25, h * 0.34, h * 0.95, w * 0.4)
+            poner_logo(im, 1, w * 0.75, h * 0.34, h * 0.95, w * 0.4)
+            if est == "etiquetas":
+                etiqueta(im, w * 0.25, 28 * SS, "ANTES", cian, FONDO, f_et)
+                etiqueta(im, w * 0.75, 28 * SS, "DESPUÉS", ROSA, BLANCO, f_et)
+        elif est == "diagonal":
+            a, b = 0.58, 0.42  # la línea va de arriba (58 %) a abajo (42 %)
+            im = Image.new("RGBA", (w, h))
+            im.paste(panel(izq, int(w * a), h), (0, 0))
+            capa = Image.new("RGB", (w, h))
+            capa.paste(panel(der, w - int(w * b), h), (int(w * b), 0))
+            mask = Image.new("L", (w, h), 0)
+            ImageDraw.Draw(mask).polygon([(w * a, 0), (w, 0), (w, h), (w * b, h)], fill=255)
+            im.paste(capa, (0, 0), mask)
+            ImageDraw.Draw(im).line([(w * a, 0), (w * b, h)], fill=ROSA, width=10 * SS)
+            poner_logo(im, 0, w * 0.22, h * 0.34, h * 0.95, w * 0.36)
+            poner_logo(im, 1, w * 0.78, h * 0.34, h * 0.95, w * 0.36)
+        else:
+            continue
+        hechas.append(guardar(im, est))
+        print("miniatura", est, flush=True)
+    hoja = Image.new("RGB", (2 * 640, ((len(hechas) + 1) // 2) * 360), "black")
+    for i, r in enumerate(hechas):
+        hoja.paste(r.resize((640, 360), Image.LANCZOS), ((i % 2) * 640, (i // 2) * 360))
+    hoja.save(SALIDA / "comparacion.jpg", quality=88)
+
+
 if __name__ == "__main__":
-    if os.environ.get("IZQ") and os.environ.get("DER"):
+    if os.environ.get("ESTILOS"):
+        variantes()
+    elif os.environ.get("IZQ") and os.environ.get("DER"):
         miniatura()
     else:
         candidatos()
