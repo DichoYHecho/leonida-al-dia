@@ -32,7 +32,9 @@ jobs:
         run: pip install numpy pillow
 
       - name: Trozos del stock nuevo
-        run: git show origin/stock-nuevo:gta/trozos.csv > video_largo/trozos.csv
+        run: |
+          git show origin/stock-nuevo:gta/trozos.csv > video_largo/trozos.csv
+          git show origin/trozos-vc:trozos_auto.csv > video_largo/trozos_auto.csv || true
 
       - name: Comprobar (sin voces ni descargas)
         run: |
@@ -47,7 +49,7 @@ jobs:
           errores, palabras, t = [], 0, 0.0
           for b in G.BLOQUES:
               for p in b["planos"] + ([b["original"]] if b.get("original") else []):
-                  if p not in tb:
+                  if p not in tb and not p.startswith("@"):
                       errores.append(f"{b['id']}: el plano {p} no está en los CSV de trozos")
               palabras += len(b["texto"].split())
               b["dur_voz"] = len(b["texto"].split()) / 2.37

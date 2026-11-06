@@ -38,7 +38,9 @@ jobs:
           pip install numpy pillow faster-whisper==1.2.1
 
       - name: Trozos del stock nuevo
-        run: git show origin/stock-nuevo:gta/trozos.csv > video_largo/trozos.csv
+        run: |
+          git show origin/stock-nuevo:gta/trozos.csv > video_largo/trozos.csv
+          git show origin/trozos-vc:trozos_auto.csv > video_largo/trozos_auto.csv || true
 
       - name: Recuperar las voces ya pedidas
         uses: actions/cache/restore@v4

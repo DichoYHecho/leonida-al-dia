@@ -1,0 +1,44 @@
+name: Preparar trozos de los juegos (vídeo 2)
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [vice-city]
+    paths: ["video_largo/fuentes_vc.py", "video_largo/preparar_trozos.py"]
+
+permissions:
+  contents: write
+
+jobs:
+  trozos:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Instalar programas
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          pip install numpy pillow
+
+      - name: Elegir trozos y hacer las hojas de contactos
+        run: python3 video_largo/preparar_trozos.py
+
+      - name: Publicar en la rama trozos-vc
+        run: |
+          cd salida_trozos
+          git init -q
+          git checkout -q -b trozos-vc
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add .
+          git commit -q -m "Trozos automáticos de los juegos"
+          git remote add origin "https://x-access-token:$GH_TOKEN@github.com/$GITHUB_REPOSITORY.git"
+          git push -f origin trozos-vc
