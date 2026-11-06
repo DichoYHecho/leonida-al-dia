@@ -2,7 +2,7 @@ name: Comprobar guion del vídeo largo
 
 on:
   push:
-    branches: [vice-city]
+    branches: [vice-city, saga]
     paths: ["video_largo/**", ".github/workflows/comprobar_guion_vl.yml"]
   workflow_dispatch:
     inputs:
@@ -18,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     env:
-      GUION: ${{ inputs.guion || 'guion_vc' }}
+      GUION: ${{ inputs.guion || (github.ref_name == 'saga' && 'guion_sg') || 'guion_vc' }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -35,39 +35,9 @@ jobs:
         run: |
           git show origin/stock-nuevo:gta/trozos.csv > video_largo/trozos.csv
           git show origin/trozos-vc:trozos_auto.csv > video_largo/trozos_auto.csv || true
+          git show origin/trozos-sg:trozos_auto.csv > video_largo/trozos_auto_sg.csv || true
 
       - name: Comprobar (sin voces ni descargas)
         run: |
           python3 -m py_compile video_largo/*.py
-          python3 - <<'EOF'
-          import importlib, os, pathlib, sys
-          sys.path.insert(0, "video_largo")
-          os.environ.setdefault("TMP_DIR", "tmp_comprobar")
-          import montaje as M
-          G = importlib.import_module(os.environ["GUION"])
-          tb = M.tabla()
-          errores, palabras, t = [], 0, 0.0
-          for b in G.BLOQUES:
-              for p in b["planos"] + ([b["original"]] if b.get("original") else []):
-                  if p not in tb and not p.startswith("@"):
-                      errores.append(f"{b['id']}: el plano {p} no está en los CSV de trozos")
-              palabras += len(b["texto"].split())
-              b["dur_voz"] = len(b["texto"].split()) / 2.37
-              b["ini"], b["voz_ini"], b["ws"] = t, t + 0.5, []
-              b["fin"] = b["voz_ini"] + b["dur_voz"] + 0.4
-              t = b["fin"]
-          ass = pathlib.Path("prueba.ass")
-          ass.write_text("[V4+ Styles]\nStyle: Dibujo,x\n\n[Events]\n", encoding="utf-8")
-          M.anadir_rotulos(ass, G.BLOQUES)
-          mus = M.musica_del_guion(G.BLOQUES, 30.0)
-          print("Música de prueba:", len(mus) / M.SR, "s")
-          rot = sum(1 for l in ass.read_text(encoding="utf-8").splitlines() if ",Dato," in l)
-          caps = [b.get("capitulo") or b["titulo"].capitalize() for b in G.BLOQUES if b["num"]]
-          inf = [f"Guion: {os.environ['GUION']}", f"Bloques: {len(G.BLOQUES)}", f"Palabras: {palabras}",
-                 f"Duración aproximada: {t / 60:.1f} min", f"Rótulos de datos: {rot}",
-                 "Capítulos: " + " · ".join(caps)] + (errores or ["Sin errores"])
-          print("\n".join(inf))
-          with open(os.environ["GITHUB_STEP_SUMMARY"], "a", encoding="utf-8") as f:
-              f.write("### Comprobación del guion\n\n" + "  \n".join(inf) + "\n")
-          sys.exit(1 if errores else 0)
-          EOF
+          python3 video_largo/comprobar_guion.py

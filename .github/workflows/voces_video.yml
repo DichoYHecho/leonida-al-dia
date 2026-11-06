@@ -4,8 +4,11 @@ on:
   workflow_dispatch:
     inputs:
       guion:
-        description: "Guion: guion_vl (vídeo 1) o guion_vc (vídeo 2, Vice City)"
+        description: "Guion: guion_vl (vídeo 1), guion_vc (vídeo 2, Vice City) o guion_sg (vídeo 3, la saga)"
         default: "guion_vl"
+      bloques:
+        description: "Solo estos bloques (hook,p02,p03...); vacío = todos"
+        default: ""
 
 permissions:
   contents: write
@@ -33,6 +36,7 @@ jobs:
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY_VIDEO }}
           GUION: ${{ inputs.guion }}
+          BLOQUES_SOLO: ${{ inputs.bloques }}
         run: python3 video_largo/voces.py
 
       - name: Guardar las voces en la caché
@@ -46,7 +50,7 @@ jobs:
         if: always()
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          RAMA: ${{ inputs.guion == 'guion_vc' && 'voces-vc' || 'voces-vl' }}
+          RAMA: ${{ inputs.guion == 'guion_vc' && 'voces-vc' || inputs.guion == 'guion_sg' && 'voces-sg' || 'voces-vl' }}
         run: |
           cd salida_voces
           git init -q

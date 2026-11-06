@@ -7,8 +7,11 @@ on:
         description: "Solo estos bloques separados por comas (hook,c01,...); vacío = el vídeo entero"
         default: ""
       guion:
-        description: "Guion: guion_vl (vídeo 1) o guion_vc (vídeo 2, Vice City)"
+        description: "Guion: guion_vl (vídeo 1), guion_vc (vídeo 2, Vice City) o guion_sg (vídeo 3, la saga)"
         default: "guion_vl"
+      solo_voces:
+        description: "1 = solo el informe del final de cada voz (sin montar)"
+        default: "0"
 
 permissions:
   contents: write
@@ -20,7 +23,8 @@ jobs:
     env:
       BLOQUES_SOLO: ${{ inputs.bloques }}
       GUION: ${{ inputs.guion }}
-      RAMA: ${{ inputs.guion == 'guion_vc' && 'montaje-vc' || 'montaje-vl' }}
+      RAMA: ${{ inputs.guion == 'guion_vc' && 'montaje-vc' || inputs.guion == 'guion_sg' && (inputs.bloques != '' && 'montaje-sg-previa' || 'montaje-sg') || 'montaje-vl' }}
+      SOLO_VOCES: ${{ inputs.solo_voces }}
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v4
@@ -41,6 +45,7 @@ jobs:
         run: |
           git show origin/stock-nuevo:gta/trozos.csv > video_largo/trozos.csv
           git show origin/trozos-vc:trozos_auto.csv > video_largo/trozos_auto.csv || true
+          git show origin/trozos-sg:trozos_auto.csv > video_largo/trozos_auto_sg.csv || true
 
       - name: Recuperar las voces ya pedidas
         uses: actions/cache/restore@v4
