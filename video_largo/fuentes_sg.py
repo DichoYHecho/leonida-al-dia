@@ -5,7 +5,8 @@ Dos tipos de fuente:
   - Partidas completas subidas a archive.org con licencia libre (CC BY 4.0): hay que citarlas en la descripción
     (ver CREDITOS). Son de 360p: el montaje las pone en un marco sobre una copia borrosa (MARCO = True en el guion).
 Las partidas de varias horas se usan por tramos («tramos»): solo se bajan esos minutos.
-preparar_trozos.py (FUENTES_MOD=fuentes_sg) elige los trozos y los deja en la rama trozos-sg."""
+preparar_trozos.py (FUENTES_MOD=fuentes_sg) elige los trozos y los deja en la rama trozos-sg
+(workflow «Preparar trozos de los juegos (vídeo 3, la saga)», que se lanza solo al cambiar este archivo)."""
 from fuentes_vc import RS, ia
 
 
