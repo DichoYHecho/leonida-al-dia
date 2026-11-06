@@ -56,14 +56,14 @@ jobs:
       - name: Montar el vídeo
         run: python3 video_largo/montaje.py
 
-      - name: Guardar el vídeo en alta calidad
+      - name: Guardar el vídeo en alta calidad (en Releases, sin el límite de espacio de los artefactos)
         if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ inputs.guion == 'guion_vc' && 'video-largo-vc-alta-calidad' || 'video-largo-alta-calidad' }}
-          path: salida_hq/
-          if-no-files-found: warn
-          retention-days: 14
+        run: |
+          ls salida_hq/* >/dev/null 2>&1 || { echo "No hay vídeo en alta calidad"; exit 0; }
+          TAG="${RAMA}-alta-calidad"
+          gh release view "$TAG" >/dev/null 2>&1 || gh release create "$TAG" --prerelease --target "$GITHUB_SHA" --title "Vídeo largo en alta calidad ($RAMA)" --notes "Se sustituye en cada montaje."
+          gh release upload "$TAG" salida_hq/* --clobber
+          echo "Descarga: https://github.com/$GITHUB_REPOSITORY/releases/tag/$TAG" >> "$GITHUB_STEP_SUMMARY"
 
       - name: Publicar la previa en la rama montaje-vl
         if: always()
