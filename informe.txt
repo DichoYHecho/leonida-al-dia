@@ -1,0 +1,24 @@
+Voces listas: 23 de 23 (esta vez se pidieron 1)
+hook: ya estaba
+p01: ya estaba
+p02: ya estaba
+p03: ya estaba
+p04: ya estaba
+p05: ya estaba
+p06: ya estaba
+p07: ya estaba
+p08: ya estaba
+p09: ya estaba
+p10: ya estaba
+p11: ya estaba
+p12: ya estaba
+p13: ya estaba
+p14: ya estaba
+p15: ya estaba
+p16: ya estaba
+p17: ya estaba
+p18: ya estaba
+e1: ya estaba
+e2: ya estaba
+e3: ya estaba
+cierre: hecho con gemini-3.8-flash-lite-tts (39.0 s)
