@@ -12,6 +12,9 @@ on:
       der:
         description: "Cara de la derecha: vídeo:segundo:x:y:zoom"
         default: ""
+      logos:
+        description: "Antes y después: URL del logo izquierdo|URL del logo derecho (vacío = sin logos)"
+        default: ""
       textos:
         description: "Texto: GRANDE|línea 1|línea 2|tamaño|y (vacío = 20 CURIOSIDADES DE GTA 6)"
         default: ""
@@ -28,6 +31,7 @@ jobs:
       IZQ: ${{ inputs.izq }}
       DER: ${{ inputs.der }}
       TEXTOS: ${{ inputs.textos }}
+      LOGOS: ${{ inputs.logos }}
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v4
