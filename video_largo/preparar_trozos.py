@@ -15,7 +15,9 @@ import numpy as np
 from PIL import Image, ImageDraw
 
 sys.path.insert(0, str(pathlib.Path(__file__).parent))
-from fuentes_vc import FUENTES  # noqa: E402
+import importlib  # noqa: E402
+
+FUENTES = importlib.import_module(os.environ.get("FUENTES_MOD", "fuentes_vc")).FUENTES  # fuentes_sg = vídeo 3
 
 TMP = pathlib.Path("tmp_trozos")
 OUT = pathlib.Path("salida_trozos")
@@ -27,6 +29,14 @@ CAMPOS = ["Trozo", "Grupo", "Inicio (s)", "Duración (s)", "Qué se ve", "Foco (
 
 def bajar(url, destino):
     if destino.exists() and destino.stat().st_size > 0:
+        return
+    if "#t=" in url:  # solo un tramo de una partida muy larga: ffmpeg pide únicamente esos bytes
+        base, rango = url.split("#t=", 1)
+        a, z = (float(x) for x in rango.split(","))
+        r = subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-user_agent", "Mozilla/5.0", "-ss", f"{a:.2f}",
+                            "-to", f"{z:.2f}", "-i", base, "-c", "copy", "-an", str(destino)], capture_output=True, text=True)
+        if r.returncode != 0 or not destino.exists():
+            raise RuntimeError(r.stderr[-300:])
         return
     req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
     with urllib.request.urlopen(req, timeout=600) as r, open(destino, "wb") as f:

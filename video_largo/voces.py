@@ -64,7 +64,8 @@ def main():
         print("Falta el secret GEMINI_API_KEY_VIDEO.")
         sys.exit(1)
     informe, agotado, pedidas = [], False, 0
-    for b in guion_vl.BLOQUES:
+    solo = [x.strip() for x in os.environ.get("BLOQUES_SOLO", "").split(",") if x.strip()]
+    for b in [b for b in guion_vl.BLOQUES if not solo or b["id"] in solo]:  # BLOQUES_SOLO: primero las de la previa
         destino = ruta_wav(b)
         texto = b.get("voz") or b["texto"]
         if destino.exists():
