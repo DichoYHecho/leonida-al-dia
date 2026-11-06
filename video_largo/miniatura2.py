@@ -25,6 +25,11 @@ VIDEOS = {
     "Trailer_1": _V + "GTAVI_Trailer_1/GTAVI_Trailer_1.mp4",
     "Trailer_2": _V + "GTAVI_Trailer_2/GTAVI_Trailer_2.mp4",
     "Lanzamiento": _V + "GTAVI_Launch_Trailer/GTAVI_Launch_Trailer.mp4",
+    # Vice City (vídeo 2)
+    "VC_Tril": "https://videos-rockstargames-com.akamaized.net/v4/8ta2r546/flv/en-us-1080p60.mp4",
+    "VC_Aniv": "https://videos-rockstargames-com.akamaized.net/v4/tror41c2/flv/en-us-720p.mp4",
+    "VC_Comp": "https://videos-rockstargames-com.akamaized.net/v4/ao1c441c/flv/en-us-1080p60.mp4",
+    "VC02_Trailer3": "https://archive.org/download/vicecity480x360_ph3/vicecity480x360_ph3.mp4",
 }
 CARPETA = "/usr/share/fonts/truetype/montserrat/"
 ROSA = (255, 79, 163)
@@ -151,9 +156,14 @@ def miniatura():
     f1 = ImageFont.truetype(CARPETA + "Montserrat-ExtraBold.ttf", 64 * SS)
     f2 = ImageFont.truetype(CARPETA + "Montserrat-ExtraBold.ttf", 62 * SS)
     cx = w / 2
-    texto(im, cx, -56 * SS, "20", f20, ROSA, tracking=-8 * SS)
-    texto(im, cx, 452 * SS, "CURIOSIDADES", f1, BLANCO, tracking=7 * SS)
-    texto(im, cx, 546 * SS, "DE GTA 6", f2, ROSA, tracking=9 * SS)
+    grande = os.environ.get("GRANDE") or "20"
+    tam = int(os.environ.get("TAM") or 500)
+    if tam != 500:
+        f20 = ImageFont.truetype(CARPETA + "Montserrat-Black.ttf", tam * SS)
+    y_grande = float(os.environ.get("Y_GRANDE") or -56)
+    texto(im, cx, y_grande * SS, grande, f20, ROSA, tracking=-8 * SS)
+    texto(im, cx, 452 * SS, os.environ.get("L1") or "CURIOSIDADES", f1, BLANCO, tracking=7 * SS)
+    texto(im, cx, 546 * SS, os.environ.get("L2") or "DE GTA 6", f2, ROSA, tracking=9 * SS)
     rgb = im.convert("RGB").resize((W, H), Image.LANCZOS)
     rgb = ImageEnhance.Contrast(rgb).enhance(1.06)
     destino = SALIDA / "miniatura_nueva.jpg"
