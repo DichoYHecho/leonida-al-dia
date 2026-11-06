@@ -1,0 +1,27 @@
+Duración: 703.5 s (11:43)
+Tamaño: 650 MB (alta calidad), 127 MB (previa en partes de 5 min)
+Tiempo de montaje: 5057 s
+
+hook: voz 34.7 s, 15 planos, subtítulos por Whisper, sonido original VCA_Welcome_Son
+p01: voz 21.8 s, 8 planos, subtítulos por Whisper
+p02: voz 36.8 s, 11 planos, subtítulos por Whisper, AVISO: revisar el final de la voz
+p03: voz 27.6 s, 12 planos, subtítulos por Whisper
+p04: voz 24.9 s, 13 planos, subtítulos por Whisper
+p05: voz 25.0 s, 14 planos, subtítulos por Whisper
+p06: voz 24.7 s, 11 planos, subtítulos por Whisper
+p07: voz 27.1 s, 14 planos, subtítulos por Whisper
+p08: voz 20.8 s, 11 planos, subtítulos por Whisper
+p09: voz 18.3 s, 11 planos, subtítulos por Whisper
+p10: voz 26.4 s, 14 planos, subtítulos por Whisper
+p11: voz 28.7 s, 12 planos, subtítulos por Whisper
+p12: voz 27.7 s, 12 planos, subtítulos por Whisper
+p13: voz 23.5 s, 15 planos, subtítulos por Whisper, sonido original T1_Musica_Petty
+p14: voz 36.1 s, 16 planos, subtítulos por Whisper
+p15: voz 28.1 s, 12 planos, subtítulos por Whisper
+p16: voz 32.2 s, 14 planos, subtítulos por Whisper
+p17: voz 37.2 s, 15 planos, subtítulos por Whisper, sonido original T2_Musica_Hot
+p18: voz 40.6 s, 19 planos, subtítulos por Whisper
+e1: voz 31.5 s, 14 planos, subtítulos por Whisper, AVISO: revisar el final de la voz
+e2: voz 27.3 s, 17 planos, subtítulos por Whisper
+e3: voz 22.4 s, 7 planos, subtítulos por Whisper
+cierre: voz 34.3 s, 12 planos, subtítulos por Whisper, sonido original Lanz_Final_19N
