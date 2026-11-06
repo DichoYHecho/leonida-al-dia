@@ -6,6 +6,7 @@ sola vez, clips en cámara lenta, los 22 bloques del guion, un sonido original p
 Salidas: «salida_hq/video_largo.mp4» (alta calidad), «salida_montaje/previa_00.mp4…» (720p, en partes de 5 min), «hoja.jpg»,
 «capitulos.txt», «informe.txt». Pruebas: DRY=1 (imágenes de relleno), BLOQUES_SOLO=hook,c01 (solo esos bloques)."""
 import csv
+import hashlib
 import os
 import pathlib
 import subprocess
@@ -62,6 +63,13 @@ def fuente(video):
                         (carpeta / os.path.basename(info.filename)).write_bytes(zz.read(info))
             z.unlink()
         return carpeta / video.split(":", 1)[1]
+    if video.startswith("Imagen:"):  # captura o imagen fija (se baja una vez)
+        url = video.split(":", 1)[1]
+        ext = os.path.splitext(url.split("?")[0])[1] or ".jpg"
+        destino = FUENTES / ("img_" + hashlib.sha1(url.encode()).hexdigest()[:10] + ext)
+        if not destino.exists() or destino.stat().st_size == 0:
+            descargar(url, destino)
+        return destino
     destino = FUENTES / (video + ".mp4")
     if not destino.exists() or destino.stat().st_size == 0:
         print("Bajando", video, flush=True)
@@ -83,6 +91,13 @@ def tabla():
 
 def cortar(nombre, t, dur_out, destino, sentido):
     """Corta un trozo a 1080p con un ligero movimiento de cámara; los clips lentos se estiran a su duración final."""
+    if t["video"].startswith("Imagen:") and not DRY:  # imagen: quieta, centrada y sobre fondo negro
+        P.run(["ffmpeg", "-y", "-loglevel", "error", "-loop", "1", "-framerate", str(FPS), "-t", f"{dur_out:.2f}",
+               "-i", str(fuente(t["video"])), "-vf",
+               "scale=1600:880:force_original_aspect_ratio=decrease:flags=lanczos,"
+               "pad=1920:1080:(ow-iw)/2:(oh-ih)/2:color=black,format=yuv420p",
+               "-t", f"{dur_out:.2f}", "-c:v", "libx264", "-crf", "12", "-preset", "veryfast", destino])
+        return
     lento = t["lento"]
     dur_in = dur_out / lento
     if DRY:
@@ -120,6 +135,48 @@ def planificar(b, dur_visual, tb):
             lista.append([n, d])
         resto -= d
         i += 1
+    return lista
+
+
+def momento(b, palabra, n=1):
+    """Segundo (desde el inicio del bloque) en que la voz dice «palabra» (Whisper; si no, su posición en el texto)."""
+    clave, vistos = P.normalizar(palabra), 0
+    for w, a, _ in b.get("ws") or []:
+        if P.normalizar(w).startswith(clave):
+            vistos += 1
+            if vistos == n:
+                return b["voz_ini"] - b["ini"] + max(0.0, a - 0.2)
+    pal = [P.normalizar(w) for w in b["texto"].split()]
+    idx = [i for i, w in enumerate(pal) if w.startswith(clave)]
+    frac = idx[min(n, len(idx)) - 1] / max(1, len(pal)) if idx else 0.0
+    return b["voz_ini"] - b["ini"] + frac * b["dur_voz"]
+
+
+def planificar_anclado(b, dur_visual, tb):
+    """Como planificar, pero con planos que salen justo cuando la voz nombra algo (clave «planos_en» del guion)."""
+    anc = sorted((momento(b, r["en"], r.get("n", 1)), r["plano"]) for r in b["planos_en"])
+    relleno = [n for n in b["planos"] if n != b.get("original")]
+    lista, estado = [], {"cursor": 0.0, "i": 0}
+
+    def rellenar(hasta):
+        while hasta - estado["cursor"] > 0.05:
+            n = relleno[estado["i"] % len(relleno)]
+            estado["i"] += 1
+            d = min(tb[n]["dur"] * tb[n]["lento"], hasta - estado["cursor"])
+            if d < 0.7 and lista:
+                lista[-1][1] += d
+            else:
+                lista.append([n, d])
+            estado["cursor"] += d
+
+    for k, (t, n) in enumerate(anc):
+        rellenar(min(max(t, estado["cursor"]), dur_visual))
+        sig = anc[k + 1][0] if k + 1 < len(anc) else dur_visual
+        d = min(tb[n]["dur"] * tb[n]["lento"], max(0.8, sig - estado["cursor"]), dur_visual - estado["cursor"])
+        if d > 0.05:
+            lista.append([n, d])
+            estado["cursor"] += d
+    rellenar(dur_visual)
     return lista
 
 
@@ -436,7 +493,7 @@ def main():
     carpeta.mkdir(exist_ok=True)
     tareas, lista_concat, k = [], [], 0
     for b in bloques:
-        b["plan"] = planificar(b, b["vis_fin"] - b["ini"], tb)
+        b["plan"] = (planificar_anclado if b.get("planos_en") else planificar)(b, b["vis_fin"] - b["ini"], tb)
         for nombre, dur in b["plan"]:
             k += 1
             destino = str(carpeta / f"{k:03d}_{nombre}.mp4")

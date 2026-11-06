@@ -34,3 +34,18 @@ VCC_Bahia_DE,Vice_City_2002,26.0,3.6,Bahía con palmeras (Definitive Edition),0.
 T1_Musica_Petty,Vice_City,51.2,5.0,Tráiler 1 con el estribillo de Love Is a Long Road,0.5,principal,si,0:51 con sonido (Whisper),Trailer_1,1
 T2_Musica_Hot,Vice_City,40.0,4.0,Tráiler 2 con Hot Together,0.5,principal,si,0:40 con sonido (sin diálogo de 0:25 a 0:50),Trailer_2,1
 Lanz_Final_19N,Cierre,79.2,4.4,Final del tráiler de lanzamiento: coming November 19th,0.5,principal,si,1:19 con sonido (Whisper),Lanzamiento,1
+VCT_Rosenberg,Vice_City_2002,10.4,1.4,Hombre con gafas en una oficina (Definitive Edition),0.5,principal,no,Tráiler Trilogy 0:10,VC_Tril,1.1
+VCT_Ciudad,Vice_City_2002,16.3,3.2,Vice City de día con palmeras (Definitive Edition),0.5,principal,no,0:16,VC_Tril,1
+VCT_Tommy_Esmoquin,Vice_City_2002,32.4,1.4,Tommy con un hombre de esmoquin (Definitive Edition),0.5,principal,no,0:32,VC_Tril,1.1
+VCT_Tommy_Viejo,Vice_City_2002,38.4,1.4,Tommy con un hombre mayor (Definitive Edition),0.5,principal,no,0:38,VC_Tril,1.1
+VCT_Tommy_Moto,Vice_City_2002,40.4,1.4,Tommy en moto (Definitive Edition),0.5,principal,no,0:40,VC_Tril,1.1
+VCT_Tommy_Estudio,Vice_City_2002,42.4,1.4,Tommy en un estudio (Definitive Edition),0.5,principal,no,0:42,VC_Tril,1.1
+IMG_GTA1,GTA_1997,0,4,Captura del GTA de 1997 (vista desde arriba),0.5,principal,no,Wikipedia,Imagen:https://upload.wikimedia.org/wikipedia/en/f/fb/GTA1_PC_in-game_screenshot.png,1
+IMG_GTA1_Caja,GTA_1997,0,4,Caja del GTA de 1997,0.5,principal,no,Wikipedia,Imagen:https://upload.wikimedia.org/wikipedia/en/e/e7/GTA_-_Box_Front.jpg,1
+IMG_RaceNChase,GTA_1997,0,4,Captura de Race'n'Chase,0.5,principal,no,Wikipedia,Imagen:https://upload.wikimedia.org/wikipedia/en/a/ad/Race%27n%27Chase_screenshot.jpg,1
+IMG_VC_Portada,Vice_City_2002,0,3.5,Portada de GTA Vice City,0.5,principal,no,Wikipedia,Imagen:https://upload.wikimedia.org/wikipedia/en/c/ce/Vice-city-cover.jpg,1
+IMG_VC_Moto,Vice_City_2002,0,3.5,Captura de Vice City en moto,0.5,principal,no,Wikipedia,Imagen:https://upload.wikimedia.org/wikipedia/en/c/c5/Grand_Theft_Auto_Vice_City_motorcycle_gameplay.jpg,1
+IMG_VC_Mundo,Vice_City_2002,0,3.5,Captura del mundo abierto de Vice City,0.5,principal,no,Wikipedia,Imagen:https://upload.wikimedia.org/wikipedia/en/c/c8/Grand_Theft_Auto_Vice_City_open_world.jpg,1
+IMG_VCS_Portada,VCS_2006,0,3.5,Portada de Vice City Stories,0.5,principal,no,Wikipedia,Imagen:https://upload.wikimedia.org/wikipedia/en/3/3e/GTA_Vice_City_Stories_PSP_boxart.jpg,1
+IMG_VCS_Socorrista,VCS_2006,0,3.5,Socorrista en la playa (Vice City Stories),0.5,principal,no,Rockstar,Imagen:https://media-rockstargames-com.akamaized.net/mfe-r19/prod/__common/img/ae01329b17c6f92ec10d153b9ecf6dc1.jpg,1
+IMG_VCS_Moto_Agua,VCS_2006,0,3.5,Moto de agua (Vice City Stories),0.5,principal,no,Rockstar,Imagen:https://media-rockstargames-com.akamaized.net/mfe-r19/prod/__common/img/4daa1a79107768db61857dfe462dbaa4.jpg,1

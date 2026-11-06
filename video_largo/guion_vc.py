@@ -13,10 +13,11 @@ Planos de Vice City 2002 (VCA_..., VCC_...) en trozos_vc.csv, de los vídeos ofi
 VIDEOS_EXTRA = {
     "VC_Aniv": "https://videos-rockstargames-com.akamaized.net/v4/tror41c2/flv/en-us-720p.mp4",
     "VC_Comp": "https://videos-rockstargames-com.akamaized.net/v4/ao1c441c/flv/en-us-1080p60.mp4",
+    "VC_Tril": "https://videos-rockstargames-com.akamaized.net/v4/8ta2r546/flv/en-us-1080p60.mp4",
 }
 
 # Logos y carteles que van quietos (sin movimiento de cámara)
-PLANOS_FIJOS = {"VCA_Logo", "VCA_Welcome", "VCA_Welcome_Son", "VCA_Aniversario", "VCA_Rockstar_North", "Mirada_Logo",
+PLANOS_FIJOS = {"VCA_Logo", "IMG_GTA1", "IMG_GTA1_Caja", "IMG_RaceNChase", "VCA_Welcome", "VCA_Welcome_Son", "VCA_Aniversario", "VCA_Rockstar_North", "Mirada_Logo",
                 "VL_Fecha", "VL_Rotulo_PS5", "Portada_Animada", "Lanz_Final_19N", "T1_Letras_Vice"}
 
 # Música: el estilo cambia al empezar estos bloques (4 estilos, ver ESTILOS_MUSICA en montaje.py)
@@ -42,6 +43,9 @@ BLOQUES = [
      "planos": ["VCA_Logo", "VCA_Tommy_Yate", "VCC_Moto_Orig", "VCA_Lanchas", "Lanz_Playa", "T1_Neones",
                 "Mirada_Vista_Aerea", "T1_Letras_Vice", "VL_Poli_2", "Lanz_Descapotable", "Mirada_Skyline_Noche",
                 "T1_Coches_Noche", "Mirada_Descapotable_1", "T1_Autopista"],
+     "planos_en": [{"en": "vice", "plano": "VCA_Logo"},
+                   {"en": "policía", "plano": "IMG_RaceNChase"},
+                   {"en": "guiño", "plano": "VCA_Tommy_Yate"}],
      "original": "VCA_Welcome_Son"},
 
     # ---------------------------------------------------------------- A. 1997 · EL ORIGEN
@@ -57,8 +61,10 @@ BLOQUES = [
              "Grand Theft Auto."),
      "rotulos": [{"en": "estudio", "texto": "RACE'N'CHASE|1995 · DUNDEE"},
                  {"en": "vuelta", "texto": "AHORA EL CRIMINAL|ERES TÚ"}],
-     "planos": ["VL_Poli_1", "VL_Poli_2", "VL_Poli_3", "VL_Poli_Heli", "Mirada_Calles_1", "VL_Poli_4",
-                "VL_HUD_Pasillo", "Mirada_Calles_2", "T1_Coches_Noche"]},
+     "planos": ["IMG_RaceNChase", "IMG_GTA1", "IMG_GTA1_Caja"],
+     "planos_en": [{"en": "persigue", "plano": "IMG_RaceNChase"},
+                   {"en": "vuelta", "plano": "IMG_GTA1"},
+                   {"en": "origen", "plano": "IMG_GTA1_Caja"}]},
     {"id": "p02", "num": 2, "total": T, "titulo": "1997 · VISTA DESDE ARRIBA", "capitulo": "Vice City, vista desde arriba",
      "overlay": "",
      "texto": ("Parada dos. 1997. El primer GTA sale en noviembre en Europa, con la cámara mirando desde el cielo y "
@@ -76,8 +82,9 @@ BLOQUES = [
                  {"en": "miami", "texto": "VICE CITY|= MIAMI"},
                  {"en": "millones", "texto": "3,5 MILLONES|EN 1999"},
                  {"en": "2001", "texto": "6 MILLONES|EN 2001"}],
-     "planos": ["Mirada_Vista_Aerea", "T1_Playa_Aerea", "T1_Noche_Aerea", "Lanz_Playa", "Mirada_Puerto",
-                "Mirada_Skyline_Azotea", "T1_Autopista", "Mirada_Atardecer"]},
+     "planos": ["IMG_GTA1", "IMG_GTA1_Caja", "IMG_RaceNChase"],
+     "planos_en": [{"en": "cielo", "plano": "IMG_GTA1"},
+                   {"en": "polémica", "plano": "IMG_GTA1_Caja"}]},
 
     # ---------------------------------------------------------------- B. 2002 · VICE CITY
     {"id": "p03", "num": 3, "total": T, "titulo": "2002 · DIECIOCHO MESES", "capitulo": "Dieciocho meses",
@@ -95,7 +102,11 @@ BLOQUES = [
                  {"en": "trece", "texto": "13 MILLONES $|PUBLICIDAD"},
                  {"en": "aquí", "texto": "8 NOV 2002|EUROPA · PS2"}],
      "planos": ["VCA_Rockstar_North", "VCA_Logo", "VCA_Coche_Aeropuerto", "VCC_Bahia_Orig", "VCA_Moto_Atardecer",
-                "VCA_Tommy_Yate", "VCC_Moto_Orig", "VCA_Barco"]},
+                "VCA_Tommy_Yate", "VCC_Moto_Orig", "VCA_Barco"],
+     "planos_en": [{"en": "anuncia", "plano": "VCA_Logo"},
+                   {"en": "dieciocho", "plano": "VCA_Rockstar_North"},
+                   {"en": "aquí", "plano": "IMG_VC_Portada"},
+                   {"en": "playstation", "plano": "IMG_VC_Moto"}]},
     {"id": "p04", "num": 4, "total": T, "titulo": "UNA PELI DE LOS OCHENTA", "capitulo": "Una peli de los ochenta",
      "overlay": "",
      "texto": ("Parada cuatro. Vice City no pasa en 2002: pasa en 1986. Y Rockstar no lo escondió. Las referencias son "
@@ -111,7 +122,10 @@ BLOQUES = [
                  {"en": "atrapado", "texto": "ATRAPADO POR SU PASADO|1993"},
                  {"en": "serie", "texto": "CORRUPCIÓN EN MIAMI|1984-1989"}],
      "planos": ["VCA_Diner", "VCA_Tommy_Yate_2", "VCA_Despacho", "VCA_Mesa", "VCA_Coches_Noche", "VCA_Salon",
-                "VCA_Lanchas", "VCA_Tommy_Bar"]},
+                "VCA_Lanchas", "VCA_Tommy_Bar"],
+     "planos_en": [{"en": "pasa", "plano": "VCC_Moto_Orig", "n": 2},
+                   {"en": "precio", "plano": "VCA_Despacho"},
+                   {"en": "camisa", "plano": "VCA_Tommy_Yate"}]},
     {"id": "p05", "num": 5, "total": T, "titulo": "TOMMY VERCETTI", "capitulo": "Tommy Vercetti", "overlay": "",
      "texto": ("Parada cinco. El protagonista: Tommy Vercetti. Se come quince años de cárcel por culpa de su jefe, "
                "Sonny Forelli, y nada más salir lo mandan a Vice City a hacer negocios con droga. El primer trato sale "
@@ -127,7 +141,12 @@ BLOQUES = [
                  {"en": "emboscada", "texto": "EMBOSCADA|EN EL PRIMER TRATO"},
                  {"en": "voz", "texto": "RAY LIOTTA|LA VOZ DE TOMMY"}],
      "planos": ["VCC_Tommy_Lance_Orig", "VCA_Tommy_Silla", "VCA_Barco", "VCA_Tiroteo", "VCA_Tommy_Bar", "VCA_Helicoptero",
-                "VCA_Tommy_Yate", "VCA_Calle"]},
+                "VCA_Tommy_Yate", "VCA_Calle"],
+     "planos_en": [{"en": "protagonista", "plano": "VCA_Tommy_Yate"},
+                   {"en": "quince", "plano": "VCA_Tommy_Silla"},
+                   {"en": "emboscada", "plano": "VCA_Tiroteo"},
+                   {"en": "voz", "plano": "VCT_Tommy_Esmoquin"},
+                   {"en": "despidió", "plano": "VCT_Tommy_Moto"}]},
     {"id": "p06", "num": 6, "total": T, "titulo": "UN REPARTO DE CINE", "capitulo": "Un reparto de cine", "overlay": "",
      "texto": ("Parada seis. Y Liotta no vino solo. En el reparto están Burt Reynolds, Tom Sizemore, Luis Guzmán, "
                "Danny Dyer... Pero el detalle bueno es este: Lance Vance, el socio de Tommy, lo dobla Philip Michael "
@@ -141,7 +160,11 @@ BLOQUES = [
                  {"en": "dobla", "texto": "LANCE VANCE|= PHILIP MICHAEL THOMAS"},
                  {"en": "compañero", "texto": "TUBBS|CORRUPCIÓN EN MIAMI"}],
      "planos": ["VCA_Tommy_Lance", "VCC_Tommy_Lance_Orig", "VCA_Trio", "VCA_Mesa", "VCC_Tommy_Lance_DE", "VCA_Diner",
-                "VCA_Tommy_Yate_2"]},
+                "VCA_Tommy_Yate_2"],
+     "planos_en": [{"en": "reparto", "plano": "VCT_Rosenberg"},
+                   {"en": "socio", "plano": "VCA_Tommy_Lance"},
+                   {"en": "compañero", "plano": "VCC_Tommy_Lance_Orig"},
+                   {"en": "mafioso", "plano": "VCC_Tommy_Lance_DE"}]},
     {"id": "p07", "num": 7, "total": T, "titulo": "EL MAPA DE 1986", "capitulo": "El mapa de 1986", "overlay": "",
      "texto": ("Parada siete. El mapa. Dos islas grandes y unas cuantas pequeñas, casi el doble que la Liberty City de "
                "GTA 3. Al principio no puedes cruzar: los puentes están cerrados porque se acerca un huracán, Hermione. "
@@ -159,7 +182,11 @@ BLOQUES = [
                  {"en": "medio", "texto": "STARFISH ISLAND|= STAR ISLAND"},
                  {"en": "primera", "texto": "OCEAN VIEW HOTEL|TU PRIMERA CASA"}],
      "planos": ["VCC_Bahia_Orig", "VCC_Moto_Orig", "VCA_Moto_Atardecer", "VCA_Coche_Aeropuerto", "VCA_Calle",
-                "VCA_Coches_Noche", "VCA_Barco", "VCA_Lanchas"]},
+                "VCA_Coches_Noche", "VCA_Barco", "VCA_Lanchas"],
+     "planos_en": [{"en": "islas", "plano": "IMG_VC_Mundo"},
+                   {"en": "playa", "plano": "VCC_Bahia_Orig"},
+                   {"en": "medio", "plano": "VCA_Despacho"},
+                   {"en": "primera", "plano": "VCC_Moto_Orig"}]},
     {"id": "p08", "num": 8, "total": T, "titulo": "NUEVE HORAS DE RADIO", "capitulo": "Nueve horas de radio",
      "overlay": "",
      "texto": ("Parada ocho. Si Vice City es famoso por algo, es por la radio. Más de 113 canciones y anuncios: unas "
@@ -176,7 +203,9 @@ BLOQUES = [
                  {"en": "suena", "texto": "EMOTION 98.3|CROCKETT'S THEME"},
                  {"en": "triple", "texto": "x3|RADIO HABLADA"}],
      "planos": ["VCA_Moto_Atardecer", "VCC_Moto_Orig", "VCA_Coches_Noche", "VCA_Diner", "VCA_Coche_Aeropuerto",
-                "VCA_Calle", "VCC_Bahia_Orig"]},
+                "VCA_Calle", "VCC_Bahia_Orig"],
+     "planos_en": [{"en": "radio", "plano": "VCA_Coches_Noche"},
+                   {"en": "caja", "plano": "VCA_Moto_Atardecer"}]},
     {"id": "p09", "num": 9, "total": T, "titulo": "EL DUEÑO DE LA CIUDAD", "capitulo": "El dueño de la ciudad",
      "overlay": "", "cta": True,
      "texto": ("Parada nueve. Y luego está lo de comprar la ciudad. Pisos para guardar coches y partidas, pero también "
@@ -186,7 +215,10 @@ BLOQUES = [
      "rotulos": [{"en": "estudio", "texto": "ESTUDIO DE CINE|TAXIS · CLUBES"},
                  {"en": "recadero", "texto": "DE RECADERO|A DUEÑO"}],
      "planos": ["VCA_Estudio_1", "VCA_Estudio_2", "VCA_Tommy_Silla", "VCA_Despacho", "VCA_Salon", "VCA_Mesa",
-                "VCA_Tommy_Bar"]},
+                "VCA_Tommy_Bar"],
+     "planos_en": [{"en": "comprar", "plano": "VCA_Despacho"},
+                   {"en": "estudio", "plano": "VCA_Estudio_1"},
+                   {"en": "dueño", "plano": "VCA_Tommy_Silla"}]},
     {"id": "p10", "num": 10, "total": T, "titulo": "EL RÉCORD", "capitulo": "El récord", "overlay": "",
      "texto": ("Parada diez. ¿Y cómo le fue? Medio millón de copias en 24 horas. Un millón cuatrocientas mil en dos "
                "días: el juego que más rápido se había vendido hasta entonces. Fue el más vendido de 2002 en Estados "
@@ -202,7 +234,10 @@ BLOQUES = [
                  {"en": "catorce", "texto": "14,2 MILLONES|SOLO EN PS2"},
                  {"en": "nota", "texto": "95|METACRITIC"},
                  {"en": "seis", "texto": "6 PREMIOS|BAFTA"}],
-     "planos": ["VCA_Logo", "VCA_Trio", "VCA_Lanchas", "VCA_Helicoptero", "VCA_Grua", "VCA_Tiroteo", "VCA_Welcome"]},
+     "planos": ["VCA_Logo", "VCA_Trio", "VCA_Lanchas", "VCA_Helicoptero", "VCA_Grua", "VCA_Tiroteo", "VCA_Welcome"],
+     "planos_en": [{"en": "medio", "plano": "VCA_Logo"},
+                   {"en": "nota", "plano": "IMG_VC_Portada"},
+                   {"en": "seis", "plano": "VCA_Trio"}]},
 
     # ---------------------------------------------------------------- C. 2006 · VICE CITY STORIES
     {"id": "p11", "num": 11, "total": T, "titulo": "2006 · EL HERMANO DE LA EMBOSCADA",
@@ -220,8 +255,11 @@ BLOQUES = [
      "rotulos": [{"en": "vuelve", "texto": "VICE CITY STORIES|2006 · PSP"},
                  {"en": "protagonista", "texto": "VICTOR VANCE|1984"},
                  {"en": "emboscada", "texto": "EL HERMANO|DE LA EMBOSCADA"}],
-     "planos": ["VCA_Barco", "VCA_Tommy_Lance", "VCA_Lanchas", "Mirada_Jason_Calle", "VL_Atraco_2", "VCA_Calle",
-                "VL_Poli_1", "VCA_Tiroteo"]},
+     "planos": ["IMG_VCS_Portada", "IMG_VCS_Moto_Agua", "IMG_VCS_Socorrista", "VCA_Tommy_Lance", "VCA_Tiroteo"],
+     "planos_en": [{"en": "vuelve", "plano": "IMG_VCS_Portada"},
+                   {"en": "protagonista", "plano": "IMG_VCS_Moto_Agua"},
+                   {"en": "emboscada", "plano": "VCA_Tiroteo"},
+                   {"en": "imperio", "plano": "IMG_VCS_Socorrista"}]},
     {"id": "p12", "num": 12, "total": T, "titulo": "PHIL COLLINS EN VICE CITY", "capitulo": "Phil Collins en Vice City",
      "overlay": "",
      "texto": ("Parada doce. Y el cameo más ochentero de toda la saga: Phil Collins. Él mismo, haciendo de él mismo. En "
@@ -236,8 +274,10 @@ BLOQUES = [
                  {"en": "concierto", "texto": "UN CONCIERTO|CON SICARIOS"},
                  {"en": "siete", "texto": "+7 MILLONES|VICE CITY STORIES"},
                  {"en": "nadar", "texto": "VIC SÍ SABE NADAR|Y HACE DE SOCORRISTA"}],
-     "planos": ["VL_Disco_1", "VL_Disco_2", "VL_Azotea_2", "VL_Disco_3", "VL_Disco_4", "Mirada_Skyline_Noche",
-                "VL_Disco_0"]},
+     "planos": ["IMG_VCS_Portada", "IMG_VCS_Socorrista", "IMG_VCS_Moto_Agua", "VCA_Diner"],
+     "planos_en": [{"en": "cameo", "plano": "IMG_VCS_Portada"},
+                   {"en": "nadar", "plano": "IMG_VCS_Moto_Agua"},
+                   {"en": "socorrista", "plano": "IMG_VCS_Socorrista"}]},
 
     # ---------------------------------------------------------------- D. 2023-2026 · LEONIDA
     {"id": "p13", "num": 13, "total": T, "titulo": "2023 · LA VUELTA", "capitulo": "La vuelta", "overlay": "",
@@ -310,7 +350,9 @@ BLOQUES = [
                  {"en": "oda", "texto": "GROTTI CHEETAH '95|«UNA ODA A SHORE DRIVE»"},
                  {"en": "taller", "texto": "RIDEOUT CUSTOMS|TALLER EN VICE CITY"}],
      "planos": ["Portada_Animada", "Lanz_Descapotable", "Mirada_Coche_Clasico", "T1_Neones", "Mirada_Terraza",
-                "Lanz_Balcon", "Mirada_Logo"]},
+                "Lanz_Balcon", "Mirada_Logo"],
+     "planos_en": [{"en": "camisa", "plano": "VCA_Tommy_Yate"},
+                   {"en": "mansión", "plano": "VCA_Despacho"}]},
     {"id": "p17", "num": 17, "total": T, "titulo": "LOS OCHENTA SIGUEN SONANDO",
      "capitulo": "Los ochenta siguen sonando", "overlay": "",
      "texto": ("Parada diecisiete. La música. El segundo tráiler, de mayo de 2025, va con Hot Together, de las Pointer "
@@ -328,6 +370,7 @@ BLOQUES = [
                  {"en": "clásicos", "texto": "CLIFF RICHARD|BELLAMY BROTHERS"}],
      "planos": ["T2_Mar_Atardecer", "T2_Muelle_Atardecer", "T2_Jason_Conduce", "Mirada_Azotea", "VL_Disco_2",
                 "Mirada_Jason_y_Lucia", "VL_Interior_1", "T2_Autopista"],
+     "planos_en": [{"en": "protegías", "plano": "IMG_VCS_Portada"}],
      "original": "T2_Musica_Hot"},
     {"id": "p18", "num": 18, "total": T, "titulo": "LO QUE CAMBIA", "capitulo": "Lo que cambia", "overlay": "",
      "texto": ("Parada dieciocho. ¿Y qué cambia? Lo primero, la época: de 1986 a hoy, con móviles y redes sociales. Lo "
@@ -344,7 +387,9 @@ BLOQUES = [
                  {"en": "protagonistas", "texto": "DE TOMMY|A JASON Y LUCÍA"},
                  {"en": "escala", "texto": "DE PS2|A PS5 Y XBOX SERIES"}],
      "planos": ["VCC_Moto_Orig", "Mirada_Jason_y_Lucia", "VCA_Tommy_Yate", "Lanz_Paseo", "VCC_Bahia_Orig",
-                "Mirada_Skyline_Noche", "Lanz_Balcon", "Mirada_Atardecer", "T1_Neones"]},
+                "Mirada_Skyline_Noche", "Lanz_Balcon", "Mirada_Atardecer", "T1_Neones"],
+     "planos_en": [{"en": "protagonistas", "plano": "VCT_Tommy_Moto"},
+                   {"en": "dos", "plano": "Mirada_Jason_y_Lucia"}]},
 
     # ---------------------------------------------------------------- TRES EXTRA DE REGALO
     {"id": "e1", "num": "E1", "total": 3, "titulo": "VICE CITY NUNCA SE FUE", "overlay": "",
@@ -375,7 +420,8 @@ BLOQUES = [
                  {"en": "sitios", "texto": "SWITCH · WII U · VITA|"},
                  {"en": "catorce", "texto": "14 PROGRAMADORES|DEMANDADOS EN 2021"}],
      "planos": ["VCC_Tommy_Lance_Orig", "VCA_Despacho", "VCA_Tommy_Silla", "VCA_Tommy_Bar", "VCA_Tiroteo",
-                "VCA_Helicoptero", "VCA_Calle"]},
+                "VCA_Helicoptero", "VCA_Calle"],
+     "planos_en": [{"en": "código", "plano": "VCC_Tommy_Lance_Orig"}]},
     {"id": "e3", "num": "E3", "total": 3, "titulo": "MURALES DE VERDAD", "overlay": "",
      "texto": ("Extra tres: murales de verdad. Según la revista Dazed, Rockstar contó con más de cincuenta artistas "
                "callejeros reales para pintar los murales de GTA 6, en sitios como el Stockyard de Vice City, inspirado "
@@ -395,18 +441,20 @@ BLOQUES = [
      "texto": ("Y para acabar, lo que todavía no sabemos. ¿Vuelve el Ocean View Hotel? Los fans creen haberlo visto en "
                "un tráiler, pero Rockstar no lo ha confirmado. ¿Vuelven Tommy, Lance o algún personaje del original? "
                "Ni una palabra. Lo que sí sabemos es la fecha: el 19 de noviembre volvemos a Vice City. Veinticuatro "
-               "años después. Y si no puedes esperar: la predescarga empieza a medianoche del 12 de noviembre. Y si jugaste al de 2002, cuéntame en los comentarios cuál era tu emisora: ¿Flash FM, Wave 103 o Emotion? Si te ha gustado el viaje, suscríbete, y si te perdiste las 20 curiosidades de GTA 6, "
+               "años después. Y si no puedes esperar: la predescarga empieza el 10 de noviembre. Y si jugaste al de 2002, cuéntame en los comentarios cuál era tu emisora: ¿Flash FM, Wave 103 o Emotion? Si te ha gustado el viaje, suscríbete, y si te perdiste las 20 curiosidades de GTA 6, "
                "tienes el vídeo aquí. Nos vemos en Leonida."),
      "voz": ("Y para acabar, lo que todavía no sabemos. ¿Vuelve el Óushen Viu Hotel? Los fans creen haberlo visto en "
              "un tráiler, pero Rockstar no lo ha confirmado. ¿Vuelven Tomi, Lans o algún personaje del original? "
              "Ni una palabra. Lo que sí sabemos es la fecha: el 19 de noviembre volvemos a Vice City. Veinticuatro "
-             "años después. Y si no puedes esperar: la predescarga empieza a medianoche del 12 de noviembre. Y si jugaste al de 2002, cuéntame en los comentarios cuál era tu emisora: ¿Flash Efe Eme, Uéiv ciento tres o Imóushon? Si te ha gustado el viaje, suscríbete, y si te perdiste las 20 curiosidades de GTA 6, "
+             "años después. Y si no puedes esperar: la predescarga empieza el 10 de noviembre. Y si jugaste al de 2002, cuéntame en los comentarios cuál era tu emisora: ¿Flash Efe Eme, Uéiv ciento tres o Imóushon? Si te ha gustado el viaje, suscríbete, y si te perdiste las 20 curiosidades de GTA 6, "
              "tienes el vídeo aquí. Nos vemos en Leonida."),
      "rotulos": [{"en": "hotel", "texto": "¿OCEAN VIEW HOTEL?|SIN CONFIRMAR"},
                  {"en": "palabra", "texto": "¿VUELVE ALGUIEN?|NI UNA PALABRA"},
                  {"en": "fecha", "texto": "19 NOV|VOLVEMOS A VICE CITY"},
-                 {"en": "predescarga", "texto": "PREDESCARGA|12 NOV, MEDIANOCHE"}],
+                 {"en": "predescarga", "texto": "PREDESCARGA|10 NOV"}],
      "planos": ["VL_Hidroavion", "VL_Atardecer_Final", "VL_Lancha_Pareja", "Mirada_Paracaidas", "Lanz_Paseo",
                 "Mirada_Logo", "VL_Fecha"],
+     "planos_en": [{"en": "vuelven", "plano": "VCA_Tommy_Yate"},
+                   {"en": "hotel", "plano": "VCC_Moto_Orig"}],
      "original": "Lanz_Final_19N"},
 ]
