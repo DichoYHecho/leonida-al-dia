@@ -12,6 +12,9 @@ on:
       der:
         description: "Cara de la derecha: vídeo:segundo:x:y:zoom"
         default: ""
+      textos:
+        description: "Texto: GRANDE|línea 1|línea 2|tamaño|y (vacío = 20 CURIOSIDADES DE GTA 6)"
+        default: ""
 
 permissions:
   contents: write
@@ -24,6 +27,7 @@ jobs:
       FRAMES: ${{ inputs.frames }}
       IZQ: ${{ inputs.izq }}
       DER: ${{ inputs.der }}
+      TEXTOS: ${{ inputs.textos }}
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v4
@@ -35,7 +39,10 @@ jobs:
           pip install pillow
 
       - name: Componer
-        run: python3 video_largo/miniatura2.py
+        run: |
+          IFS="|" read -r GRANDE L1 L2 TAM Y_GRANDE <<< "$TEXTOS"
+          export GRANDE L1 L2 TAM Y_GRANDE
+          python3 video_largo/miniatura2.py
 
       - name: Publicar en la rama miniaturas-2
         if: always()
