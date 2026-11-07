@@ -16,7 +16,7 @@ import montaje as M  # noqa: E402
 import prototipo as P  # noqa: E402
 
 G = importlib.import_module(os.environ.get("GUION", "guion_vl"))
-PAL_S = 2.37  # palabras por segundo con la voz real (Orus +12 %)
+PAL_S = 3.4  # palabras por segundo con la voz real (Orus +12 %; medido en la previa del vídeo 3: 3,6)
 
 
 def aparece(texto, palabra, n=1):

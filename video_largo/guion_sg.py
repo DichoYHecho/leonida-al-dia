@@ -47,7 +47,9 @@ FONETICA = {
     "L.": "El", "Jackson": "Yákson", "Hot": "Jot", "Coffee": "Cófi", "Game": "Guéim", "Boy": "Boi",
     "Advance": "Advans", "Stories": "Stóris", "Chinatown": "Cháinataun", "Wars": "Uors", "Bellic": "Bélic",
     "RAGE": "Reich", "Euphoria": "Iufória", "Lost": "Lost", "Damned": "Dámd", "Ballad": "Bálad", "Gay": "Guei",
-    "Tony": "Toni", "Michael": "Máikel", "Online": "Onlain", "CJ": "Siyéi", "London": "Lóndon", "Leonida": "Leónida",
+    "Tony": "Toni", "Petty": "Péti", "Love": "Lov", "Road.": "Roud.", "Pointer": "Póinter", "Sisters.": "Sísters.",
+    "Together,": "Tuguéder,", "Roman": "Róman", "Queens,": "Kuins,", "Bronx": "Bronks", "Trevor,": "Trévor,",
+    "Franklin,": "Fránklin,", "Johnson,": "Yónson,", "Definitive": "Définitiv", "Edition.": "Edíshon.", "Michael": "Máikel", "Online": "Onlain", "CJ": "Siyéi", "London": "Lóndon", "Leonida": "Leónida",
 }
 
 
@@ -95,8 +97,8 @@ BLOQUES = [
                "ser el malo. Así que le dieron la vuelta, y nació Grand Theft Auto. Salió en Europa el veintiocho de "
                "noviembre de 1997: un juego visto desde arriba, con tres ciudades inspiradas en sitios reales. Liberty "
                "City, que es Nueva York. San Andreas, que es San Francisco. Y Vice City, que es Miami. Apúntate esta "
-               "última. Para venderlo, contrataron a un publicista que convirtió la polémica por su violencia en "
-               "publicidad gratis. Y vaya si funcionó: en marzo de 2001 ya llevaba seis millones de copias. Nada mal "
+               "última. Salió en PC y en PlayStation, y hasta tuvo versión para Game Boy Color. Para venderlo, contrataron a un publicista que convirtió la polémica por su violencia en "
+               "publicidad gratis. Se habló hasta de prohibirlo, y en Brasil lo prohibieron. Y vaya si funcionó: en marzo de 2001 ya llevaba seis millones de copias. Nada mal "
                "para unos coches del tamaño de una uña."),
      "rotulos": [{"en": "escocia", "texto": "DUNDEE|ESCOCIA"},
                  {"en": "estudio", "texto": "DMA DESIGN"},
@@ -106,8 +108,10 @@ BLOQUES = [
                  {"en": "nueva", "texto": "LIBERTY CITY|= NUEVA YORK"},
                  {"en": "francisco", "texto": "SAN ANDREAS|= SAN FRANCISCO"},
                  {"en": "miami", "texto": "VICE CITY|= MIAMI"},
+                 {"en": "color", "texto": "PC · PLAYSTATION|GAME BOY COLOR"},
+                 {"en": "brasil", "texto": "PROHIBIDO|EN BRASIL"},
                  {"en": "seis", "texto": "6 MILLONES|EN 2001"}],
-     "nombres": ["escocia", "estudio", "pelotazo", "llamado", "grand", "veintiocho", "nueva", "francisco", "miami",
+     "nombres": ["brasil", "escocia", "estudio", "pelotazo", "llamado", "grand", "veintiocho", "nueva", "francisco", "miami",
                  "publicista", "seis"],
      "planos": ["@GTA1_1997:28", "GTA_15_05", "GTA_15_06"],
      "planos_en": [{"en": "persecuciones", "plano": "IMG_RaceNChase"},
@@ -166,14 +170,16 @@ BLOQUES = [
     {"id": "p04", "num": 4, "total": T, "titulo": "2002 · VICE CITY", "capitulo": "2002 · Vice City", "overlay": "",
      "anio": 2002,
      "texto": ("Y cambia en Vice City. Sí, la ciudad que te pedí que apuntaras. Rockstar se va a Miami en 1986: neón, "
-               "trajes claros, deportivos y radios llenas de música de los ochenta. Y el protagonista, por fin, habla. "
+               "trajes claros, deportivos y radios llenas de música de los ochenta. Y lo hace un equipo de unas "
+               "cincuenta personas en solo dieciocho meses. Y el protagonista, por fin, habla. "
                "Tommy Vercetti, con la voz de Ray Liotta, es el primer protagonista de la saga que habla. Hoy lo damos "
                "por hecho, pero en 2002 fue un cambio enorme: el personaje ya tenía carácter propio, no era solo el "
-               "muñeco que tú movías. Vendió veinte millones de copias. Y si quieres la historia completa de esta "
+               "muñeco que tú movías. Primero salió solo en PlayStation 2; los de PC tuvieron que esperar a mayo de 2003. Vendió veinte millones de copias. Y si quieres la historia completa de esta "
                "ciudad, la tienes en el vídeo anterior del canal. Aquí solo te dejo una pista: hoy volvemos a hablar de "
                "ella."),
      "rotulos": [{"en": "miami", "texto": "VICE CITY|= MIAMI"},
                  {"en": "1986", "texto": "1986"},
+                 {"en": "dieciocho", "texto": "18 MESES|~50 PERSONAS"},
                  {"en": "tommy", "texto": "TOMMY VERCETTI"},
                  {"en": "liotta", "texto": "VOZ:|RAY LIOTTA"},
                  {"en": "veinte", "texto": "20 MILLONES"}],
@@ -188,20 +194,25 @@ BLOQUES = [
      "anio": 2004, "cta": True,
      "texto": ("En 2004, Rockstar se pasa de frenada. Ya no es una ciudad: es un estado entero. San Andreas, en 1992, "
                "con tres ciudades, Los Santos, San Fierro y Las Venturas, y campo, desierto y montañas entre medias. "
-               "Treinta y seis kilómetros cuadrados: entre cuatro y seis veces más grande que GTA III o Vice City. Y CJ "
-               "no solo conducía y disparaba: iba al gimnasio, comía, engordaba y adelgazaba. El reparto era de "
+               "O sea: Los Ángeles, San Francisco y Las Vegas. "
+               "Treinta y seis kilómetros cuadrados: entre cuatro y seis veces más grande que GTA III o Vice City. Carl "
+               "Johnson, CJ, vuelve a casa tras cinco años en Liberty City porque han matado a su madre. Y CJ no solo conducía y disparaba: iba al gimnasio, comía, engordaba y adelgazaba. El reparto era de "
                "película: al policía corrupto, Tenpenny, le pone voz Samuel L. Jackson. También trajo la mayor polémica "
                "de la saga: un minijuego escondido en el código, Hot Coffee, por el que en Estados Unidos lo "
                "recalificaron durante un tiempo solo para adultos. Aun así, con más de diecisiete millones de copias, "
-               "es el juego más vendido de PlayStation 2."),
+               "es el juego más vendido de PlayStation 2. Y sumando todas sus versiones, en 2011 ya pasaba de veintisiete "
+               "millones y medio."),
      "rotulos": [{"en": "estado", "texto": "UN ESTADO|ENTERO"},
                  {"en": "1992", "texto": "1992"},
                  {"en": "santos", "texto": "LOS SANTOS · SAN FIERRO|LAS VENTURAS"},
+                 {"en": "vegas", "texto": "= LOS ÁNGELES · SAN FRANCISCO|· LAS VEGAS"},
                  {"en": "treinta", "texto": "36 KM²|×4 A ×6 GTA III"},
+                 {"en": "carl", "texto": "CARL JOHNSON|«CJ»"},
                  {"en": "tenpenny", "texto": "TENPENNY|VOZ: SAMUEL L. JACKSON"},
                  {"en": "hot", "texto": "HOT COFFEE"},
-                 {"en": "diecisiete", "texto": "+17 MILLONES|EN PS2"}],
-     "nombres": ["estado", "1992", "santos", "desierto", "treinta", "gimnasio", "tenpenny", "hot", "diecisiete"],
+                 {"en": "diecisiete", "texto": "+17 MILLONES|EN PS2"},
+                 {"en": "veintisiete", "texto": "27,5 MILLONES|EN 2011"}],
+     "nombres": ["estado", "1992", "santos", "vegas", "desierto", "treinta", "carl", "gimnasio", "tenpenny", "hot", "diecisiete"],
      "planos": ["@SA_2004:32", "@SA_DE:4", "GTA_15_25", "GTA_15_26", "GTA_15_27"],
      "planos_en": [{"en": "estado", "plano": "@SA_DE"},
                    {"en": "desierto", "plano": "@SA_2004"},
@@ -210,15 +221,17 @@ BLOQUES = [
     {"id": "p06", "num": 6, "total": T, "titulo": "2004-2009 · PORTÁTILES", "capitulo": "2004-2009 · Las portátiles",
      "overlay": "", "anio": 2004, "etiqueta_linea": "2004-2009 · PORTÁTILES",
      "texto": ("Mientras tanto, GTA se mete en el bolsillo. GTA Advance en la Game Boy Advance. Liberty City Stories y "
-               "Vice City Stories en PSP: un GTA en 3D en una consola portátil. Y Chinatown Wars en Nintendo DS, que "
+               "Vice City Stories en PSP: un GTA en 3D en una consola portátil. Y Vice City Stories, además, viaja a 1984, "
+               "dos años antes que el Vice City original. Y Chinatown Wars en Nintendo DS, que "
                "recupera la cámara desde arriba, pero con pantalla táctil. La que más vendió fue Liberty City Stories: "
                "ocho millones de copias. Que se dice pronto, para un juego de bolsillo."),
      "rotulos": [{"en": "boy", "texto": "GTA ADVANCE|GBA · 2004"},
                  {"en": "liberty", "texto": "LIBERTY CITY STORIES|PSP · 2005"},
                  {"en": "vice", "texto": "VICE CITY STORIES|PSP · 2006"},
+                 {"en": "1984", "texto": "VICE CITY STORIES|1984"},
                  {"en": "chinatown", "texto": "CHINATOWN WARS|NINTENDO DS · 2009"},
                  {"en": "ocho", "texto": "8 MILLONES"}],
-     "nombres": ["boy", "liberty", "vice", "chinatown", "ocho"],
+     "nombres": ["boy", "liberty", "vice", "1984", "chinatown", "ocho"],
      "planos": ["@LCS_2005:14", "@VCS_2006:12", "@Advance_2004:3", "GTA_15_21", "GTA_15_22"],
      "planos_en": [{"en": "boy", "plano": "@Advance_2004"},
                    {"en": "liberty", "plano": "@LCS_2005"},
@@ -231,20 +244,25 @@ BLOQUES = [
      "anio": 2008, "cartela": {"anio": "2008", "acto": "ACTO III", "titulo": "LA ERA HD"}, "intro_original": "IV_TV_01",
      "texto": ("El veintinueve de abril de 2008 volvemos a Liberty City, pero ya nada se parece a lo de antes. Esto es "
                "otra generación. Niko Bellic, un veterano de guerra de Europa del Este, llega buscando el sueño "
-               "americano… y lo que encuentra es otra cosa. GTA IV estrena RAGE, el motor propio de Rockstar, y una "
+               "americano… y lo que encuentra es otra cosa. Su primo Roman le había contado una vida de lujo; la "
+               "realidad era un piso pequeño, una empresa de taxis que no da dinero y deudas de juego. Y esta Liberty "
+               "City copia cuatro barrios de Nueva York: Brooklyn, Queens, el Bronx y Manhattan. GTA IV estrena RAGE, el motor propio de Rockstar, y una "
                "física llamada Euphoria que hace que cada caída y cada atropello sean distintos. Tan difícil era de "
                "meter que los ingenieros de la empresa que la hizo se pasaron meses trabajando dentro del estudio. El "
                "tono también cambia: más serio, más gris, más de película. Costó más de cien millones de dólares, una "
-               "barbaridad para la época, y lo recuperó en nada: en su primera semana facturó más de quinientos "
+               "barbaridad para la época, y lo recuperó en nada: solo el primer día vendió tres millones seiscientas mil copias, y en su primera semana facturó más de quinientos "
                "millones. Y la crítica se rindió."),
      "rotulos": [{"en": "veintinueve", "texto": "29 ABR 2008"},
                  {"en": "niko", "texto": "NIKO BELLIC"},
+                 {"en": "primo", "texto": "ROMAN|EL PRIMO"},
+                 {"en": "barrios", "texto": "4 BARRIOS|DE NUEVA YORK"},
                  {"en": "rage", "texto": "MOTOR RAGE"},
                  {"en": "euphoria", "texto": "FÍSICA EUPHORIA"},
                  {"en": "cien", "texto": "+100 MILLONES $|DE PRESUPUESTO"},
+                 {"en": "seiscientas", "texto": "3,6 MILLONES|EL PRIMER DÍA"},
                  {"en": "quinientos", "texto": "+500 MILLONES $|EN 1 SEMANA"},
                  {"en": "crítica", "texto": "98|EN METACRITIC"}],
-     "nombres": ["liberty", "niko", "rage", "euphoria", "cien", "quinientos", "crítica"],
+     "nombres": ["liberty", "niko", "primo", "barrios", "rage", "euphoria", "cien", "quinientos", "crítica"],
      "planos": ["@GTA4_2008:34"],
      "planos_en": [{"en": "liberty", "plano": "GTA_15_12"},
                    {"en": "niko", "plano": "@GTA4_2008"},
@@ -269,22 +287,28 @@ BLOQUES = [
     {"id": "p09", "num": 9, "total": T, "titulo": "2013 · GTA V", "capitulo": "2013 · GTA V", "overlay": "",
      "anio": 2013,
      "texto": ("Y ahí está: GTA V. El diecisiete de septiembre de 2013 conocemos a Michael, Franklin y Trevor, tres "
-               "protagonistas entre los que cambias cuando quieres, incluso en mitad de un atraco. Volvemos a Los "
+               "protagonistas entre los que cambias cuando quieres, incluso en mitad de un atraco. Michael, un ladrón de "
+               "bancos retirado que vive escondido con otro nombre. Franklin, un chaval de la calle que quiere salir de "
+               "ahí. Y Trevor, el antiguo socio de Michael, que vive en el desierto y es pura dinamita. Volvemos a Los "
                "Santos, que es Los Ángeles, con todo el sur de San Andreas alrededor. Y lo de las ventas ya es de otro "
                "planeta: en tres días pasa de mil millones de dólares. Es el producto de entretenimiento que más rápido "
-               "se ha vendido en la historia. No el videojuego: el producto, contando películas y discos. Pero lo más "
+               "se ha vendido en la historia. No el videojuego: el producto, contando películas y discos. Batió siete "
+               "récords Guinness. Pero lo más "
                "loco no es cómo empezó, sino cuánto ha durado. Salió en 2013, volvió en 2014 para la nueva generación "
-               "de consolas, y otra vez en 2022. Tres generaciones con el mismo juego. Hoy lleva más de doscientos "
+               "de consolas y PC, y otra vez en 2022, para PlayStation 5 y Xbox Series. Tres generaciones con el mismo juego. Hoy lleva más de doscientos "
                "treinta millones de copias."),
      "rotulos": [{"en": "diecisiete", "texto": "17 SEP 2013"},
                  {"en": "michael", "texto": "MICHAEL · FRANKLIN|TREVOR"},
+                 {"en": "ladrón", "texto": "MICHAEL|LADRÓN DE BANCOS RETIRADO"},
+                 {"en": "chaval", "texto": "FRANKLIN"},
+                 {"en": "socio", "texto": "TREVOR"},
                  {"en": "ángeles", "texto": "LOS SANTOS|= LOS ÁNGELES"},
                  {"en": "planeta", "texto": "815 MILLONES $|EN 24 HORAS"},
                  {"en": "mil", "texto": "1.000 MILLONES $|EN 3 DÍAS"},
                  {"en": "historia", "texto": "7 RÉCORDS|GUINNESS"},
                  {"en": "2014", "texto": "2013 → 2014|→ 2022"},
                  {"en": "doscientos", "texto": "+230 MILLONES|DE COPIAS"}],
-     "nombres": ["michael", "atraco", "ángeles", "planeta", "mil", "2014", "doscientos"],
+     "nombres": ["michael", "atraco", "ladrón", "chaval", "socio", "ángeles", "planeta", "mil", "2014", "doscientos"],
      "planos": ["@GTA5_2013:36"],
      "planos_en": [{"en": "michael", "plano": "@GTA5_2013"},
                    {"en": "atraco", "plano": "@GTA5_2013"},
@@ -293,12 +317,14 @@ BLOQUES = [
      "anio": 2013, "etiqueta_linea": "2013 · GTA ONLINE",
      "texto": ("Dos semanas después, el uno de octubre de 2013, se abre GTA Online. Y aquí está la clave de por qué "
                "llevamos tanto esperando a GTA VI. Con atracos, negocios y actualizaciones constantes, GTA Online se "
-               "convirtió en un juego que no se acababa nunca. Y la gente siguió jugando, y comprando, GTA V año tras "
+               "convirtió en un juego que no se acababa nunca. Los grandes golpes en equipo llegaron el diez de marzo "
+               "de 2015, y a partir de ahí cada actualización traía algo nuevo. Y la gente siguió jugando, y comprando, GTA V año tras "
                "año. Resultado: trece años sin un GTA principal nuevo. El hueco más largo de toda la saga, con mucha "
                "diferencia."),
      "rotulos": [{"en": "octubre", "texto": "1 OCT 2013|GTA ONLINE"},
+                 {"en": "marzo", "texto": "10 MAR 2015|LLEGAN LOS GOLPES"},
                  {"en": "trece", "texto": "13 AÑOS|SIN GTA NUEVO"}],
-     "nombres": ["octubre", "atracos", "trece"],
+     "nombres": ["octubre", "atracos", "marzo", "trece"],
      "planos": ["@GTA_Online:24"],
      "planos_en": [{"en": "online", "plano": "@GTA_Online"},
                    {"en": "atracos", "plano": "@GTA_Online"}]},
@@ -311,12 +337,14 @@ BLOQUES = [
                "2023 llega el primer tráiler. Bueno, llega un día antes de lo previsto: el cuatro de diciembre se filtra "
                "una versión en baja calidad, y Rockstar lo publica esa misma noche. En doce horas suma cuarenta y seis "
                "millones de visitas: récord en YouTube para un vídeo que no es de música. Y en las primeras imágenes, "
-               "la ciudad que te pedí que apuntaras al principio. Volvemos a Vice City."),
+               "la ciudad que te pedí que apuntaras al principio. Volvemos a Vice City. Y de fondo, una canción de "
+               "Tom Petty, Love Is a Long Road. Un clásico de los ochenta para la ciudad de los ochenta."),
      "rotulos": [{"en": "febrero", "texto": "4 FEB 2022|CONFIRMADO"},
                  {"en": "tráiler", "texto": "TRÁILER 1|DICIEMBRE 2023"},
                  {"en": "cuarenta", "texto": "46 MILLONES|EN 12 HORAS"},
-                 {"en": "volvemos", "texto": "VICE CITY"}],
-     "nombres": ["febrero", "tráiler", "cuarenta", "volvemos"],
+                 {"en": "volvemos", "texto": "VICE CITY"},
+                 {"en": "petty", "texto": "TOM PETTY|LOVE IS A LONG ROAD"}],
+     "nombres": ["febrero", "tráiler", "cuarenta", "volvemos", "petty"],
      "planos": ["T1_Playa_Aerea", "T1_Neones", "T1_Autopista", "T1_Noche_Aerea", "T1_Coches_Noche", "T1_Lancha_Rapida",
                 "T1_Camioneta", "@Vice_City:6"],
      "planos_en": [{"en": "febrero", "plano": "Mirada_Azotea"},
@@ -327,13 +355,15 @@ BLOQUES = [
      "overlay": "", "anio": 2026,
      "texto": ("El tráiler decía 2025. Spoiler: no. En mayo de 2025 se retrasa al veintiséis de mayo de 2026, y el seis "
                "de mayo llega el tráiler 2: cuatrocientos setenta y cinco millones de visitas en veinticuatro horas, "
-               "sumando todas las plataformas. En noviembre de 2025, otro retraso: diecinueve de noviembre de 2026. Y "
-               "esta vez, todo apunta a que sí. Jason y Lucía, el estado de Leonida… y, otra vez, Vice City."),
+               "sumando todas las plataformas. Esta vez, con Hot Together, de The Pointer Sisters. En noviembre de 2025, otro retraso: diecinueve de noviembre de 2026. Y "
+               "esta vez, todo apunta a que sí. Jason y Lucía, una pareja de criminales. Leonida, un estado inspirado en "
+               "Florida. Y, otra vez, Vice City."),
      "rotulos": [{"en": "veintiséis", "texto": "RETRASO|→ 26 MAY 2026"},
                  {"en": "cuatrocientos", "texto": "TRÁILER 2|475 MILLONES EN 24 H"},
+                 {"en": "pointer", "texto": "THE POINTER SISTERS|HOT TOGETHER"},
                  {"en": "diecinueve", "texto": "RETRASO|→ 19 NOV 2026"},
-                 {"en": "leonida", "texto": "LEONIDA"}],
-     "nombres": ["veintiséis", "cuatrocientos", "diecinueve", "jason", "leonida"],
+                 {"en": "leonida", "texto": "LEONIDA|= FLORIDA"}],
+     "nombres": ["veintiséis", "cuatrocientos", "pointer", "diecinueve", "jason", "leonida"],
      "planos": ["T2_Jason_Tejado", "T2_Cayos_Aereo", "Lanz_Balcon", "Lanz_Marina", "T2_Autopista", "T2_Casa_Pilotes",
                 "T2_Muelle_Atardecer", "Mirada_Paracaidas", "Mirada_Descapotable_2", "T2_Casa_Aerea",
                 "T2_Gimnasio_Playa", "Lanz_Moto_Salto", "@Vice_City:6", "@Jason_Duval:2", "@Leonida_Keys:3"],
@@ -341,6 +371,47 @@ BLOQUES = [
                    {"en": "jason", "plano": "Mirada_Jason_y_Lucia"},
                    {"en": "leonida", "plano": "T2_Cayos_Aereo"},
                    {"en": "vice", "plano": "Lanz_Playa"}]},
+
+    # ---------------------------------------------------------------- 3 EXTRA DE REGALO
+    {"id": "e1", "num": "E1", "total": 3, "titulo": "LA TRILOGÍA VUELVE", "overlay": "", "anio": 2026,
+     "etiqueta_linea": "EXTRA · 2021",
+     "texto": ("Y antes de despedirnos, tres extra de regalo. El primero: el once de noviembre de 2021, GTA III, Vice "
+               "City y San Andreas volvieron a la vez, remasterizados, en un solo paquete: The Trilogy, Definitive "
+               "Edition. Los tres juegos que llevaron la saga al 3D, con gráficos nuevos, veinte años después de que "
+               "Claude bajara por primera vez a la calle."),
+     "rotulos": [{"en": "once", "texto": "11 NOV 2021"},
+                 {"en": "trilogy", "texto": "THE TRILOGY|DEFINITIVE EDITION"},
+                 {"en": "veinte", "texto": "20 AÑOS DESPUÉS"}],
+     "nombres": ["once", "trilogy"],
+     "planos": ["@GTA3_DE:3", "@SA_DE:1", "@VC_DE:4", "@VC_Comparativa:2", "VCC_Bahia_DE", "VCC_Moto_DE",
+                "VCC_Tommy_Lance_DE"],
+     "planos_en": [{"en": "trilogy", "plano": "@VC_DE"},
+                   {"en": "claude", "plano": "@GTA3_DE"}]},
+    {"id": "e2", "num": "E2", "total": 3, "titulo": "LA CIUDAD QUE MÁS VUELVE", "overlay": "", "anio": 2026,
+     "etiqueta_linea": "EXTRA · LIBERTY CITY",
+     "texto": ("El segundo: ¿qué ciudad ha salido en más GTA? No es Vice City. Es Liberty City. Está en el primer GTA, "
+               "en GTA III, en GTA Advance, en Liberty City Stories, en GTA IV y en Chinatown Wars. Seis juegos, "
+               "siempre inspirada en Nueva York, y cada vez más parecida."),
+     "rotulos": [{"en": "seis", "texto": "LIBERTY CITY|6 JUEGOS"},
+                 {"en": "nueva", "texto": "= NUEVA YORK"}],
+     "nombres": ["seis", "nueva"],
+     "planos": ["@GTA1_1997:3", "@GTA3_2001:3", "@Advance_2004:2", "@LCS_2005:3", "@GTA4_2008:3"],
+     "planos_en": [{"en": "primer", "plano": "@GTA1_1997"},
+                   {"en": "advance", "plano": "@Advance_2004"},
+                   {"en": "stories", "plano": "@LCS_2005"},
+                   {"en": "nueva", "plano": "@GTA4_2008"}]},
+    {"id": "e3", "num": "E3", "total": 3, "titulo": "TODO SALE DE ESCOCIA", "overlay": "", "anio": 2026,
+     "etiqueta_linea": "EXTRA · ROCKSTAR NORTH",
+     "texto": ("Y el tercero: todos los GTA principales, del primero al sexto, salen del mismo estudio. Aquel DMA "
+               "Design de Dundee que hacía Lemmings hoy se llama Rockstar North y está en Edimburgo. Veintinueve años "
+               "después, el estudio que convirtió un juego aburrido de policías en Grand Theft Auto es el que firma "
+               "GTA VI."),
+     "rotulos": [{"en": "estudio", "texto": "EL MISMO ESTUDIO|DE GTA 1 A GTA VI"},
+                 {"en": "edimburgo", "texto": "ROCKSTAR NORTH|EDIMBURGO"}],
+     "nombres": ["estudio", "edimburgo"],
+     "planos": ["@Historia_GTA:8", "@GTA5_2013:2"],
+     "planos_en": [{"en": "lemmings", "plano": "GTA_15_03"},
+                   {"en": "firma", "plano": "T2_Jason_Conduce"}]},
 
     # ---------------------------------------------------------------- CIERRE
     {"id": "cierre", "num": None, "titulo": "", "overlay": "", "capitulo": "De 1997 a 2026", "anio": 2026,
