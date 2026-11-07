@@ -689,13 +689,12 @@ def expandir_grupos(bloques, tb):
         lista = grupos.get(g) or []
         if not lista:
             return None
-        for _ in range(len(lista)):
+        while usados.get(g, 0) < len(lista):  # cuando el grupo se acaba, no se repite: se usan los demás planos
             i = usados.get(g, 0)
             usados[g] = i + 1
-            n = lista[i % len(lista)]
-            if n not in explicitos or i >= len(lista):
-                return n
-        return lista[usados[g] % len(lista)]
+            if lista[i] not in explicitos:
+                return lista[i]
+        return None
 
     for b in bloques:
         nuevos = []
