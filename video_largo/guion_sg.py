@@ -32,6 +32,7 @@ PLANOS_FIJOS = {"GTA_15_01", "GTA_15_02", "GTA_15_15", "IMG_GTA1", "IMG_GTA1_Caj
 MUSICA = {"hook": "synthwave", "p01": "chiptune", "p03": "breakbeat", "p07": "hiphop", "p11": "synthwave"}
 
 # Línea de tiempo de abajo
+LINEA_ANIMADA = True  # línea de tiempo animada aparte (linea_tiempo.py), aprobada por mí el 7 nov
 LINEA = [(1997, "GTA"), (1999, "GTA 2"), (2001, "GTA III"), (2002, "VICE CITY"), (2004, "SAN ANDREAS"),
          (2008, "GTA IV"), (2013, "GTA V"), (2026, "GTA VI")]
 
@@ -205,7 +206,7 @@ BLOQUES = [
                    {"en": "gimnasio", "plano": "@SA_2004"},
                    {"en": "película", "plano": "@SA_DE"}]},
     {"id": "p06", "num": 6, "total": T, "titulo": "2004-2009 · PORTÁTILES", "capitulo": "2004-2009 · Las portátiles",
-     "overlay": "", "anio": 2005, "etiqueta_linea": "2004-2009 · PORTÁTILES",
+     "overlay": "", "anio": 2004, "etiqueta_linea": "2004-2009 · PORTÁTILES",
      "texto": ("Mientras tanto, GTA se mete en el bolsillo. GTA Advance en la Game Boy Advance. Liberty City Stories y "
                "Vice City Stories en PSP: un GTA en 3D en una consola portátil. Y Chinatown Wars en Nintendo DS, que "
                "recupera la cámara desde arriba, pero con pantalla táctil. La que más vendió fue Liberty City Stories: "

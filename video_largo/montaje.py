@@ -772,6 +772,49 @@ def anadir_linea(ruta, bloques, total):
     pathlib.Path(ruta).write_text(txt.rstrip("\n") + "\n" + "\n".join(ev) + "\n", encoding="utf-8")
 
 
+LINEA_ANIMADA = bool(LINEA) and os.environ.get("LINEA_ANIMADA", "1" if getattr(guion_vl, "LINEA_ANIMADA", False) else "0") == "1"
+if LINEA_ANIMADA:
+    import linea_tiempo as LT  # noqa: E402
+
+
+def empezar_linea(bloques, total):
+    """Fabrica la línea de tiempo animada (linea_tiempo.py) en otro hilo mientras se cortan los planos."""
+    if not LINEA_ANIMADA:
+        return None
+    import threading
+    nombres = {a: n for a, n in LINEA}
+    eventos = []
+    for b in bloques:
+        if b.get("anio"):
+            et = b.get("etiqueta_linea")
+            nombre = et.split("·", 1)[-1].strip() if et else nombres.get(int(b["anio"]), "")
+            eventos.append((b["ini"], int(b["anio"]), nombre))
+    if not eventos:
+        return None
+    destino = TMP / "linea.mov"
+    estado = {"ruta": None}
+
+    def trabajo():
+        t0 = time.time()
+        try:
+            LT.render([(a, n) for a, n in LINEA], eventos, total + 0.1, destino)
+            estado["ruta"] = destino
+            print(f"Línea de tiempo animada lista ({time.time() - t0:.0f} s)", flush=True)
+        except Exception as e:  # noqa: BLE001
+            print("No se ha podido hacer la línea de tiempo animada:", type(e).__name__, e, flush=True)
+    hilo = threading.Thread(target=trabajo, daemon=True)
+    hilo.start()
+    return hilo, estado
+
+
+def esperar_linea(h):
+    if not h:
+        return None
+    hilo, estado = h
+    hilo.join()
+    return estado["ruta"]
+
+
 def golpe():
     """Golpe grave + aire para las cartelas (hecho con código)."""
     n = int(1.2 * SR)
@@ -947,6 +990,7 @@ def main():
         t = b["fin"]
     total = t + 0.8
     print(f"Duración total prevista: {total:.1f} s ({hms(total)})", flush=True)
+    hilo_linea = empezar_linea(bloques, total)
     # 3) planos: se cortan en paralelo
     carpeta = TMP / "planos"
     carpeta.mkdir(exist_ok=True)
@@ -1014,7 +1058,8 @@ def main():
     anadir_cta(TMP / "rotulos.ass", bloques)
     anadir_rotulos(TMP / "rotulos.ass", bloques)
     anadir_cartelas(TMP / "rotulos.ass", bloques)
-    anadir_linea(TMP / "rotulos.ass", bloques, total)
+    if not LINEA_ANIMADA:
+        anadir_linea(TMP / "rotulos.ass", bloques, total)
     # 5) audio: voz + música que baja con la voz + sonidos originales
     n = int(total * SR)
     voz = np.zeros((n, 2), np.float32)
@@ -1058,12 +1103,15 @@ def main():
     del voz, mus, orig, mezcla
     # 6) montaje final
     P.crear_degradado(TMP / "degradado.png")
+    linea_mov = esperar_linea(hilo_linea)
+    capa_linea = (f"[3:v]format=rgba[lt];[v1][lt]overlay=0:{LT.Y0}:eof_action=pass[v1b];" if linea_mov else "")
     grafo = (f"[0:v]tpad=stop_mode=clone:stop_duration=3,eq=contrast=1.04:saturation=1.08,unsharp=5:5:0.4:5:5:0.0[v0];"
              f"[2:v]format=rgba[g];[v0][g]overlay=0:{H - P.ALTO_DEGRADADO}:shortest=1[v1];"
-             f"[v1]ass={TMP / 'rotulos.ass'}[v]")
+             + capa_linea + f"[{'v1b' if linea_mov else 'v1'}]ass={TMP / 'rotulos.ass'}[v]")
     final = HQ / "video_largo.mp4"
     P.run(["ffmpeg", "-y", "-loglevel", "error", "-i", TMP / "sin_audio.mp4", "-i", TMP / "mezcla.wav",
-           "-loop", "1", "-framerate", FPS, "-i", TMP / "degradado.png", "-filter_complex", grafo, "-map", "[v]",
+           "-loop", "1", "-framerate", FPS, "-i", TMP / "degradado.png", *(["-i", linea_mov] if linea_mov else []),
+           "-filter_complex", grafo, "-map", "[v]",
            "-map", "1:a", "-af", "loudnorm=I=-14:TP=-1.5:LRA=11", "-c:v", "libx264", "-crf", "19", "-preset", "medium",
            "-pix_fmt", "yuv420p", "-c:a", "aac", "-b:a", "192k", "-ar", SR, "-t", f"{total:.2f}", "-movflags", "+faststart",
            final])
