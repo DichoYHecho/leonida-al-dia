@@ -238,7 +238,7 @@ def datos(regs_todas, carpeta):
     dia = max(HOY + timedelta(days=1), ARRANQUE)
     out, fallos = [], 0
     for d in banco():
-        if falta <= 0 or fallos >= 3:
+        if falta <= 0 or fallos >= 6:
             break
         orden = int(d["Orden"])
         if orden in usados:
@@ -254,6 +254,8 @@ def datos(regs_todas, carpeta):
         except Exception as e:
             fallos += 1
             nota(f"⚠️ No se pudo preparar el dato {orden}: {str(e)[:200]}")
+            import traceback
+            print(traceback.format_exc()[-1500:], flush=True)
     if falta > 0:
         nota("⚠️ Quedan pocos datos en el banco: hay que añadir más a gta/banco_datos.csv")
     return out
