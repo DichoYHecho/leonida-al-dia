@@ -20,6 +20,7 @@ VIDEOS_EXTRA.update({k: v["url"] for k, v in _FUENTES_VC.items() if k not in VID
 VIDEOS_EXTRA.update({
     "VC_Aniv": "https://videos-rockstargames-com.akamaized.net/v4/tror41c2/flv/en-us-720p.mp4",
     "VC_Comp": "https://videos-rockstargames-com.akamaized.net/v4/ao1c441c/flv/en-us-1080p60.mp4",
+    "VC_Tril": "https://videos-rockstargames-com.akamaized.net/v4/8ta2r546/flv/en-us-1080p60.mp4",
 })
 
 # Partidas con la marca de agua del canal arriba («GTASERIESVIDEOS.COM»): se recorta esa franja (fracción de la altura)

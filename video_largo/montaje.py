@@ -1080,6 +1080,10 @@ def main():
             print("PARADO: hay trozos repetidos (añade más material o planos al guion).")
             sys.exit(2)
     if not DRY:
+        faltan = sorted(v for v in {tb[n]["video"] for n, *_ in tareas} if not v.startswith(("Clips:", "Imagen:")) and v not in P.VIDEOS)
+        if faltan:
+            print("PARADO: estos vídeos de los trozos no tienen dirección (añádelos a VIDEOS_EXTRA del guion): " + ", ".join(faltan))
+            sys.exit(4)
         for v in sorted({tb[n]["video"] for n, *_ in tareas}):
             fuente(v)  # baja cada vídeo oficial una vez, antes de cortar en paralelo
     with ThreadPoolExecutor(max_workers=3) as ex:
