@@ -182,6 +182,10 @@ def planificar(b, dur_visual, tb):
     nombres = [n for n in b["planos"] if n != b.get("original")]
     lista, resto, i = [], dur_visual, 0
     while resto > 0.05 and i < 60:
+        if i >= len(nombres) and lista:  # sin planos nuevos: se alarga el último en vez de repetir uno
+            lista[-1][1] += resto
+            b["alargado"] = b.get("alargado", 0) + resto
+            break
         n = nombres[i % len(nombres)]
         d = min(tb[n]["dur"] * tb[n]["lento"], resto)
         if d < 0.7 and lista:
@@ -217,6 +221,12 @@ def planificar_anclado(b, dur_visual, tb):
 
     def rellenar(hasta):
         while hasta - estado["cursor"] > 0.05:
+            if estado["i"] >= len(relleno) and lista:  # sin planos nuevos: se alarga el último en vez de repetir
+                extra = hasta - estado["cursor"]
+                lista[-1][1] += extra
+                b["alargado"] = b.get("alargado", 0) + extra
+                estado["cursor"] = hasta
+                break
             n = relleno[estado["i"] % len(relleno)]
             estado["i"] += 1
             d = min(tb[n]["dur"] * tb[n]["lento"], hasta - estado["cursor"])
@@ -705,9 +715,14 @@ def expandir_grupos(bloques, tb):
             else:
                 nuevos.append(p)
         b["planos"] = nuevos or [p for p in b["planos"] if not p.startswith("@")] or ["VCA_Logo"]
+        anclados = {r["plano"] for r in b.get("planos_en", []) if not r["plano"].startswith("@")}
         for r in b.get("planos_en", []):
             if r["plano"].startswith("@"):
-                r["plano"] = siguiente(r["plano"].partition(":")[0]) or b["planos"][0]
+                elegido = siguiente(r["plano"].partition(":")[0])
+                if not elegido:  # grupo agotado: un plano del propio bloque que aún no esté anclado
+                    elegido = next((p for p in b["planos"] if p not in anclados), None)
+                r["plano"] = elegido or ""
+                anclados.add(r["plano"])
         b["planos_en"] = [r for r in b.get("planos_en", []) if r["plano"] in tb]
 
 

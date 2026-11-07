@@ -64,6 +64,9 @@ def main():
         M.expandir_grupos(bloques, tb)
         for b in bloques:
             b["plan"] = (M.planificar_anclado if b.get("planos_en") else M.planificar)(b, b["vis_fin"] - b["plan_ini"], tb)
+        for b in bloques:
+            if b.get("alargado", 0) > 1.5:
+                avisos.append(f"{b['id']}: faltan planos, el último se alarga {b['alargado']:.1f} s (añade más al guion)")
         rep = M.comprobar_repetidos(bloques)
         if rep:
             errores.append(f"{len(rep)} trozos saldrían repetidos: " + "; ".join(rep[:12]) + (" …" if len(rep) > 12 else ""))
