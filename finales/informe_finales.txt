@@ -1,0 +1,17 @@
+hook: bien · guion «al final vuelve.» · oído «al final, vuelve.» · recortado 0.28 s
+p01: bien · guion «de una uña.» · oído «de una uña.» · recortado 0.42 s
+p02: bien · guion «necesitaba otra cámara.» · oído «necesitaba otra cámara.» · recortado 0.25 s
+p03: bien · guion «año después cambia.» · oído «año después cambia.» · recortado 0.27 s
+p04: bien · guion «hablar de ella.» · oído «hablar de ella.» · recortado 0.30 s
+p05: bien · guion «millones y medio.» · oído «millones y medio.» · recortado 0.27 s
+p06: bien · guion «juego de bolsillo.» · oído «juego de bolsillo.» · recortado 0.38 s
+p07: bien · guion «crítica se rindió.» · oído «crítica se arruindió.» · recortado 0.33 s
+p08: bien · guion «mucho más lejos.» · oído «mucho más lejos.» · recortado 0.30 s
+p09: bien · guion «millones de copias.» · oído «millones de copias.» · recortado 0.43 s
+p10: bien · guion «con mucha diferencia.» · oído «con mucha diferencia.» · recortado 0.30 s
+p11: bien · guion «de los ochenta.» · oído «de los 80.» · recortado 0.55 s
+p12: bien · guion «vez, Vice City.» · oído «vez Bye City.» · recortado 0.30 s
+e1: bien · guion «a la calle.» · oído «a la calle.» · recortado 0.47 s
+e2: bien · guion «vez más parecida.» · oído «vez más parecida.» · recortado 0.50 s
+e3: bien · guion «firma GTA VI.» · oído «firma GTA 6.» · recortado 0.26 s
+cierre: bien · guion «vemos en Leonida.» · oído «vemos en Leónida.» · recortado 0.23 s
