@@ -134,12 +134,14 @@ def cortar(nombre, t, dur_out, destino, sentido):
     x = f"(in_w-out_w)*t/{dur_out:.3f}" if sentido == 0 else f"(in_w-out_w)*(1-t/{dur_out:.3f})"
     if es_fijo(nombre):
         x = "(in_w-out_w)/2"
-    vf = (f"setpts={lento}*PTS,fps={FPS},scale=2112:1188:flags=lanczos:force_original_aspect_ratio=increase,"
+    rec = RECORTES.get(t["video"], 0)
+    quitar = f"crop=iw:ih*{1 - rec:.3f}:0:ih*{rec:.3f}," if rec else ""  # franja de arriba con marca de agua
+    vf = (f"setpts={lento}*PTS,{quitar}fps={FPS},scale=2112:1188:flags=lanczos:force_original_aspect_ratio=increase,"
           f"crop={W}:{H}:x='{x}':y='(in_h-out_h)/2',format=yuv420p")
     if MARCO and not DRY and alto(fuente(t["video"])) < 600:
         # vídeo antiguo de poca resolución: se ve entero y nítido en un marco, sobre una copia borrosa y oscura
         z = "1+0.03*t/%.3f" % dur_out if not es_fijo(nombre) else "1"
-        vf = (f"setpts={lento}*PTS,fps={FPS},split[a][b];"
+        vf = (f"setpts={lento}*PTS,{quitar}fps={FPS},split[a][b];"
               f"[a]scale=480:270:force_original_aspect_ratio=increase,crop=480:270,boxblur=12:2,eq=brightness=-0.32,"
               f"scale={W}:{H}[f];"
               f"[b]scale=-2:{int(H * 0.82)}:flags=lanczos,scale='trunc(iw*({z})/2)*2':'trunc(ih*({z})/2)*2':eval=frame[c];"
@@ -155,6 +157,7 @@ def cortar(nombre, t, dur_out, destino, sentido):
     raise RuntimeError("No se pudo cortar " + nombre)
 
 
+RECORTES = getattr(guion_vl, "RECORTES", {})
 MARCO = os.environ.get("MARCO", "1" if getattr(guion_vl, "MARCO", False) else "0") == "1"
 _ALTOS = {}
 
@@ -247,9 +250,12 @@ def planificar_anclado(b, dur_visual, tb):
     return lista
 
 
+USA_FRASE_LUCIA = True
+
+
 def ajustar_frase_lucia(tb):
     """Afina con Whisper dónde empieza y acaba «Relationships are about communication, Jay»."""
-    if DRY or "VL_Frase_Lucia" not in tb:
+    if DRY or "VL_Frase_Lucia" not in tb or not USA_FRASE_LUCIA:
         return
     try:
         from faster_whisper import WhisperModel
@@ -918,6 +924,9 @@ def main():
     tb = tabla()
     bloques = [b for b in guion_vl.BLOQUES if not SOLO or b["id"] in SOLO]
     planos_en_linea(bloques, tb)
+    global USA_FRASE_LUCIA
+    USA_FRASE_LUCIA = any("VL_Frase_Lucia" in list(b["planos"]) + [r["plano"] for r in b.get("planos_en", [])]
+                          + [b.get("original"), b.get("intro_original")] for b in bloques)
     expandir_grupos(bloques, tb)
     faltan = [b["id"] for b in bloques if not V.ruta_wav(b).exists()]
     if faltan:

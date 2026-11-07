@@ -22,6 +22,8 @@ VIDEOS_EXTRA.update({
     "VC_Comp": "https://videos-rockstargames-com.akamaized.net/v4/ao1c441c/flv/en-us-1080p60.mp4",
 })
 
+# Partidas con la marca de agua del canal arriba («GTASERIESVIDEOS.COM»): se recorta esa franja (fracción de la altura)
+RECORTES = {k: 0.075 for k in _FUENTES if k.startswith(("LON_PC", "IV_PC", "TLAD_PC", "TBOGT_PC", "V_Juego", "ON_Juego"))}
 MARCO = True  # las partidas de 360p van en un marco sobre una copia borrosa (no estiradas a pantalla completa)
 
 PLANOS_FIJOS = {"GTA_15_01", "GTA_15_02", "GTA_15_15", "IMG_GTA1", "IMG_GTA1_Caja", "IMG_RaceNChase", "IMG_VC_Portada",
@@ -138,7 +140,7 @@ BLOQUES = [
 
     # ---------------------------------------------------------------- ACTO II · EL SALTO AL 3D (2001-2009)
     {"id": "p03", "num": 3, "total": T, "titulo": "2001 · GTA III", "capitulo": "2001 · GTA III", "overlay": "",
-     "anio": 2001, "cartela": {"anio": "2001", "acto": "ACTO II", "titulo": "EL SALTO AL 3D"}, "intro_original": "G3_Aniv_01",
+     "anio": 2001, "cartela": {"anio": "2001", "acto": "ACTO II", "titulo": "EL SALTO AL 3D"}, "intro_original": "G3_DE_01",
      "texto": ("Y entonces llega 2001 y todo cambia. Por primera vez, bajas a la calle. GTA III mete la saga en 3D, y "
                "Liberty City deja de ser un mapa para convertirse en una ciudad de verdad. Pero casi no sale como lo "
                "conocemos. Tras los atentados del once de septiembre, Rockstar lo retrasa tres semanas y lo repasa "
