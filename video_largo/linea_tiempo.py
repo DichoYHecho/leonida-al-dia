@@ -21,8 +21,9 @@ import numpy as np
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
 W, ALTO, Y0 = 1920, 200, 880          # franja: de y = 880 a 1080
-YC = 1046 - Y0                         # altura de la línea dentro de la franja
-X0, X1 = 470, 1690                     # extremos de la línea
+YC = 1062 - Y0                         # altura de la línea dentro de la franja (pegada al borde de abajo)
+X0, X1 = 70, W - 70                    # primer y último año (la línea va de punta a punta: de 0 a W)
+TAM_ANIO = 34                          # tamaño del año que gira (va encima del cabezal, con el nombre del juego)
 FPS = 30
 ROSA = np.array([255, 79, 163], np.float32) / 255
 ROSA_OSCURO = np.array([194, 24, 120], np.float32) / 255
@@ -150,7 +151,7 @@ class Linea:
         self.total = total
         self.y = np.arange(ALTO, dtype=np.float32)[:, None]
         self.x = np.arange(W, dtype=np.float32)[None, :]
-        grad = np.clip((self.x - X0) / (X1 - X0), 0, 1)[0]
+        grad = np.clip(self.x / W, 0, 1)[0]
         self.col_relleno = (ROSA_OSCURO[None, :] * (1 - grad[:, None]) + ROSA[None, :] * grad[:, None])
         # sprites
         self.punto_futuro = circulo(5.0, np.array([0.08, 0.06, 0.1]), 1.6, BLANCO, alfa=0.9)
@@ -161,8 +162,9 @@ class Linea:
         self.anillos = {}
         self.cache_punto = {}
         self.nombres = {}
-        self.digitos = [texto(str(i), FUENTE_NUM, 46, BLANCO, sombra=True) for i in range(10)]
-        self.fin_txt = texto(str(self.a1), FUENTE_NUM, 26, BLANCO, sombra=True)
+        self.digitos = [texto(str(i), FUENTE_NUM, TAM_ANIO, BLANCO, sombra=True) for i in range(10)]
+        self.fin_txt = texto(str(self.a1), FUENTE_NUM, 22, BLANCO, sombra=True)
+        self.t0 = self.eventos[0][0] if self.eventos else 0.0  # la línea aparece cuando empieza la explicación
 
     def xa(self, anio):
         return X0 + (X1 - X0) * (anio - self.a0) / (self.a1 - self.a0)
@@ -234,12 +236,12 @@ class Linea:
 
     def frame(self, t):
         L = np.zeros((ALTO, W, 4), np.float32)
-        aparece = salida_suave((t - 0.3) / 0.9)  # la línea se dibuja al empezar
+        aparece = salida_suave((t - self.t0) / 0.9)  # se dibuja de izquierda a derecha al empezar la explicación
         if aparece <= 0:
             return L
-        x_fin_pista = X0 + (X1 - X0) * aparece
-        # pista
-        cobertura = np.clip(x_fin_pista - self.x, 0, 1) * np.clip(self.x - X0 + 1, 0, 1)
+        x_fin_pista = W * aparece
+        # pista, de punta a punta
+        cobertura = np.clip(x_fin_pista - self.x, 0, 1)
         perfil = np.clip(1.6 - np.abs(self.y - YC), 0, 1)
         a = (perfil * cobertura * 0.30)[..., None]
         L[..., :3] += BLANCO * a
@@ -248,14 +250,14 @@ class Linea:
         # relleno rosa con brillo
         if st:
             xr = st["x"]
-            cov = np.clip(xr - self.x, 0, 1) * np.clip(self.x - X0 + 1, 0, 1)
+            cov = np.clip(xr - self.x, 0, 1)
             nucleo = np.clip(2.3 - np.abs(self.y - YC), 0, 1)
             brillo = np.exp(-((self.y - YC) ** 2) / (2 * 4.5 ** 2)) * 0.45
             # destello que recorre la línea al llegar al final
             fin_t = self.eventos[-1][0] + D_VIAJE if st["anio"] == self.a1 else None
             extra = 0
             if fin_t is not None and t > fin_t:
-                xs = X0 - 200 + (X1 - X0 + 400) * salida_suave((t - fin_t) / 1.6)
+                xs = -200 + (W + 400) * salida_suave((t - fin_t) / 1.6)
                 extra = np.exp(-((self.x - xs) ** 2) / (2 * 60 ** 2)) * (1 - salida_suave((t - fin_t - 1.2) / 1.0))
             cuerpo = (nucleo + brillo * (1 + 1.5 * extra)) * cov
             claro = np.zeros((1, W), np.float32)
@@ -276,7 +278,7 @@ class Linea:
         # hitos
         for i, (anio, _) in enumerate(self.hitos):
             xh = self.xa(anio)
-            ap = rebote((t - 0.5 - i * 0.09) / 0.45)
+            ap = rebote((t - self.t0 - 0.2 - i * 0.09) / 0.45)
             if ap <= 0.01 or xh > x_fin_pista + 6:
                 continue
             tp = self.cuando_pasa(anio)
@@ -290,14 +292,17 @@ class Linea:
                     pegar(L, self.anillo(r), xh, YC, (1 - k) * 0.9)
                 pegar(L, self.halo_punto, xh, YC, 0.5)
             pegar(L, self.punto(pasado, esc), xh, YC)
-        # final de la línea: el año 2026
-        pegar(L, self.fin_txt, X1 + 38, YC + 1, 0.55 * aparece)
+        # el año final, pequeño, encima del último hito (se aparta cuando llega el cabezal)
+        if not st or st["x"] < X1 - 260:
+            pegar(L, self.fin_txt, X1, YC - 24, 0.55 * aparece)
         if not st:
             return L
         # cabezal con halo que respira
         quieto = st["p"] >= 1
         resp = 0.75 + 0.25 * math.sin(2 * math.pi * (t - st["llegada"]) / 2.6) if quieto else 1.0
-        entrada = rebote((t - st["t_ev"]) / 0.5) if st["desde"] is None else 1.0
+        entrada = rebote((t - st["t_ev"] - 0.6) / 0.5) if st["desde"] is None else 1.0
+        if entrada <= 0.01:
+            return L
         pegar(L, self.halo_cab, st["x"], YC, 0.9 * resp * min(1, entrada))
         cab = self.cabezal
         if entrada < 0.999:
@@ -305,24 +310,29 @@ class Linea:
             tam = max(2, int(cab.shape[1] * max(0.05, entrada)))
             cab = np.asarray(img.resize((tam, tam), Image.LANCZOS), np.float32) / 255
         pegar(L, cab, st["x"], YC)
-        # nombre encima del cabezal: el anterior se va, el nuevo entra subiendo
+        # etiqueta encima del cabezal: el año gira como un cuentakilómetros y al lado entra el nombre del juego
+        ancho_anio = 4 * (self.digitos[0].shape[1] - 15)
+        w_nom = max(self.nombre_sprite(st["nombre"]).shape[1],
+                    self.nombre_sprite(st["nombre_ant"]).shape[1] if st["nombre_ant"] else 0)
+        total = ancho_anio + 8 + w_nom
+        cx = min(max(st["x"], total / 2 + 18), W - total / 2 - 18)
+        x_der = cx - total / 2 + ancho_anio
+        y_et = YC - 30
+        v = st["anio_ant"] + (st["anio"] - st["anio_ant"]) * st["p"]
+        self.cuentakm(L, v, x_der, y_et, min(1, entrada * 1.2))
         if st["nombre_ant"] and st["p"] < 1:
             sale = salida_suave((t - st["t_ev"]) / 0.35)
             spr = self.nombre_sprite(st["nombre_ant"])
-            pegar(L, spr, st["desde"], YC - 26 - 8 * sale, 1 - sale)
-        llega = salida_suave((t - (st["llegada"] - 0.25)) / 0.5)
+            pegar(L, spr, x_der + 8 + spr.shape[1] / 2, y_et + 2 - 8 * sale, 1 - sale)
+        llega = salida_suave((t - (st["llegada"] - 0.25)) / 0.5) * min(1, entrada)
         if llega > 0:
             spr = self.nombre_sprite(st["nombre"])
-            xn = min(max(st["x"], X0 + spr.shape[1] / 2 - 10), X1 - spr.shape[1] / 2 + 10)
-            pegar(L, spr, xn, YC - 26 + 10 * (1 - llega), llega)
-        # año que gira como un cuentakilómetros, a la izquierda de la línea
-        v = st["anio_ant"] + (st["anio"] - st["anio_ant"]) * st["p"]
-        self.cuentakm(L, v, X0 - 34, YC + 2, min(1, entrada * 1.2))
+            pegar(L, spr, x_der + 8 + spr.shape[1] / 2, y_et + 2 + 10 * (1 - llega), llega)
         return L
 
     def cuentakm(self, L, v, x_der, yc, alfa):
-        alto = 46 * 1.0
-        ancho = self.digitos[0].shape[1] - 14
+        alto = TAM_ANIO * 1.0
+        ancho = self.digitos[0].shape[1] - 15
         cifras = []
         for p in range(4):
             # cada cifra gira solo mientras todas las de su derecha pasan de 9…9 a 0…0 (como un cuentakilómetros)
@@ -364,10 +374,10 @@ def render(hitos, eventos, total, salida, desde=0.0):
 
 DEMO_HITOS = [(1997, "GTA"), (1999, "GTA 2"), (2001, "GTA III"), (2002, "Vice City"), (2004, "San Andreas"),
               (2008, "GTA IV"), (2013, "GTA V"), (2026, "GTA VI")]
-DEMO_EVENTOS = [(2.5, 1997, "GTA"), (6.0, 1999, "GTA 2"), (9.5, 2001, "GTA III"), (12.5, 2002, "Vice City"),
-                (15.5, 2004, "San Andreas"), (18.5, 2004, "Portátiles"), (21.5, 2008, "GTA IV"), (24.5, 2009, "Episodios"),
-                (27.5, 2013, "GTA V"), (30.5, 2013, "GTA Online"), (33.5, 2023, "El anuncio"), (37.5, 2026, "GTA VI")]
+DEMO_EVENTOS = [(5.0, 1997, "GTA"), (8.5, 1999, "GTA 2"), (12.0, 2001, "GTA III"), (15.0, 2002, "Vice City"),
+                (18.0, 2004, "San Andreas"), (21.0, 2004, "Portátiles"), (24.0, 2008, "GTA IV"), (27.0, 2009, "Episodios"),
+                (30.0, 2013, "GTA V"), (33.0, 2013, "GTA Online"), (36.0, 2023, "El anuncio"), (40.0, 2026, "GTA VI")]
 
 if __name__ == "__main__":
     if len(sys.argv) >= 3 and sys.argv[1] == "demo":
-        render(DEMO_HITOS, DEMO_EVENTOS, 42.0, sys.argv[2])
+        render(DEMO_HITOS, DEMO_EVENTOS, 45.0, sys.argv[2])

@@ -655,7 +655,21 @@ def fin_oido(b, ws):
         n = P.normalizar(w)
         if len(n) >= 3 and any(n == c or n[:4] == c[:4] for c in claves):
             return e
+    if ws and parecido_final(b, ws) >= 0.7:  # Whisper lo escribe distinto («BICITY» por «Vice City»), pero es el final
+        return ws[-1][2]
     return None
+
+
+def parecido_final(b, ws, letras=12):
+    """Cuánto se parecen las últimas letras del guion (texto o voz) a las últimas que oye Whisper (0 a 1)."""
+    import difflib
+    oido = "".join(P.normalizar(w) for w, _, _ in ws[-4:])[-letras:]
+    mejor = 0.0
+    for txt in (b["texto"], b.get("voz") or ""):
+        guion = "".join(P.normalizar(w) for w in txt.split()[-4:])[-letras:]
+        if guion and oido:
+            mejor = max(mejor, difflib.SequenceMatcher(None, guion, oido).ratio())
+    return mejor
 
 
 def silencio_tras(x, desde, margen=0.7):
@@ -983,7 +997,8 @@ def main():
         ult = [P.normalizar(w) for w in b["texto"].split()[-2:]]
         ult += [P.normalizar(w) for w in (b.get("voz") or "").split()[-2:]]
         oidas = [P.normalizar(w[0]) for w in b["ws"] if w[1] < b["dur_voz"]][-6:]
-        b["aviso_final"] = bool(b["ws"]) and not any(u in oidas for u in ult if len(u) >= 3)
+        b["aviso_final"] = bool(b["ws"]) and not any(u in oidas for u in ult if len(u) >= 3) and \
+            parecido_final(b, [w for w in b["ws"] if w[1] < b["dur_voz"]]) < 0.7
         if b["aviso_final"]:
             print("  AVISO: Whisper no oye el final del guion en la voz montada", flush=True)
         print(f"  {b['dur_voz']:.1f} s (final recortado {b['cola_cortada']:.2f} s)", flush=True)
