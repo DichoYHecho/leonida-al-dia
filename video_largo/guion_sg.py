@@ -86,7 +86,7 @@ BLOQUES = [
     # ---------------------------------------------------------------- ACTO I · DESDE EL CIELO (1997-1999)
     {"id": "p01", "num": 1, "total": T, "titulo": "1997 · GRAND THEFT AUTO", "capitulo": "1997 · Grand Theft Auto",
      "overlay": "", "anio": 1997,
-     "cartela": {"anio": "1997", "acto": "ACTO I", "titulo": "DESDE EL CIELO"},
+     "cartela": {"anio": "1997", "acto": "ACTO I", "titulo": "DESDE EL CIELO"}, "intro_original": "G1_Demo1_01",
      "texto": ("Todo empieza en Escocia, en Dundee. Allí estaba DMA Design, un estudio que ya había dado el pelotazo "
                "con Lemmings, sí, los bichitos de pelo verde. Y estaban haciendo un juego de persecuciones llamado "
                "Race'n'Chase. La idea era jugar de policía. El problema: era aburrido. En las pruebas, lo divertido era "
@@ -138,7 +138,7 @@ BLOQUES = [
 
     # ---------------------------------------------------------------- ACTO II · EL SALTO AL 3D (2001-2009)
     {"id": "p03", "num": 3, "total": T, "titulo": "2001 · GTA III", "capitulo": "2001 · GTA III", "overlay": "",
-     "anio": 2001, "cartela": {"anio": "2001", "acto": "ACTO II", "titulo": "EL SALTO AL 3D"},
+     "anio": 2001, "cartela": {"anio": "2001", "acto": "ACTO II", "titulo": "EL SALTO AL 3D"}, "intro_original": "G3_Aniv_01",
      "texto": ("Y entonces llega 2001 y todo cambia. Por primera vez, bajas a la calle. GTA III mete la saga en 3D, y "
                "Liberty City deja de ser un mapa para convertirse en una ciudad de verdad. Pero casi no sale como lo "
                "conocemos. Tras los atentados del once de septiembre, Rockstar lo retrasa tres semanas y lo repasa "
@@ -226,7 +226,7 @@ BLOQUES = [
 
     # ---------------------------------------------------------------- ACTO III · LA ERA HD (2008-2013)
     {"id": "p07", "num": 7, "total": T, "titulo": "2008 · GTA IV", "capitulo": "2008 · GTA IV", "overlay": "",
-     "anio": 2008, "cartela": {"anio": "2008", "acto": "ACTO III", "titulo": "LA ERA HD"},
+     "anio": 2008, "cartela": {"anio": "2008", "acto": "ACTO III", "titulo": "LA ERA HD"}, "intro_original": "IV_TV_01",
      "texto": ("El veintinueve de abril de 2008 volvemos a Liberty City, pero ya nada se parece a lo de antes. Esto es "
                "otra generación. Niko Bellic, un veterano de guerra de Europa del Este, llega buscando el sueño "
                "americano… y lo que encuentra es otra cosa. GTA IV estrena RAGE, el motor propio de Rockstar, y una "
@@ -304,7 +304,7 @@ BLOQUES = [
     # ---------------------------------------------------------------- ACTO IV · RUMBO A GTA 6 (2022-2026)
     {"id": "p11", "num": 11, "total": T, "titulo": "2023 · EL ANUNCIO", "capitulo": "2022-2023 · GTA VI: el anuncio",
      "overlay": "", "anio": 2023, "etiqueta_linea": "2022-2023 · EL ANUNCIO",
-     "cartela": {"anio": "2022", "acto": "ACTO IV", "titulo": "RUMBO A GTA VI"},
+     "cartela": {"anio": "2022", "acto": "ACTO IV", "titulo": "RUMBO A GTA VI"}, "intro_original": "T1_Musica_Petty",
      "texto": ("El cuatro de febrero de 2022, Rockstar confirma que el siguiente GTA está en marcha. Y en diciembre de "
                "2023 llega el primer tráiler. Bueno, llega un día antes de lo previsto: el cuatro de diciembre se filtra "
                "una versión en baja calidad, y Rockstar lo publica esa misma noche. En doce horas suma cuarenta y seis "

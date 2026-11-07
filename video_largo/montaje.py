@@ -683,7 +683,7 @@ def expandir_grupos(bloques, tb):
         random.Random(7).shuffle(lista)
     usados = {}
     explicitos = {p for b in bloques for p in list(b["planos"]) + [r["plano"] for r in b.get("planos_en", [])]
-                  if not p.startswith("@")}  # los planos que el guion pide por su nombre no salen también por grupo
+                  + [b[k] for k in ("original", "intro_original") if b.get(k)] if not p.startswith("@")}  # los planos que el guion pide por su nombre no salen también por grupo
 
     def siguiente(g):
         lista = grupos.get(g) or []
