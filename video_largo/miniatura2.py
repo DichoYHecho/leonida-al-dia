@@ -152,7 +152,7 @@ def texto(capa, cx, y, s, font, color, tracking=0, sombra=True):
         capa.alpha_composite(sc.filter(ImageFilter.GaussianBlur(14 * SS)))
     d = ImageDraw.Draw(capa)
     for c in s:
-        d.text((x, y), c, font=font, fill=color)
+        d.text((x, y), c, font=font, fill=color, stroke_width=int(float(os.environ.get("BORDE") or 0) * SS), stroke_fill=(0, 0, 0))
         x += font.getlength(c) + tracking
 
 
@@ -166,6 +166,16 @@ def miniatura():
     base.paste(izq, (0, 0))  # Lucía entera, sin fundido: no queda franja oscura
     base.paste(der, (w - ancho_d, 0), degradado_h(ancho_d, h, 0, float(os.environ.get("MEZCLA") or 0.62), 1.0))  # Jason se funde sobre Lucía
     im = base.convert("RGBA")
+    if os.environ.get("SOLO_IZQ"):  # una sola foto (IZQ) de fondo a pantalla completa
+        im = panel(os.environ["IZQ"], w, h).convert("RGBA")
+    osc = float(os.environ.get("OSCURECER") or 0)
+    if osc:  # velo oscuro, más fuerte en el centro, para que el texto se lea mejor
+        velo = Image.new("L", (w, h), 0)
+        ImageDraw.Draw(velo).ellipse((int(w * 0.1), int(h * 0.1), int(w * 0.9), int(h * 0.95)), fill=255)
+        velo = velo.filter(ImageFilter.GaussianBlur(110 * SS)).point(lambda p: int(255 * osc * (0.55 + 0.45 * p / 255)))
+        negro = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+        negro.putalpha(velo)
+        im.alpha_composite(negro)
     # sin sombra en el centro: las dos fotos se funden directamente (el texto lleva su propia sombra suave)
     f20 = ImageFont.truetype(CARPETA + "Montserrat-Black.ttf", 500 * SS)
     f1 = ImageFont.truetype(CARPETA + "Montserrat-ExtraBold.ttf", 64 * SS)
