@@ -1,0 +1,81 @@
+name: Short de adelanto del vídeo largo
+
+# Corta un tramo del vídeo largo (alta calidad de Releases), lo pasa a vertical 1080x1920
+# (vídeo centrado sobre una copia borrosa), pone un texto arriba y «Vídeo completo en el canal»
+# abajo, y lo deja en la rama shorts-adelanto. No publica nada.
+
+on:
+  workflow_dispatch:
+    inputs:
+      etiqueta:
+        description: "Release del vídeo largo (montaje-vc-alta-calidad, montaje-sg-alta-calidad...)"
+        default: "montaje-vc-alta-calidad"
+      inicio:
+        description: "Segundo de inicio del tramo"
+        default: "155"
+      duracion:
+        description: "Duración en segundos (máx. 59)"
+        default: "50"
+      linea1:
+        description: "Texto de arriba, línea 1"
+        default: "TOMMY VERCETTI"
+      linea2:
+        description: "Texto de arriba, línea 2 (rosa)"
+        default: "EL PRIMERO QUE HABLÓ"
+      abajo:
+        description: "Texto de abajo"
+        default: "Vídeo completo en el canal"
+      nombre:
+        description: "Nombre del archivo de salida (sin .mp4)"
+        default: "short_vice_city"
+
+permissions:
+  contents: write
+
+jobs:
+  short:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - name: Instalar programas
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg fonts-montserrat
+
+      - name: Bajar el vídeo largo
+        run: gh release download "${{ inputs.etiqueta }}" -R "$GITHUB_REPOSITORY" -p "*.mp4" -O largo.mp4
+
+      - name: Montar el Short
+        env:
+          L1: ${{ inputs.linea1 }}
+          L2: ${{ inputs.linea2 }}
+          AB: ${{ inputs.abajo }}
+        run: |
+          mkdir -p salida
+          printf '%s' "$L1" > l1.txt
+          printf '%s' "$L2" > l2.txt
+          printf '%s' "$AB" > ab.txt
+          F=/usr/share/fonts/truetype/montserrat
+          ffmpeg -y -loglevel error -ss "${{ inputs.inicio }}" -t "${{ inputs.duracion }}" -i largo.mp4 -filter_complex "\
+          [0:v]scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,boxblur=28:4,eq=brightness=-0.18[bg];\
+          [0:v]scale=1080:-2[fg];[bg][fg]overlay=0:(H-h)/2,\
+          drawtext=fontfile=$F/Montserrat-Black.ttf:textfile=l1.txt:fontsize=70:fontcolor=white:x=(w-tw)/2:y=470:shadowcolor=black@0.7:shadowy=5,\
+          drawtext=fontfile=$F/Montserrat-Black.ttf:textfile=l2.txt:fontsize=62:fontcolor=0xFF4FA3:x=(w-tw)/2:y=560:shadowcolor=black@0.7:shadowy=5,\
+          drawtext=fontfile=$F/Montserrat-ExtraBold.ttf:textfile=ab.txt:fontsize=48:fontcolor=white:x=(w-tw)/2:y=1420:box=1:boxcolor=0xFF4FA3@0.95:boxborderw=22,\
+          fps=30,format=yuv420p[v]" -map "[v]" -map 0:a -c:v libx264 -preset veryfast -crf 21 -c:a aac -b:a 160k -movflags +faststart "salida/${{ inputs.nombre }}.mp4"
+          ls -l salida
+          ffmpeg -y -loglevel error -ss 5 -i "salida/${{ inputs.nombre }}.mp4" -frames:v 1 "salida/${{ inputs.nombre }}_muestra.jpg"
+
+      - name: Publicar en la rama shorts-adelanto
+        run: |
+          cd salida
+          git init -q
+          git checkout -q -b shorts-adelanto
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add .
+          git commit -q -m "Short de adelanto"
+          git remote add origin "https://x-access-token:$GH_TOKEN@github.com/$GITHUB_REPOSITORY.git"
+          git push -f origin shorts-adelanto
