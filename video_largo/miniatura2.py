@@ -20,6 +20,9 @@ UA = "LeonidaAlDiaBot/1.0 (cuenta de fans de GTA 6) GitHubActions"
 _V = "https://media-rockstargames-com.akamaized.net/VI/downloads/videos/"
 _M = "https://videos-rockstargames-com.akamaized.net/v4/rk721912/flv/"
 VIDEOS = {
+    # Saga (vídeo 3): captura del GTA de 1997 (Wikipedia) y partida de PlayStation (Joe Roberts, CC BY 4.0)
+    "GTA1_Captura": "https://upload.wikimedia.org/wikipedia/en/f/fb/GTA1_PC_in-game_screenshot.png",
+    "GTA1_PS": "https://archive.org/download/grand-theft-auto-1-play-station-pal-gameplay-full-game-longplay-recorded-by-joe-/Grand%20Theft%20Auto%201%20PlayStation%20PAL%20Gameplay%20%28Full%20Game%20Longplay%20Recorded%20By%20Joe%20Roberts%20With%20Free%20Roam%20Liberty%20City%20Part%2001%29.mp4",
     "Mirada": _M + "es-es-1080p.mp4",
     "Mirada4K": _M + "es-es-2160p.mp4",
     "Trailer_1": _V + "GTAVI_Trailer_1/GTAVI_Trailer_1.mp4",
