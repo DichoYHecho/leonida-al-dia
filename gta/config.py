@@ -28,7 +28,7 @@ ESTILO_VOZ = ("Habla todo el texto en español de España, de principio a fin, s
               "Relaxed, friendly Spanish gaming YouTuber telling a funny story to a friend. "
               "Native Castilian Spanish accent from Spain. Warm and close, light humour, natural pauses "
               "between sentences, lively but never rushed, never sounds like an advert or a radio announcer.")
-VELOCIDAD_VOZ = 1.12  # +12 %, como en los vídeos largos
+VELOCIDAD_VOZ = 1.03  # 9 nov: +12 % sonaba acelerado en los Shorts; Adrià pide más calma
 
 # Calendario
 LANZAMIENTO = date(2026, 11, 19)
