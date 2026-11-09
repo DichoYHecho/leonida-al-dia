@@ -467,7 +467,7 @@ def fondo_en(t, fondos, tramos, estilo_trans):
         efecto, lado = 1 - (t - a) / (TRANS / 2), 1
     if efecto <= 0:
         return fondos[k].fotograma(p), 0.0
-    e = efecto ** 2
+    e = float(efecto) ** 2  # 9 nov: float; con un número de numpy fallaba el desenfoque de PIL
     tipo = estilo_trans[q if lado < 0 else q - 1]
     if tipo == "barrido":
         desp = e * W * 0.55 * (1 if lado < 0 else -1)
