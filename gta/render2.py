@@ -19,6 +19,7 @@ captura, un 4.º valor con los sujetos que hay que enseñar [(x0, y0, x1, y1)].
 import math, os, re, subprocess
 import numpy as np, soundfile as sf
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
+import grafismo  # HUD y tarjeta de cristal (9 nov)
 
 W, H, FPS = 1080, 1920, 30
 AQUI = os.path.dirname(os.path.abspath(__file__))
@@ -882,8 +883,6 @@ def montar(cfg):
             img = Image.alpha_composite(img, Image.new("RGBA", (W, H), NOCHE + (90,)))
             numero_cuenta(img, t, ca, acento if acento != WHITE else AMBER)
             lineas_cuenta(img, t, ca, tiempos[1][0] - 0.1 if ca["trozos_intro"] > 1 else 0.6)
-        img = barrido_luz(img, t)
-        cabecera(img, t, cfg, mostrar_cuenta=not en_intro)
         if not ca:
             if e1:
                 subtitulos.dibujar_banda_gancho(img, t, plan_g)
@@ -909,9 +908,12 @@ def montar(cfg):
                     img.alpha_composite(capa)
                     break
         pregunta(img, t, trozos[ultimo], t_pregunta, 1 - suave((t - t_cierre) / 0.2))
-        pie(img, cfg["pie"])
+        # tarjeta de cristal abajo: desde que se va el gancho (o el sello de la cuenta atrás) hasta la pregunta
+        t_tarj = (tiempos[ca["trozo_dato"]][0] + 0.9) if ca else salida_gancho + 0.2
+        grafismo.tarjeta(img, t, cfg, t_tarj, t_pregunta)
+        grafismo.credito(img, cfg["pie"])
         img = cierre_marca(img, t, t_cierre)
-        barra_progreso(img, t, dur, acento if acento != WHITE else AMBER)
+        grafismo.barra(img, t, dur)
         if flash > 0:
             img = Image.alpha_composite(img, Image.new("RGBA", (W, H), (255, 255, 255, int(255 * min(flash, 0.8)))))
         if e1:  # capa siempre encima: los subtítulos se pintan los últimos (también encima del destello)
