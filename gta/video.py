@@ -9,7 +9,7 @@
 import hashlib, json, os, re, shutil, tempfile, unicodedata
 from datetime import date
 import airtable, medios, render, render2, voz
-from config import VOZ  # 9 nov: la voz entra en la huella; si cambia de voz, se pide de nuevo
+from config import VOZ, VELOCIDAD_VOZ  # 9 nov: la voz entra en la huella; si cambia de voz, se pide de nuevo
 from config import CACHE, T_PUB, cuenta_atras
 
 VOCES = os.path.join(CACHE, "voces")
@@ -42,7 +42,7 @@ def preparar_voz(f):
     trozos = trozos_de(f)
     if len(trozos) < 3:
         raise RuntimeError("el guion necesita al menos 3 líneas (gancho, cuerpo y pregunta final)")
-    h = huella(VOZ, (f.get("Guion") or "").strip())
+    h = huella(f"{VOZ} {VELOCIDAD_VOZ} calma", (f.get("Guion") or "").strip())  # 9 nov: velocidad y estilo nuevos: se piden de nuevo
     os.makedirs(VOCES, exist_ok=True)
     wav, js = os.path.join(VOCES, h + ".wav"), os.path.join(VOCES, h + ".json")
     if os.path.exists(wav) and os.path.exists(js):
