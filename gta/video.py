@@ -93,7 +93,25 @@ def montar(f, dia, semilla, salida_dir, extra=None):
     return salida, info, cambios
 
 
+def encoger(ruta, maximo=4.8e6):
+    """9 nov: con el cristal desenfocado algunos vídeos pasan de 5 MB (límite de Airtable): se recomprimen."""
+    import subprocess
+    if os.path.getsize(ruta) <= maximo:
+        return
+    r = subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", ruta],
+                       capture_output=True, text=True)
+    dur = float((r.stdout or "30").strip() or 30)
+    kbps = max(800, int(maximo * 8 / dur / 1000) - 160)  # deja sitio al audio
+    tmp = ruta + ".tmp.mp4"
+    subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", ruta, "-c:v", "libx264", "-preset", "medium",
+                    "-b:v", f"{kbps}k", "-maxrate", f"{kbps}k", "-bufsize", f"{2 * kbps}k", "-pix_fmt", "yuv420p",
+                    "-c:a", "copy", "-movflags", "+faststart", tmp], check=True)
+    os.replace(tmp, ruta)
+    print(f"  Vídeo recomprimido a {os.path.getsize(ruta) / 1e6:.1f} MB ({kbps} kb/s)")
+
+
 def subir(rec_id, ruta):
+    encoger(ruta)
     """Sube el vídeo y devuelve la URL del nuevo adjunto (el viejo se quita después)."""
     nuevo = airtable.subir_adjunto(rec_id, "Vídeo", ruta, "video/mp4")
     if not nuevo:  # por si la respuesta no trae el adjunto: se lee la publicación (1 llamada más)
