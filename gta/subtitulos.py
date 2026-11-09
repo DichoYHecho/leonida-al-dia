@@ -134,7 +134,8 @@ def plan_gancho(fondo_rgb, caja, salida, abajo):
 
 
 def dibujar_banda_gancho(img, t, pg):
-Subtítulos en pastilla de cristal    if not pg or pg["banda"] <= 0:
+    """Banda oscura detrás del gancho; se apaga cuando el gancho se va."""
+    if not pg or pg["banda"] <= 0:
         return
     e = 0.0
     if t > pg["salida"]:
