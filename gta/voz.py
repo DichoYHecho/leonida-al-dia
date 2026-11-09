@@ -1,11 +1,13 @@
 """Voz del vídeo y tiempos de los subtítulos.
 
-- Principal: Gemini «Mako» (estilo «Promote»), un solo audio con todo el guion (1 petición por vídeo).
+- Principal: Gemini, con la voz y el estilo de config.py (desde el 9 nov, Orus, la de los vídeos largos, a +12 %),
+  un solo audio con todo el guion (1 petición por vídeo).
   Los subtítulos se sincronizan con Whisper (palabra a palabra); si falla, por las pausas de la voz.
 - Reserva: Piper «sharvard» (voz natural española, CC BY 3.0), trozo a trozo, con tiempos exactos."""
-import difflib, json, os, re, unicodedata
+import difflib, json, os, re, subprocess, unicodedata
 import numpy as np, soundfile as sf
 import gemini
+from config import VOZ, VELOCIDAD_VOZ
 
 SR = 24000
 MODELOS = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "modelos")
@@ -143,6 +145,14 @@ def alinear(ruta, trozos):
 
 
 # ---------------------------------------------------------------- voces
+def acelerar(ruta, factor):
+    """9 nov: misma velocidad que los vídeos largos (+12 %). atempo no cambia el tono de la voz."""
+    if abs(factor - 1) < 0.01:
+        return
+    tmp = ruta + ".rapido.wav"
+    subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", ruta, "-filter:a", f"atempo={factor}", tmp], check=True)
+    os.replace(tmp, ruta)
+
 def con_silencio(ruta, inicio=0.15):
     """Añade 0,15 s de silencio al principio (para que el primer fotograma ya tenga el gancho)."""
     x, sr = sf.read(ruta, dtype="float32")
@@ -194,19 +204,21 @@ def generar(trozos, ruta):
                     break
                 raise
             open(ruta, "wb").write(wav)
+            acelerar(ruta, VELOCIDAD_VOZ)
             con_silencio(ruta)
             c = cobertura(ruta, trozos)
             if c >= UMBRAL:
                 tiempos, metodo = alinear(ruta, trozos)
-                return tiempos, f"Gemini Mako ({modelo}, subtítulos por {metodo})", ""
+                return tiempos, f"Gemini {VOZ} ({modelo}, subtítulos por {metodo})", ""
             print(f"  La voz no sigue el guion (Whisper reconoce el {c:.0%}): se pide otra", flush=True)
             if mejor is None or c > mejor[0]:
                 mejor = (c, wav, modelo)
         c, wav, modelo = mejor
         open(ruta, "wb").write(wav)
+        acelerar(ruta, VELOCIDAD_VOZ)
         con_silencio(ruta)
         tiempos, metodo = alinear(ruta, trozos)
-        return (tiempos, f"Gemini Mako ({modelo}, subtítulos por {metodo})",
+        return (tiempos, f"Gemini {VOZ} ({modelo}, subtítulos por {metodo})",
                 f"Revisa la voz: puede pasarse al inglés o saltarse texto (Whisper solo reconoce el {c:.0%} del guion)")
     except Exception as e:
         print(f"  Voz de Gemini no disponible: {str(e)[:300]}", flush=True)

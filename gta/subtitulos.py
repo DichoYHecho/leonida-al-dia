@@ -18,7 +18,7 @@ W, H = 1080, 1920
 CX = 510           # centro horizontal (30 px a la izquierda: botones de la derecha)
 ANCHO = 800        # ancho máximo del texto (de 110 a 910 px)
 ALTO_ZONA = 200    # alto que se mide alrededor de la línea
-ZONAS = (("media", 1180, 0.0), ("baja", 1360, 0.02), ("alta", 440, 0.06))  # nombre, centro y, penalización
+ZONAS = (("media", 1140, 0.0), ("alta", 440, 0.06))  # 9 nov: sin zona baja, ahí va la tarjeta de cristal (grafismo.py)  # nombre, centro y, penalización
 LIMPIO = 0.18      # por debajo, el fondo no molesta: zona media y sin banda
 BANDA_MAX = 0.78   # opacidad máxima de la banda oscura
 CAMBIAR = 0.40     # la zona solo cambia si la media pasa de esto…
@@ -112,7 +112,7 @@ def planificar(grupos, t_pregunta, fondo_rgb, tramo_de, gancho=None):
         zona = zona_tramo.get(tramo_de((a + b) / 2), "media") if notas else "media"
         if gancho and a < gancho[0]:
             if zona == "alta":  # nunca encima del gancho
-                zona = "media" if notas.get("media", 0) <= notas.get("baja", 0) + 0.02 else "baja"
+                zona = "media"  # 9 nov: ya no hay zona baja
             if gancho[1] > 900:  # gancho abajo: esperar a que se vaya
                 a = gancho[0]
         nota = notas.get(zona, 0.0)
