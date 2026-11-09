@@ -2,20 +2,23 @@
 
 Reglas (apartado 5 del plan): nada que no diga la fuente; «Rockstar confirma» solo si es oficial;
 nada de filtraciones, rumores como hechos ni destripes; sin enlaces para comprar; parafrasear."""
-import re, unicodedata
+import csv, datetime, os, re, unicodedata
 import gemini
 from config import HASHTAGS_FIJOS, PIE_POST, OFICIALES
 from medios import GRUPOS, CAPTURAS, validas
 
 REGLAS = """Eres el guionista de «Leónida al Día», una cuenta de fans de GTA 6 en español de España.
-Escribes vídeos verticales de 12 a 20 segundos (unas 35-55 palabras en total; cuanto más corto, mejor) que lee una voz sintética.
+Escribes vídeos verticales de 25 a 40 segundos (unas 75-105 palabras en total) que lee una voz sintética.
+Cada vídeo tiene que enseñar algo de verdad: no un dato suelto, sino el dato con sus detalles y su contexto, como lo contaría
+un youtuber de gaming que se lo explica a un amigo, con guasa suave. Cada frase aporta información nueva: nada de relleno,
+frases hechas ni muletillas de anuncio («increíble», «sin duda», «prepárate», «no te lo vas a creer»).
 Reglas que no se pueden saltar:
 - Usa SOLO la información del TEXTO DE LA FUENTE. No añadas datos, cifras, fechas ni opiniones que no estén ahí.
 - Si la fuente no es oficial (Rockstar Games o Take-Two), atribúyelo: «Según {medio}…», en el primer trozo del cuerpo (nunca en el gancho). «Rockstar confirma» solo si lo dice Rockstar o Take-Two.
 - Nada de filtraciones (material filtrado), rumores presentados como hechos ni destripes de la historia.
 - No copies frases literales de la fuente: cuéntalo con tus palabras.
 - No invites a comprar ni a reservar, y no pongas enlaces.
-- Frases cortas y claras, tono cercano y con energía, sin exagerar ni engañar. Nada de mayúsculas sostenidas ni emojis.
+- Frases cortas y claras, tono cercano y natural (no de anuncio), sin exagerar ni engañar. Nada de mayúsculas sostenidas ni emojis.
 - Escribe los números como se dicen si es raro leerlos («GTA 6», «19 de noviembre», «30 euros»).
 - Usa bien los signos del español: «¿…?» y «¡…!». La pregunta final siempre entre «¿» y «?».
 - No hagas predicciones ni especules sobre lo que pasará en el juego, en la historia ni en las ventas.
@@ -32,7 +35,7 @@ FORMATO = """Devuelve SOLO un JSON con estos campos:
   "es_personaje": true o false (si la etiqueta es un personaje),
   "grupo_capturas": "uno de: %s",
   "gancho": "primera frase, máximo 60 caracteres (8-10 palabras), que sale en grande en la portada: lo más llamativo y concreto del vídeo (una cifra, un nombre, un contraste) con la palabra clave (GTA 6, Vice City, Lucía…). Sin nombrar al medio ni empezar por «Según», «Repasamos», «Conoce» o «Descubre». Varía la forma (una afirmación directa, una cifra, un contraste, una cita corta…). NUNCA empieces por «¿Sabías que» ni hagas una pregunta, y no prometas ni exageres nada que no diga la fuente",
-  "cuerpo": ["2 a 4 trozos de máximo 45 caracteres cada uno, que se leen seguidos. Punto al acabar cada frase; si la frase sigue en el trozo siguiente, no pongas coma al final salvo que la gramática la pida"],
+  "cuerpo": ["7 a 12 trozos de máximo 45 caracteres cada uno, que se leen seguidos. Orden: primero el dato principal con sus detalles concretos (nombres, cifras, fechas); después los DATOS RELACIONADOS que encajen, enlazados con naturalidad, como en una conversación (p. ej. «Y ojo, porque…», «Pero hay más:»), con su atribución si no son oficiales; y al final una frase que lo una todo, sin opinar ni predecir. Punto al acabar cada frase; si la frase sigue en el trozo siguiente, no pongas coma al final salvo que la gramática la pida"],
   "cierre": "pregunta final para comentar, máximo 60 caracteres",
   "texto_post": "2 o 3 frases para el texto de la publicación (sin hashtags); la primera, con «GTA 6» y el tema concreto, porque es lo que se busca; sin empezar por «Conoce», «Repasamos», «Descubre», «Te contamos» ni «Según», y con las cifras en número (50 temas, 210 GB)",
   "cosas_reales": ["cada cosa REAL y concreta que se nombra en el guion y que NO sale en el juego (un restaurante, un producto, una persona, una portada, una tienda, un evento…), con su nombre propio tal cual, una por elemento (si se nombran dos restaurantes, son dos); [] si todo se puede enseñar con capturas del juego"],
@@ -119,7 +122,7 @@ def validar(j):
         "etiqueta": _limpiar(j.get("etiqueta"), 18).upper().rstrip("…") or "GTA 6",
         "personaje": bool(j.get("es_personaje")),
         "grupo": grupo,
-        "trozos": [_limpiar(j["gancho"], 95)] + cuerpo[:6] + [pregunta(_limpiar(j["cierre"], 75))],
+        "trozos": [_limpiar(j["gancho"], 95)] + cuerpo[:14] + [pregunta(_limpiar(j["cierre"], 75))],
         "capturas": validas(", ".join(str(c) for c in (j.get("capturas") or []))),
         "texto_post": en_cifras(_limpiar(j.get("texto_post"), 600)),
         "hashtags": hashtags(j.get("hashtags")),
@@ -151,25 +154,61 @@ def con_buen_gancho(prompt, intentos=3):
 
 def caption(g, fuente, oficial, voz_reserva=False):
     linea = f"Fuente: {fuente}" + ("" if oficial else " (según medios)")
+    if g.get("fuentes_extra"):  # 9 nov: las fuentes de los datos relacionados
+        linea += "\nTambién: " + "; ".join(g["fuentes_extra"])
     extra = "\nVoz: sharvard (CC BY 3.0)" if voz_reserva else ""
     return f"{g['texto_post']}\n\n{linea}\n{PIE_POST}{extra}\n\n{g['hashtags']}"
 
 
+BANCO = os.path.join(os.path.dirname(os.path.abspath(__file__)), "banco_datos.csv")
+GENERICOS = {"Vice_City", "Jason_and_Lucia"}  # grupos que valen para casi todo: ahí se exige también el mismo tema
+
+def relacionados(dato, maximo=3):
+    """9 nov: los vídeos se quedaban en un dato suelto. Se añaden otros datos del banco sobre lo mismo (mismo personaje
+    o lugar; en los grupos genéricos, además, el mismo tema), vigentes y ya comprobados, para dar contexto.
+    Así la imagen sigue casando con lo que se dice."""
+    try:
+        with open(BANCO, encoding="utf-8") as fh:
+            filas = list(csv.DictReader(fh))
+    except Exception:
+        return []
+    hoy = datetime.date.today().isoformat()
+    img, tema, orden = dato.get("Imagen sugerida"), dato.get("Tema"), str(dato.get("Orden") or "").strip()
+    out = []
+    for f in filas:
+        if str(f.get("Orden") or "").strip() == orden or (f.get("Válido hasta") or "9999") < hoy:
+            continue
+        if not img or f.get("Imagen sugerida") != img or (img in GENERICOS and f.get("Tema") != tema):
+            continue
+        if (f.get("Dato") or "").strip() == (dato.get("Dato") or "").strip():
+            continue
+        out.append(f)
+    return out[:maximo]
+
 def de_dato(dato):
-    """Guion a partir de un dato del banco (columnas del CSV / tabla Datos)."""
+    """Guion a partir de un dato del banco (columnas del CSV / tabla Datos), con sus datos relacionados."""
     oficial = dato.get("Estado") == "Oficial"
     grupo = dato.get("Imagen sugerida") if dato.get("Imagen sugerida") in GRUPOS else None
+    rel = relacionados(dato)
+    if rel:
+        extra = ("\n\nDATOS RELACIONADOS (también comprobados; úsalos para dar contexto y detalle, cada uno con su "
+                 "atribución si no es oficial):\n" + "\n".join(
+                     f"- {r['Dato']} (Fuente: {r['Fuente']}; {'oficial' if r.get('Estado') == 'Oficial' else 'no oficial: atribúyelo'})"
+                     for r in rel))
+    else:
+        extra = ("\n\nNo hay datos relacionados: cuenta el dato con todos sus detalles y no rellenes con nada que no "
+                 "diga el texto; en este caso el vídeo puede ser más corto.")
     prompt = (REGLAS + "\n" + AYUDA_GRUPOS + "\n\nVas a contar un DATO o CURIOSIDAD de GTA 6. Es algo ya conocido, "
               "no una novedad: no digas que es nuevo, que se acaba de anunciar ni que Rockstar «comparte» o «revela» nada hoy.\n"
               f"Tema: {dato.get('Tema')}\nFuente: {dato.get('Fuente')} ({'oficial' if oficial else 'no oficial: atribúyelo'})\n"
               f"Grupo de capturas: {grupo or 'el que mejor case'}\n\n{catalogo(grupo)}\n\n"
-              f"TEXTO DE LA FUENTE:\n{dato.get('Dato')}\n\n" + FORMATO)
+              f"TEXTO DE LA FUENTE (dato principal):\n{dato.get('Dato')}" + extra + "\n\n" + FORMATO)
     g = con_buen_gancho(prompt)
     if grupo:
         g["grupo"] = grupo  # la imagen la decide el banco (regla de G2)
         g["capturas"] = [c for c in g["capturas"] if CAPTURAS[c]["grupo"] == grupo]
+    g["fuentes_extra"] = list(dict.fromkeys(r["Fuente"] for r in rel if r.get("Fuente") and r["Fuente"] != dato.get("Fuente")))
     return g
-
 
 def de_noticia(medio, titulo, texto):
     oficial = medio in OFICIALES
