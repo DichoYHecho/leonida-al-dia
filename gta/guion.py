@@ -120,12 +120,15 @@ def validar(j):
     if not j.get("gancho") or len(cuerpo) < 2 or not j.get("cierre"):
         raise RuntimeError("Gemini devolvió un guion incompleto")
     grupo = j.get("grupo_capturas") if j.get("grupo_capturas") in GRUPOS else "Vice_City"
+    cuerpo = cuerpo[:24]  # 9 nov: si sobra, se recorta, pero nunca a mitad de frase
+    while len(cuerpo) > 2 and not cuerpo[-1].rstrip().endswith((".", "!", "…", "?")):
+        cuerpo.pop()
     return {
         "titular": _limpiar(j.get("titular"), 90),
         "etiqueta": _limpiar(j.get("etiqueta"), 18).upper().rstrip("…") or "GTA 6",
         "personaje": bool(j.get("es_personaje")),
         "grupo": grupo,
-        "trozos": [_limpiar(j["gancho"], 95)] + cuerpo[:18] + [pregunta(_limpiar(j["cierre"], 75))],
+        "trozos": [_limpiar(j["gancho"], 95)] + cuerpo + [pregunta(_limpiar(j["cierre"], 75))],
         "capturas": validas(", ".join(str(c) for c in (j.get("capturas") or []))),
         "texto_post": en_cifras(_limpiar(j.get("texto_post"), 600)),
         "hashtags": hashtags(j.get("hashtags")),
