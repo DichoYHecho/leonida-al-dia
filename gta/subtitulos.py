@@ -134,8 +134,7 @@ def plan_gancho(fondo_rgb, caja, salida, abajo):
 
 
 def dibujar_banda_gancho(img, t, pg):
-    """Banda oscura detrás del gancho; se apaga cuando el gancho se va."""
-    if not pg or pg["banda"] <= 0:
+Subtítulos en pastilla de cristal    if not pg or pg["banda"] <= 0:
         return
     e = 0.0
     if t > pg["salida"]:
@@ -158,21 +157,18 @@ def dibujar(img, t, plan, grupos, f, acento, r):
         cy = p["cy"]
         capa = Image.new("RGBA", (W, H), (0, 0, 0, 0))
         lineas = r.partir_lineas([(w, x, y) for _, w, x, y in g], f, ANCHO)
-        r.poner_palabras(capa, lineas, cy, f, acento, t, borde=10)
-        if p["banda"] > 0:
-            caja = capa.getbbox()
-            if caja:
-                fondo = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-                x0, y0, x1, y1 = caja
-                ImageDraw.Draw(fondo).rounded_rectangle([x0 - 26, y0 - 10, x1 + 26, y1 + 6], 34,
-                                                        fill=r.NOCHE + (int(255 * p["banda"]),))
-                fondo.alpha_composite(capa)
-                capa = fondo
+        r.poner_palabras(capa, lineas, cy, f, acento, t, borde=10, caja=False)  # 9 nov: palabra activa en color, sin caja
         e = r.sale((t - p["a"]) / 0.12)
         if e < 1:
             esc = 0.8 + 0.2 * e
             capa = capa.transform((W, H), Image.AFFINE, (1 / esc, 0, W / 2 * (1 - 1 / esc), 0, 1 / esc,
                                                          cy * (1 - 1 / esc)), resample=Image.BILINEAR)
+        caja = capa.getbbox()
+        if caja:  # 9 nov: pastilla de cristal (grafismo.py) en vez de la banda oscura
+            import grafismo
+            dx = W // 2 - CX
+            x0, y0, x1, y1 = caja
+            grafismo.cristal(img, (x0 - dx - 30, y0 - 14, x1 - dx + 30, y1 + 10), 34, min(1.0, e))
         img.alpha_composite(capa, (0, 0), (W // 2 - CX, 0))  # desplazado a la izquierda (zona segura)
         return
 
