@@ -151,19 +151,21 @@ def palabras(g):
 AVISO_CORTO = ("\n\nOJO: el guion anterior era demasiado corto ({n} palabras) y se quedaba en un dato suelto. Escribe entre 85 y 115 "
                "palabras en total y usa al menos 2 de los DATOS RELACIONADOS, cada uno en su propia frase.")
 
-def con_buen_gancho(prompt, intentos=3, min_palabras=0):
+def con_buen_gancho(prompt, intentos=3, min_palabras=0, min_usados=0):
     """Pide el guion; si el gancho es flojo o (9 nov) se queda corto, lo vuelve a pedir (como mucho «intentos» veces)
     y se queda el mejor. Solo gasta texto de Gemini, no voz."""
     g, mejor, aviso = None, None, ""
     for i in range(intentos):
-        g = validar(gemini.texto_json(prompt + aviso))
+        j = gemini.texto_json(prompt + aviso)
+        g = validar(j)
+        g["usados"] = len(set(str(x) for x in (j.get("datos_usados") or [])))
         flojo = gancho_flojo(g["trozos"][0]) or bool(GANCHO_FLOJO.search(g["texto_post"] or ""))  # 30 oct: también el texto
-        corto = palabras(g) < min_palabras
+        corto = palabras(g) < min_palabras or g["usados"] < min_usados
         if not flojo and (mejor is None or palabras(g) > palabras(mejor)):
             mejor = g
         if not flojo and not corto:
             return g
-        print(f"  (guion flojo o corto, {palabras(g)} palabras: se pide otro)", flush=True)
+        print(f"  (guion flojo o corto, {palabras(g)} palabras: se pide otro; usa {g['usados']} datos relacionados)", flush=True)
         aviso = (AVISO_GANCHO if flojo else "") + (AVISO_CORTO.format(n=palabras(g)) if corto else "")
     return mejor or g
 
@@ -177,6 +179,10 @@ def caption(g, fuente, oficial, voz_reserva=False):
 
 BANCO = os.path.join(os.path.dirname(os.path.abspath(__file__)), "banco_datos.csv")
 GENERICOS = {"Vice_City", "Jason_and_Lucia"}  # grupos que valen para casi todo: ahí se exige también el mismo tema
+
+def sin_via(fuente):
+    """9 nov: «IGN (entrevista a X), vía GamingBolt» → «IGN (entrevista a X)»: se atribuye a quien lo dijo, no a quien lo copia."""
+    return re.sub(r",?\s*vía\s.*$", "", fuente or "").strip()
 
 def relacionados(dato, maximo=3):
     """9 nov: los vídeos se quedaban en un dato suelto. Se añaden otros datos del banco sobre lo mismo (mismo personaje
@@ -208,17 +214,18 @@ def de_dato(dato):
     if rel:
         extra = ("\n\nDATOS RELACIONADOS (también comprobados; úsalos para dar contexto y detalle, cada uno con su "
                  "atribución si no es oficial). OBLIGATORIO: usa al menos 2, cada uno en su propia frase:\n" + "\n".join(
-                     f"- {r['Dato']} (Fuente: {r['Fuente']}; {'oficial' if r.get('Estado') == 'Oficial' else 'no oficial: atribúyelo'})"
-                     for r in rel))
+                     f"R{k}. {r['Dato']} (Fuente: {sin_via(r['Fuente'])}{'; la misma que el dato principal: no repitas la atribución' if sin_via(r['Fuente']) == sin_via(dato.get('Fuente')) else ''}; {'oficial' if r.get('Estado') == 'Oficial' else 'no oficial: atribúyelo'})"
+                     for k, r in enumerate(rel, 1)) +
+                 "\nAñade al JSON el campo \"datos_usados\": [\"R1\", …] con los datos relacionados que has contado.")
     else:
         extra = ("\n\nNo hay datos relacionados: cuenta el dato con todos sus detalles y no rellenes con nada que no "
                  "diga el texto; en este caso el vídeo puede ser más corto.")
     prompt = (REGLAS + "\n" + AYUDA_GRUPOS + "\n\nVas a contar un DATO o CURIOSIDAD de GTA 6. Es algo ya conocido, "
               "no una novedad: no digas que es nuevo, que se acaba de anunciar ni que Rockstar «comparte» o «revela» nada hoy.\n"
-              f"Tema: {dato.get('Tema')}\nFuente: {dato.get('Fuente')} ({'oficial' if oficial else 'no oficial: atribúyelo'})\n"
+              f"Tema: {dato.get('Tema')}\nFuente: {sin_via(dato.get('Fuente'))} ({'oficial' if oficial else 'no oficial: atribúyelo'})\n"
               f"Grupo de capturas: {grupo or 'el que mejor case'}\n\n{catalogo(grupo)}\n\n"
               f"TEXTO DE LA FUENTE (dato principal):\n{dato.get('Dato')}" + extra + "\n\n" + FORMATO)
-    g = con_buen_gancho(prompt, min_palabras=80 if len(rel) >= 2 else (55 if rel else 0))
+    g = con_buen_gancho(prompt, min_palabras=80 if len(rel) >= 2 else (55 if rel else 0), min_usados=min(len(rel), 2))
     if grupo:
         g["grupo"] = grupo  # la imagen la decide el banco (regla de G2)
         g["capturas"] = [c for c in g["capturas"] if CAPTURAS[c]["grupo"] == grupo]
