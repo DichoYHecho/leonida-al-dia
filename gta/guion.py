@@ -185,7 +185,9 @@ GENERICOS = {"Vice_City", "Jason_and_Lucia"}  # grupos que valen para casi todo:
 
 def sin_via(fuente):
     """9 nov: «IGN (entrevista a X), vía GamingBolt» → «IGN (entrevista a X)»: se atribuye a quien lo dijo, no a quien lo copia."""
-    return re.sub(r",?\s*vía\s.*$", "", fuente or "").strip()
+    f = re.sub(r",?\s*vía\s.*$", "", fuente or "").strip()
+    m = re.match(r"Wikipedia \(citando a (.+)\)$", f)  # «Wikipedia (citando a VGC)» → «VGC»
+    return m.group(1) if m else f
 
 def relacionados(dato, maximo=3):
     """9 nov: los vídeos se quedaban en un dato suelto. Se añaden otros datos del banco sobre lo mismo (mismo personaje
