@@ -21,11 +21,14 @@ YT_CATEGORIA = "20"  # Videojuegos
 # Gemini
 MODELOS_TEXTO = ["gemini-3.5-flash-lite", "gemini-3.1-flash-lite"]
 MODELOS_VOZ = ["gemini-3.8-flash-tts", "gemini-3.8-flash-lite-tts"]
-VOZ = "Mako"
+VOZ = "Orus"  # 9 nov: la misma voz que los vídeos largos en todos los vídeos (antes Mako, estilo «Promote»)
 # 2 nov: la voz se pasaba al inglés a mitad de algunos vídeos; se le pide español de España de principio a fin
 ESTILO_VOZ = ("Habla todo el texto en español de España, de principio a fin, sin pasar nunca al inglés "
               "(los nombres en inglés se dicen tal cual, sin cambiar de idioma). "
-              "High energy, elongated vowels")  # estilo «Promote» de AI Studio (elegido el 20 oct)
+              "Relaxed, friendly Spanish gaming YouTuber telling a funny story to a friend. "
+              "Native Castilian Spanish accent from Spain. Warm and close, light humour, natural pauses "
+              "between sentences, lively but never rushed, never sounds like an advert or a radio announcer.")
+VELOCIDAD_VOZ = 1.12  # +12 %, como en los vídeos largos
 
 # Calendario
 LANZAMIENTO = date(2026, 11, 19)
