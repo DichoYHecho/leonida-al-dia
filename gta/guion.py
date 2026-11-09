@@ -8,7 +8,7 @@ from config import HASHTAGS_FIJOS, PIE_POST, OFICIALES
 from medios import GRUPOS, CAPTURAS, validas
 
 REGLAS = """Eres el guionista de «Leónida al Día», una cuenta de fans de GTA 6 en español de España.
-Escribes vídeos verticales de 25 a 40 segundos (unas 75-105 palabras en total) que lee una voz sintética.
+Escribes vídeos verticales de 25 a 40 segundos (unas 85-115 palabras en total) que lee una voz sintética.
 Cada vídeo tiene que enseñar algo de verdad: no un dato suelto, sino el dato con sus detalles y su contexto, como lo contaría
 un youtuber de gaming que se lo explica a un amigo, con guasa suave. Cada frase aporta información nueva: nada de relleno,
 frases hechas ni muletillas de anuncio («increíble», «sin duda», «prepárate», «no te lo vas a creer»).
@@ -22,6 +22,9 @@ Reglas que no se pueden saltar:
 - Escribe los números como se dicen si es raro leerlos («GTA 6», «19 de noviembre», «30 euros»).
 - Usa bien los signos del español: «¿…?» y «¡…!». La pregunta final siempre entre «¿» y «?».
 - No hagas predicciones ni especules sobre lo que pasará en el juego, en la historia ni en las ventas.
+- Atribuye a quien lo dijo de verdad («según Rob Nelson, de Rockstar», «según IGN»), nunca a la web que lo copia (lo que va tras «vía»).
+  Si dos datos vienen de la misma persona o medio, no repitas la atribución.
+- No partas un nombre propio ni una cifra entre dos trozos; cada trozo, un bloque de sentido.
 - Si la fuente cita a otro (una empresa de análisis, un periodista, un desarrollador), dilo: «Según 3DJuegos, Sensor Tower calcula…».
   Una estimación se cuenta como estimación («calcula», «estima»), nunca como un hecho.
 - Da el dato concreto (cifras, nombres, fechas de la fuente) en vez de frases vagas como «millones» o «muchos».
@@ -35,7 +38,7 @@ FORMATO = """Devuelve SOLO un JSON con estos campos:
   "es_personaje": true o false (si la etiqueta es un personaje),
   "grupo_capturas": "uno de: %s",
   "gancho": "primera frase, máximo 60 caracteres (8-10 palabras), que sale en grande en la portada: lo más llamativo y concreto del vídeo (una cifra, un nombre, un contraste) con la palabra clave (GTA 6, Vice City, Lucía…). Sin nombrar al medio ni empezar por «Según», «Repasamos», «Conoce» o «Descubre». Varía la forma (una afirmación directa, una cifra, un contraste, una cita corta…). NUNCA empieces por «¿Sabías que» ni hagas una pregunta, y no prometas ni exageres nada que no diga la fuente",
-  "cuerpo": ["7 a 12 trozos de máximo 45 caracteres cada uno, que se leen seguidos. Orden: primero el dato principal con sus detalles concretos (nombres, cifras, fechas); después los DATOS RELACIONADOS que encajen, enlazados con naturalidad, como en una conversación (p. ej. «Y ojo, porque…», «Pero hay más:»), con su atribución si no son oficiales; y al final una frase que lo una todo, sin opinar ni predecir. Punto al acabar cada frase; si la frase sigue en el trozo siguiente, no pongas coma al final salvo que la gramática la pida"],
+  "cuerpo": ["12 a 16 trozos de máximo 45 caracteres cada uno, que se leen seguidos. Orden: primero el dato principal con sus detalles concretos (nombres, cifras, fechas); después los DATOS RELACIONADOS que encajen, enlazados con naturalidad, como en una conversación (p. ej. «Y ojo, porque…», «Pero hay más:»), con su atribución si no son oficiales; y al final una frase que lo una todo, sin opinar ni predecir. Punto al acabar cada frase; si la frase sigue en el trozo siguiente, no pongas coma al final salvo que la gramática la pida"],
   "cierre": "pregunta final para comentar, máximo 60 caracteres",
   "texto_post": "2 o 3 frases para el texto de la publicación (sin hashtags); la primera, con «GTA 6» y el tema concreto, porque es lo que se busca; sin empezar por «Conoce», «Repasamos», «Descubre», «Te contamos» ni «Según», y con las cifras en número (50 temas, 210 GB)",
   "cosas_reales": ["cada cosa REAL y concreta que se nombra en el guion y que NO sale en el juego (un restaurante, un producto, una persona, una portada, una tienda, un evento…), con su nombre propio tal cual, una por elemento (si se nombran dos restaurantes, son dos); [] si todo se puede enseñar con capturas del juego"],
@@ -122,7 +125,7 @@ def validar(j):
         "etiqueta": _limpiar(j.get("etiqueta"), 18).upper().rstrip("…") or "GTA 6",
         "personaje": bool(j.get("es_personaje")),
         "grupo": grupo,
-        "trozos": [_limpiar(j["gancho"], 95)] + cuerpo[:14] + [pregunta(_limpiar(j["cierre"], 75))],
+        "trozos": [_limpiar(j["gancho"], 95)] + cuerpo[:18] + [pregunta(_limpiar(j["cierre"], 75))],
         "capturas": validas(", ".join(str(c) for c in (j.get("capturas") or []))),
         "texto_post": en_cifras(_limpiar(j.get("texto_post"), 600)),
         "hashtags": hashtags(j.get("hashtags")),
@@ -145,7 +148,7 @@ def gancho_flojo(txt):
 def palabras(g):
     return sum(len(t.split()) for t in g["trozos"])
 
-AVISO_CORTO = ("\n\nOJO: el guion anterior era demasiado corto ({n} palabras) y se quedaba en un dato suelto. Escribe entre 75 y 105 "
+AVISO_CORTO = ("\n\nOJO: el guion anterior era demasiado corto ({n} palabras) y se quedaba en un dato suelto. Escribe entre 85 y 115 "
                "palabras en total y usa al menos 2 de los DATOS RELACIONADOS, cada uno en su propia frase.")
 
 def con_buen_gancho(prompt, intentos=3, min_palabras=0):
@@ -215,7 +218,7 @@ def de_dato(dato):
               f"Tema: {dato.get('Tema')}\nFuente: {dato.get('Fuente')} ({'oficial' if oficial else 'no oficial: atribúyelo'})\n"
               f"Grupo de capturas: {grupo or 'el que mejor case'}\n\n{catalogo(grupo)}\n\n"
               f"TEXTO DE LA FUENTE (dato principal):\n{dato.get('Dato')}" + extra + "\n\n" + FORMATO)
-    g = con_buen_gancho(prompt, min_palabras=70 if len(rel) >= 2 else (50 if rel else 0))
+    g = con_buen_gancho(prompt, min_palabras=80 if len(rel) >= 2 else (55 if rel else 0))
     if grupo:
         g["grupo"] = grupo  # la imagen la decide el banco (regla de G2)
         g["capturas"] = [c for c in g["capturas"] if CAPTURAS[c]["grupo"] == grupo]
