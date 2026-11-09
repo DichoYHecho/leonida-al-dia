@@ -51,3 +51,17 @@ jobs:
           name: video-de-prueba
           path: salida_prueba/
           retention-days: 7
+      - name: Hojas de los vídeos (rama hojas-stock, carpeta Prueba)
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git clone -q --depth 1 -b hojas-stock "https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git" pub
+          rm -rf pub/Prueba && mkdir -p pub/Prueba
+          for v in salida_prueba/*.mp4; do
+            n=$(basename "$v" .mp4)
+            ffmpeg -loglevel error -y -i "$v" -vf "fps=1,scale=180:320,tile=8x3" -frames:v 1 "pub/Prueba/$n.jpg" || true
+            cp "$v" pub/Prueba/ || true
+          done
+          ls -l salida_prueba > pub/Prueba/lista.txt || true
+          cd pub && git add -A && git -c user.name="github-actions" -c user.email="github-actions@users.noreply.github.com" commit -qm "Prueba (run ${{ github.run_number }})" && git push -q

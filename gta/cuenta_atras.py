@@ -163,7 +163,10 @@ def main():
     n, trozos, precarga, corta = textos(hoy, ahora, d)
     oficial = d["Estado"] == "Oficial"
     grupo = d.get("Imagen sugerida") if d.get("Imagen sugerida") in medios.GRUPOS else "Vice_City"
-    caps = medios.elegir(grupo, d["Orden"], 2)  # 30 oct: 2 capturas del tema (sin la foto del día)
+    # 31 oct: más vídeo que fotos: 1 captura (o arte) del tema y trozos de vídeo del mismo grupo
+    caps = medios.con_mas_video(medios.elegir(grupo, d["Orden"], 1), grupo, d["Orden"], 4)
+    if len(caps) < 2:  # el grupo no tiene trozos: 2 capturas, como antes
+        caps = medios.elegir(grupo, d["Orden"], 2)
     caption = (f"{d['Dato']}\n\n"
                f"Faltan {n} días para GTA 6: sale el jueves 19 de noviembre en PS5 y Xbox Series X|S. {precarga}\n\n"
                "Cuenta atrás hasta las 00:00 (hora de España): Rockstar no ha confirmado la hora de salida.\n"
