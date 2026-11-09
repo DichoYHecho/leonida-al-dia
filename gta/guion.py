@@ -13,7 +13,7 @@ Cada vídeo tiene que enseñar algo de verdad: no un dato suelto, sino el dato c
 un youtuber de gaming que se lo explica a un amigo, con guasa suave. Cada frase aporta información nueva: nada de relleno,
 frases hechas ni muletillas de anuncio («increíble», «sin duda», «prepárate», «no te lo vas a creer»).
 Reglas que no se pueden saltar:
-- Usa SOLO la información del TEXTO DE LA FUENTE. No añadas datos, cifras, fechas ni opiniones que no estén ahí.
+- Usa SOLO la información del TEXTO DE LA FUENTE (y de los DATOS RELACIONADOS, si los hay). No añadas datos, cifras, fechas ni opiniones que no estén ahí.
 - Si la fuente no es oficial (Rockstar Games o Take-Two), atribúyelo: «Según {medio}…», en el primer trozo del cuerpo (nunca en el gancho). «Rockstar confirma» solo si lo dice Rockstar o Take-Two.
 - Nada de filtraciones (material filtrado), rumores presentados como hechos ni destripes de la historia.
 - No copies frases literales de la fuente: cuéntalo con tus palabras.
@@ -142,15 +142,27 @@ def gancho_flojo(txt):
     txt = (txt or "").strip()
     return txt.startswith("¿") or txt.endswith("?") or bool(GANCHO_FLOJO.search(txt))
 
-def con_buen_gancho(prompt, intentos=3):
-    """Pide el guion; si el gancho es flojo, lo vuelve a pedir (como mucho «intentos» veces) y se queda el último."""
-    g = None
+def palabras(g):
+    return sum(len(t.split()) for t in g["trozos"])
+
+AVISO_CORTO = ("\n\nOJO: el guion anterior era demasiado corto ({n} palabras) y se quedaba en un dato suelto. Escribe entre 75 y 105 "
+               "palabras en total y usa al menos 2 de los DATOS RELACIONADOS, cada uno en su propia frase.")
+
+def con_buen_gancho(prompt, intentos=3, min_palabras=0):
+    """Pide el guion; si el gancho es flojo o (9 nov) se queda corto, lo vuelve a pedir (como mucho «intentos» veces)
+    y se queda el mejor. Solo gasta texto de Gemini, no voz."""
+    g, mejor, aviso = None, None, ""
     for i in range(intentos):
-        g = validar(gemini.texto_json(prompt if i == 0 else prompt + AVISO_GANCHO))
-        if not gancho_flojo(g["trozos"][0]) and not GANCHO_FLOJO.search(g["texto_post"] or ""):  # 30 oct: también el texto
+        g = validar(gemini.texto_json(prompt + aviso))
+        flojo = gancho_flojo(g["trozos"][0]) or bool(GANCHO_FLOJO.search(g["texto_post"] or ""))  # 30 oct: también el texto
+        corto = palabras(g) < min_palabras
+        if not flojo and (mejor is None or palabras(g) > palabras(mejor)):
+            mejor = g
+        if not flojo and not corto:
             return g
-        print(f"  (gancho flojo, se pide otro: {g['trozos'][0]})", flush=True)
-    return g
+        print(f"  (guion flojo o corto, {palabras(g)} palabras: se pide otro)", flush=True)
+        aviso = (AVISO_GANCHO if flojo else "") + (AVISO_CORTO.format(n=palabras(g)) if corto else "")
+    return mejor or g
 
 def caption(g, fuente, oficial, voz_reserva=False):
     linea = f"Fuente: {fuente}" + ("" if oficial else " (según medios)")
@@ -192,7 +204,7 @@ def de_dato(dato):
     rel = relacionados(dato)
     if rel:
         extra = ("\n\nDATOS RELACIONADOS (también comprobados; úsalos para dar contexto y detalle, cada uno con su "
-                 "atribución si no es oficial):\n" + "\n".join(
+                 "atribución si no es oficial). OBLIGATORIO: usa al menos 2, cada uno en su propia frase:\n" + "\n".join(
                      f"- {r['Dato']} (Fuente: {r['Fuente']}; {'oficial' if r.get('Estado') == 'Oficial' else 'no oficial: atribúyelo'})"
                      for r in rel))
     else:
@@ -203,7 +215,7 @@ def de_dato(dato):
               f"Tema: {dato.get('Tema')}\nFuente: {dato.get('Fuente')} ({'oficial' if oficial else 'no oficial: atribúyelo'})\n"
               f"Grupo de capturas: {grupo or 'el que mejor case'}\n\n{catalogo(grupo)}\n\n"
               f"TEXTO DE LA FUENTE (dato principal):\n{dato.get('Dato')}" + extra + "\n\n" + FORMATO)
-    g = con_buen_gancho(prompt)
+    g = con_buen_gancho(prompt, min_palabras=70 if len(rel) >= 2 else (50 if rel else 0))
     if grupo:
         g["grupo"] = grupo  # la imagen la decide el banco (regla de G2)
         g["capturas"] = [c for c in g["capturas"] if CAPTURAS[c]["grupo"] == grupo]
