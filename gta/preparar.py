@@ -48,6 +48,11 @@ def fila(g, tipo, fuente, oficial, enlace, texto_fuente, dia, orden=None):
     if len(caps) < 2:
         caps = (caps + [c for c in medios.elegir(g["grupo"], g["titular"] + str(orden or ""), 3) if c not in caps])[:cuantas]
     caps = caps[:3]
+    if dia < LANZAMIENTO:  # 9 nov: hasta el lanzamiento, abre una captura nueva de «The Launch Gallery» si su grupo la tiene
+        nuevas = [c for c in medios.elegir(g["grupo"], g["titular"] + str(orden or ""), 3)
+                  if "nueva" in medios.CAPTURAS.get(c, {}).get("notas", "")]
+        if nuevas and not any(c in nuevas for c in caps):
+            caps = [nuevas[0]] + caps[:2]
     if dia >= LANZAMIENTO:  # desde el 19 nov, el primer fondo es un clip de tus partidas (clips.py), si hay
         clip = clips.elegir(g["titular"] + str(orden or ""))
         if clip:

@@ -460,6 +460,7 @@ def fondo_en(t, fondos, tramos, estilo_trans):
     k, a, b = tramos[q]
     p = (t - a) / max(b - a, 1e-3)
     fondos[k].tramo = b - a
+    grafismo.ACTUAL = getattr(fondos[k], "ruta", "")
     # ¿cerca del corte siguiente o del anterior?
     efecto, lado = 0.0, 0
     if q + 1 < len(tramos) and b - t < TRANS / 2:
@@ -800,6 +801,7 @@ def montar(cfg):
         else:
             suj = c[3] if len(c) > 3 else sujetos_de(c[0], trozos[0])
             caps.append(Fondo(c[0], c[1], c[2], estilo=i % 3, sujetos=suj))
+            caps[-1].ruta = c[0]  # 9 nov: para saber qué captura se ve (etiqueta «NUEVO · 5 NOV»)
     if ca:
         suj = ca["sujetos_intro"] if "sujetos_intro" in ca else sujetos_de(ca["fondo_intro"])
         intro = Fondo(ca["fondo_intro"], ca.get("foco_intro", 0.5), "retrato", estilo=0, sujetos=suj)

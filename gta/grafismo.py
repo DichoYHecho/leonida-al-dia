@@ -18,6 +18,7 @@ TARJ_ABAJO = 1560                # borde inferior de la tarjeta; debajo quedan l
 TARJ_X = (110, 970)
 FUNDIDO = 0.3
 _f, _grad = {}, {}
+ACTUAL = ""  # foto o vídeo que se ve ahora mismo (lo apunta render2.fondo_en)
 
 
 def fuente(p, s):
@@ -88,22 +89,18 @@ def credito(img, txt):
     img.alpha_composite(capa)
 
 
-def es_nueva(cfg):
-    """¿Sale alguna captura de «The Launch Gallery» (5 nov)?"""
+def es_nueva(ruta):
+    """¿Es una captura de «The Launch Gallery» (5 nov)?"""
     try:
         import medios
-        for c in cfg.get("capturas") or []:
-            ruta = c[0] if isinstance(c, (list, tuple)) else c
-            n = os.path.splitext(os.path.basename(str(ruta)))[0]
-            if "nueva" in medios.CAPTURAS.get(n, {}).get("notas", ""):
-                return True
+        n = os.path.splitext(os.path.basename(str(ruta or "")))[0]
+        return "nueva" in medios.CAPTURAS.get(n, {}).get("notas", "")
     except Exception:
-        pass
-    return False
+        return False
 
 
 def textos(cfg):
-    sello = "NUEVO · 5 NOV" if es_nueva(cfg) else (cfg.get("tipo") or "GTA 6").upper()
+    sello = "NUEVO · 5 NOV" if es_nueva(ACTUAL) else (cfg.get("tipo") or "GTA 6").upper()
     titulo = (cfg.get("etiqueta") or "GTA 6").strip()
     return sello, titulo, (cfg.get("cuenta") or "").strip()
 
