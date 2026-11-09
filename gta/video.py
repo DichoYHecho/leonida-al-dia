@@ -13,7 +13,7 @@ from config import VOZ, VELOCIDAD_VOZ  # 9 nov: la voz entra en la huella; si ca
 from config import CACHE, T_PUB, cuenta_atras
 
 VOCES = os.path.join(CACHE, "voces")
-EDICION = "v4"  # 29 oct: subtítulos siempre legibles (fase E1, subtitulos.py). v3, 27 oct: sin cierre de marca (v2, 25 oct: edición nueva (render2 + encuadre). Si cambia, la repesca rehace los vídeos sin publicar
+EDICION = "v5"  # 9 nov: grafismo de cristal y voz a velocidad 1,0;  # 29 oct: subtítulos siempre legibles (fase E1, subtitulos.py). v3, 27 oct: sin cierre de marca (v2, 25 oct: edición nueva (render2 + encuadre). Si cambia, la repesca rehace los vídeos sin publicar
 
 
 def huella(*partes):
