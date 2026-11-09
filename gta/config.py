@@ -29,7 +29,7 @@ ESTILO_VOZ = ("Habla todo el texto en español de España, de principio a fin, s
               "Native Castilian Spanish accent from Spain. Warm and close, light humour, natural pauses "
               "between sentences. Speak SLOWLY and calmly, at a relaxed conversational pace, taking short breaths "
               "between ideas; never rushed, never sounds like an advert or a radio announcer.")
-VELOCIDAD_VOZ = 0.97  # 9 nov: a 1.03 seguía sonando acelerado y poco natural; Adrià pide más calma
+VELOCIDAD_VOZ = 1.0  # 9 nov: a 0,97 sonaba demasiado pausada y a 1,03 acelerada; punto medio
 
 # Calendario
 LANZAMIENTO = date(2026, 11, 19)
