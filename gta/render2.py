@@ -19,6 +19,7 @@ captura, un 4.º valor con los sujetos que hay que enseñar [(x0, y0, x1, y1)].
 import math, os, re, subprocess
 import numpy as np, soundfile as sf
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
+import grafismo  # HUD y tarjeta de cristal (9 nov)
 
 W, H, FPS = 1080, 1920, 30
 AQUI = os.path.dirname(os.path.abspath(__file__))
@@ -459,6 +460,7 @@ def fondo_en(t, fondos, tramos, estilo_trans):
     k, a, b = tramos[q]
     p = (t - a) / max(b - a, 1e-3)
     fondos[k].tramo = b - a
+    grafismo.ACTUAL = getattr(fondos[k], "ruta", "")
     # ¿cerca del corte siguiente o del anterior?
     efecto, lado = 0.0, 0
     if q + 1 < len(tramos) and b - t < TRANS / 2:
@@ -467,7 +469,7 @@ def fondo_en(t, fondos, tramos, estilo_trans):
         efecto, lado = 1 - (t - a) / (TRANS / 2), 1
     if efecto <= 0:
         return fondos[k].fotograma(p), 0.0
-    e = efecto ** 2
+    e = float(efecto) ** 2  # 9 nov: float; con un número de numpy fallaba el desenfoque de PIL
     tipo = estilo_trans[q if lado < 0 else q - 1]
     if tipo == "barrido":
         desp = e * W * 0.55 * (1 if lado < 0 else -1)
@@ -799,6 +801,7 @@ def montar(cfg):
         else:
             suj = c[3] if len(c) > 3 else sujetos_de(c[0], trozos[0])
             caps.append(Fondo(c[0], c[1], c[2], estilo=i % 3, sujetos=suj))
+            caps[-1].ruta = c[0]  # 9 nov: para saber qué captura se ve (etiqueta «NUEVO · 5 NOV»)
     if ca:
         suj = ca["sujetos_intro"] if "sujetos_intro" in ca else sujetos_de(ca["fondo_intro"])
         intro = Fondo(ca["fondo_intro"], ca.get("foco_intro", 0.5), "retrato", estilo=0, sujetos=suj)
@@ -882,8 +885,6 @@ def montar(cfg):
             img = Image.alpha_composite(img, Image.new("RGBA", (W, H), NOCHE + (90,)))
             numero_cuenta(img, t, ca, acento if acento != WHITE else AMBER)
             lineas_cuenta(img, t, ca, tiempos[1][0] - 0.1 if ca["trozos_intro"] > 1 else 0.6)
-        img = barrido_luz(img, t)
-        cabecera(img, t, cfg, mostrar_cuenta=not en_intro)
         if not ca:
             if e1:
                 subtitulos.dibujar_banda_gancho(img, t, plan_g)
@@ -909,9 +910,12 @@ def montar(cfg):
                     img.alpha_composite(capa)
                     break
         pregunta(img, t, trozos[ultimo], t_pregunta, 1 - suave((t - t_cierre) / 0.2))
-        pie(img, cfg["pie"])
+        # tarjeta de cristal abajo: desde que se va el gancho (o el sello de la cuenta atrás) hasta la pregunta
+        t_tarj = (tiempos[ca["trozo_dato"]][0] + 0.9) if ca else salida_gancho + 0.2
+        grafismo.tarjeta(img, t, cfg, t_tarj, t_pregunta)
+        grafismo.credito(img, cfg["pie"])
         img = cierre_marca(img, t, t_cierre)
-        barra_progreso(img, t, dur, acento if acento != WHITE else AMBER)
+        grafismo.barra(img, t, dur)
         if flash > 0:
             img = Image.alpha_composite(img, Image.new("RGBA", (W, H), (255, 255, 255, int(255 * min(flash, 0.8)))))
         if e1:  # capa siempre encima: los subtítulos se pintan los últimos (también encima del destello)

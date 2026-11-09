@@ -18,13 +18,13 @@ W, H = 1080, 1920
 CX = 510           # centro horizontal (30 px a la izquierda: botones de la derecha)
 ANCHO = 800        # ancho máximo del texto (de 110 a 910 px)
 ALTO_ZONA = 200    # alto que se mide alrededor de la línea
-ZONAS = (("media", 1180, 0.0), ("baja", 1360, 0.02), ("alta", 440, 0.06))  # nombre, centro y, penalización
+ZONAS = (("media", 1140, 0.0), ("alta", 440, 0.06))  # 9 nov: sin zona baja, ahí va la tarjeta de cristal (grafismo.py)  # nombre, centro y, penalización
 LIMPIO = 0.18      # por debajo, el fondo no molesta: zona media y sin banda
 BANDA_MAX = 0.78   # opacidad máxima de la banda oscura
 CAMBIAR = 0.40     # la zona solo cambia si la media pasa de esto…
 MEJORA = 0.15      # …y la otra es al menos esto más limpia
 TAPADO = 0.85      # nota tan alta que ni con la banda se garantiza la lectura → aviso
-ENCOGER_LOGO = (0.72, -260)  # trozos con el logo de GTA VI: tamaño y desplazamiento vertical (sube)
+ENCOGER_LOGO = (0.56, -420)  # trozos con el logo de GTA VI: tamaño y desplazamiento vertical (sube). 4 nov: el logo queda por encima de los subtítulos
 
 
 def es_logo(ruta):
@@ -112,7 +112,7 @@ def planificar(grupos, t_pregunta, fondo_rgb, tramo_de, gancho=None):
         zona = zona_tramo.get(tramo_de((a + b) / 2), "media") if notas else "media"
         if gancho and a < gancho[0]:
             if zona == "alta":  # nunca encima del gancho
-                zona = "media" if notas.get("media", 0) <= notas.get("baja", 0) + 0.02 else "baja"
+                zona = "media"  # 9 nov: ya no hay zona baja
             if gancho[1] > 900:  # gancho abajo: esperar a que se vaya
                 a = gancho[0]
         nota = notas.get(zona, 0.0)
@@ -158,21 +158,18 @@ def dibujar(img, t, plan, grupos, f, acento, r):
         cy = p["cy"]
         capa = Image.new("RGBA", (W, H), (0, 0, 0, 0))
         lineas = r.partir_lineas([(w, x, y) for _, w, x, y in g], f, ANCHO)
-        r.poner_palabras(capa, lineas, cy, f, acento, t, borde=10)
-        if p["banda"] > 0:
-            caja = capa.getbbox()
-            if caja:
-                fondo = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-                x0, y0, x1, y1 = caja
-                ImageDraw.Draw(fondo).rounded_rectangle([x0 - 26, y0 - 10, x1 + 26, y1 + 6], 34,
-                                                        fill=r.NOCHE + (int(255 * p["banda"]),))
-                fondo.alpha_composite(capa)
-                capa = fondo
+        r.poner_palabras(capa, lineas, cy, f, acento, t, borde=10, caja=False)  # 9 nov: palabra activa en color, sin caja
         e = r.sale((t - p["a"]) / 0.12)
         if e < 1:
             esc = 0.8 + 0.2 * e
             capa = capa.transform((W, H), Image.AFFINE, (1 / esc, 0, W / 2 * (1 - 1 / esc), 0, 1 / esc,
                                                          cy * (1 - 1 / esc)), resample=Image.BILINEAR)
+        caja = capa.getbbox()
+        if caja:  # 9 nov: pastilla de cristal (grafismo.py) en vez de la banda oscura
+            import grafismo
+            dx = W // 2 - CX
+            x0, y0, x1, y1 = caja
+            grafismo.cristal(img, (x0 - dx - 30, y0 - 14, x1 - dx + 30, y1 + 10), 34, min(1.0, e))
         img.alpha_composite(capa, (0, 0), (W // 2 - CX, 0))  # desplazado a la izquierda (zona segura)
         return
 

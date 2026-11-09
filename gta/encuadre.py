@@ -12,12 +12,14 @@ import hashlib, json, os
 from config import CACHE
 
 DIR = os.path.join(CACHE, "voces", "encuadres")  # dentro de la caché de las voces, que guardan todas las tareas
-VERSION = "2"
+VERSION = "3"  # 9 nov: solo protagonistas (salía un preso del fondo en vez de Lucía)
 
 PROMPT = """Esta imagen va a salir de fondo en un vídeo vertical (9:16) que solo enseña una franja estrecha de ella.
 Dime qué tiene que verse para que la imagen se entienda y sea interesante:
 - Si hay personas o personajes, sus CARAS: la caja de cada persona es SOLO su cabeza (de la coronilla a la barbilla),
-  aunque se vea el cuerpo entero. Todas las caras que se vean bien.
+  aunque se vea el cuerpo entero. SOLO las de los protagonistas: personas en primer plano, grandes y enfocadas.
+  No cuentes a quien está detrás, al fondo, desenfocado, de espaldas o cortado por el borde.
+  Si una persona destaca claramente (más grande, más cerca, más nítida), devuelve SOLO esa.
 - Si no hay caras, el objeto, vehículo, edificio, animal o cartel principal.
 {contexto}
 Devuelve SOLO este JSON, como mucho 4 sujetos, el más importante primero:

@@ -1,0 +1,29 @@
+name: Prueba de voces del vídeo largo
+
+on:
+  workflow_dispatch:
+
+jobs:
+  voces:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Generar las voces de prueba
+        env:
+          # Usa la clave del vídeo si existe; si no, la de Leónida al Día
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY_VIDEO || secrets.GEMINI_API_KEY }}
+        run: python video_largo/prueba_voces.py
+
+      - name: Guardar los audios
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: voces-video-largo
+          path: salida/
+          if-no-files-found: warn

@@ -9,10 +9,11 @@
 import hashlib, json, os, re, shutil, tempfile, unicodedata
 from datetime import date
 import airtable, medios, render, render2, voz
+from config import VOZ, VELOCIDAD_VOZ  # 9 nov: la voz entra en la huella; si cambia de voz, se pide de nuevo
 from config import CACHE, T_PUB, cuenta_atras
 
 VOCES = os.path.join(CACHE, "voces")
-EDICION = "v4"  # 29 oct: subtítulos siempre legibles (fase E1, subtitulos.py). v3, 27 oct: sin cierre de marca (v2, 25 oct: edición nueva (render2 + encuadre). Si cambia, la repesca rehace los vídeos sin publicar
+EDICION = "v5"  # 9 nov: grafismo de cristal y voz a velocidad 1,0;  # 29 oct: subtítulos siempre legibles (fase E1, subtitulos.py). v3, 27 oct: sin cierre de marca (v2, 25 oct: edición nueva (render2 + encuadre). Si cambia, la repesca rehace los vídeos sin publicar
 
 
 def huella(*partes):
@@ -41,7 +42,7 @@ def preparar_voz(f):
     trozos = trozos_de(f)
     if len(trozos) < 3:
         raise RuntimeError("el guion necesita al menos 3 líneas (gancho, cuerpo y pregunta final)")
-    h = huella((f.get("Guion") or "").strip())
+    h = huella(f"{VOZ} {VELOCIDAD_VOZ} calma", (f.get("Guion") or "").strip())  # 9 nov: velocidad y estilo nuevos: se piden de nuevo
     os.makedirs(VOCES, exist_ok=True)
     wav, js = os.path.join(VOCES, h + ".wav"), os.path.join(VOCES, h + ".json")
     if os.path.exists(wav) and os.path.exists(js):
@@ -92,7 +93,25 @@ def montar(f, dia, semilla, salida_dir, extra=None):
     return salida, info, cambios
 
 
+def encoger(ruta, maximo=4.8e6):
+    """9 nov: con el cristal desenfocado algunos vídeos pasan de 5 MB (límite de Airtable): se recomprimen."""
+    import subprocess
+    if os.path.getsize(ruta) <= maximo:
+        return
+    r = subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", ruta],
+                       capture_output=True, text=True)
+    dur = float((r.stdout or "30").strip() or 30)
+    kbps = max(800, int(maximo * 8 / dur / 1000) - 160)  # deja sitio al audio
+    tmp = ruta + ".tmp.mp4"
+    subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", ruta, "-c:v", "libx264", "-preset", "medium",
+                    "-b:v", f"{kbps}k", "-maxrate", f"{kbps}k", "-bufsize", f"{2 * kbps}k", "-pix_fmt", "yuv420p",
+                    "-c:a", "copy", "-movflags", "+faststart", tmp], check=True)
+    os.replace(tmp, ruta)
+    print(f"  Vídeo recomprimido a {os.path.getsize(ruta) / 1e6:.1f} MB ({kbps} kb/s)")
+
+
 def subir(rec_id, ruta):
+    encoger(ruta)
     """Sube el vídeo y devuelve la URL del nuevo adjunto (el viejo se quita después)."""
     nuevo = airtable.subir_adjunto(rec_id, "Vídeo", ruta, "video/mp4")
     if not nuevo:  # por si la respuesta no trae el adjunto: se lee la publicación (1 llamada más)

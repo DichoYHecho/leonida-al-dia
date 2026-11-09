@@ -226,6 +226,9 @@ def elegir(grupo, semilla, cuantas=2):
     lista = principales or secundarias
     k = int(hashlib.sha256(str(semilla).encode()).hexdigest(), 16) % len(lista)
     orden = lista[k:] + lista[:k]
+    # Hasta el lanzamiento, primero las capturas nuevas de «The Launch Gallery» (5 nov)
+    nuevas = [n for n in orden if "nueva" in CAPTURAS[n]["notas"]]
+    orden = nuevas + [n for n in orden if n not in nuevas]
     elegidas = orden[:cuantas]
     if len(elegidas) < cuantas:
         elegidas += [s for s in secundarias if s not in elegidas][:cuantas - len(elegidas)]

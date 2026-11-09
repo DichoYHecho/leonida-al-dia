@@ -48,6 +48,11 @@ def fila(g, tipo, fuente, oficial, enlace, texto_fuente, dia, orden=None):
     if len(caps) < 2:
         caps = (caps + [c for c in medios.elegir(g["grupo"], g["titular"] + str(orden or ""), 3) if c not in caps])[:cuantas]
     caps = caps[:3]
+    if dia < LANZAMIENTO:  # 9 nov: hasta el lanzamiento, abre una captura nueva de «The Launch Gallery» si su grupo la tiene
+        nuevas = [c for c in medios.elegir(g["grupo"], g["titular"] + str(orden or ""), 3)
+                  if "nueva" in medios.CAPTURAS.get(c, {}).get("notas", "")]
+        if nuevas and not any(c in nuevas for c in caps):
+            caps = [nuevas[0]] + caps[:2]
     if dia >= LANZAMIENTO:  # desde el 19 nov, el primer fondo es un clip de tus partidas (clips.py), si hay
         clip = clips.elegir(g["titular"] + str(orden or ""))
         if clip:
@@ -232,14 +237,14 @@ def datos(regs_todas, carpeta):
     regs = airtable.listar(T_PUB, ["Estado", "Orden dato"], formula="{Tipo}='Dato'")
     usados = {int(r["fields"]["Orden dato"]) for r in regs if r["fields"].get("Orden dato") is not None}
     pendientes = sum(1 for r in regs if r["fields"].get("Estado") in ("Por Revisar", "Aprobado"))
-    falta = DATOS_EN_COLA - pendientes
+    falta = int(os.environ.get("COLA") or DATOS_EN_COLA) - pendientes   # COLA: a mano, para preparar más datos
     nota(f"Datos pendientes de publicar: {pendientes}; se preparan {max(falta, 0)}")
     if falta <= 0:
         return []
     dia = max(HOY + timedelta(days=1), ARRANQUE)
     out, fallos = [], 0
     for d in banco():
-        if falta <= 0 or fallos >= 3:
+        if falta <= 0 or fallos >= 6:
             break
         orden = int(d["Orden"])
         if orden in usados:
@@ -255,6 +260,8 @@ def datos(regs_todas, carpeta):
         except Exception as e:
             fallos += 1
             nota(f"⚠️ No se pudo preparar el dato {orden}: {str(e)[:200]}")
+            import traceback
+            print(traceback.format_exc()[-1500:], flush=True)
     if falta > 0:
         nota("⚠️ Quedan pocos datos en el banco: hay que añadir más a gta/banco_datos.csv")
     return out

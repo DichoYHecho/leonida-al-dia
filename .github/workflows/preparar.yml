@@ -22,6 +22,10 @@ on:
         description: "Máximo de noticias (vacío = 3 por la mañana y 2 por la tarde)"
         required: false
         default: ""
+      cola:
+        description: "Datos que tiene que haber en cola (vacío = 3). Para preparar N datos más: 3 + N"
+        required: false
+        default: ""
 
 concurrency:
   group: videos
@@ -68,6 +72,7 @@ jobs:
       GOOGLE_REFRESH_TOKEN: ${{ secrets.GOOGLE_REFRESH_TOKEN }}
       QUE: ${{ inputs.que || 'todo' }}
       MAX: ${{ inputs.max }}
+      COLA: ${{ inputs.cola }}
     steps:
       - uses: actions/checkout@v5
       - uses: ./.github/actions/entorno

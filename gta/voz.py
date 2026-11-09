@@ -1,15 +1,20 @@
 """Voz del vídeo y tiempos de los subtítulos.
 
-- Principal: Gemini «Mako» (estilo «Promote»), un solo audio con todo el guion (1 petición por vídeo).
+- Principal: Gemini, con la voz y el estilo de config.py (desde el 9 nov, Orus, la de los vídeos largos, a +12 %),
+  un solo audio con todo el guion (1 petición por vídeo).
   Los subtítulos se sincronizan con Whisper (palabra a palabra); si falla, por las pausas de la voz.
 - Reserva: Piper «sharvard» (voz natural española, CC BY 3.0), trozo a trozo, con tiempos exactos."""
-import difflib, json, os, re, unicodedata
+import difflib, json, os, re, subprocess, unicodedata
 import numpy as np, soundfile as sf
 import gemini
+from config import VOZ, VELOCIDAD_VOZ
 
 SR = 24000
 MODELOS = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "modelos")
 PIPER = "vits-piper-es_ES-sharvard-medium"
+# 2 nov: parte del guion que Whisper tiene que reconocer en la voz de Gemini. Si es menos, la voz se ha ido
+# del texto (por ejemplo, se ha pasado al inglés a mitad del vídeo) y se pide otra.
+UMBRAL = 0.8
 PRON_PIPER = [(r"\bGTA 6\b", "ge te a seis"), (r"\bGTA VI\b", "ge te a seis"), (r"\bGTA\b", "ge te a"),
               (r"Rockstar", "Rocstar"), (r"Vice City", "Vais Síti"), (r"\bJason\b", "Yéison")]
 
@@ -64,6 +69,18 @@ def por_pausas(x, trozos):
 
 
 def por_whisper(ruta, trozos):
+    return _whisper(ruta, trozos)[0]
+
+
+def cobertura(ruta, trozos):
+    """Parte del guion (de 0 a 1) que Whisper reconoce en el audio (0 si no entiende casi nada)."""
+    try:
+        return _whisper(ruta, trozos)[1]
+    except Exception:
+        return 0.0
+
+
+def _whisper(ruta, trozos):
     from faster_whisper import WhisperModel
     x, sr = sf.read(ruta, dtype="float32")
     if x.ndim > 1:
@@ -108,7 +125,7 @@ def por_whisper(ruta, trozos):
     for k in range(len(trozos)):
         idx = [i for i, kk in enumerate(de_trozo) if kk == k]
         out.append((tiempos[idx[0]][0], tiempos[idx[-1]][1]) if idx else (out[-1][1] if out else 0, out[-1][1] if out else 0))
-    return out
+    return out, len(conocidos) / len(guion)
 
 
 def alinear(ruta, trozos):
@@ -128,6 +145,14 @@ def alinear(ruta, trozos):
 
 
 # ---------------------------------------------------------------- voces
+def acelerar(ruta, factor):
+    """9 nov: misma velocidad que los vídeos largos (+12 %). atempo no cambia el tono de la voz."""
+    if abs(factor - 1) < 0.01:
+        return
+    tmp = ruta + ".rapido.wav"
+    subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", ruta, "-filter:a", f"atempo={factor}", tmp], check=True)
+    os.replace(tmp, ruta)
+
 def con_silencio(ruta, inicio=0.15):
     """Añade 0,15 s de silencio al principio (para que el primer fotograma ya tenga el gancho)."""
     x, sr = sf.read(ruta, dtype="float32")
@@ -170,11 +195,31 @@ def piper(trozos, ruta):
 def generar(trozos, ruta):
     """Crea la voz en `ruta` (wav). Devuelve (tiempos, nombre de la voz, aviso o '')."""
     try:
-        wav, modelo = gemini.voz(" ".join(trozos))
+        mejor = None
+        for intento in range(2):  # 2 nov: si la voz no sigue el guion (se pasa al inglés…), se pide otra una vez
+            try:
+                wav, modelo = gemini.voz(" ".join(trozos))
+            except Exception:
+                if mejor:
+                    break
+                raise
+            open(ruta, "wb").write(wav)
+            acelerar(ruta, VELOCIDAD_VOZ)
+            con_silencio(ruta)
+            c = cobertura(ruta, trozos)
+            if c >= UMBRAL:
+                tiempos, metodo = alinear(ruta, trozos)
+                return tiempos, f"Gemini {VOZ} ({modelo}, subtítulos por {metodo})", ""
+            print(f"  La voz no sigue el guion (Whisper reconoce el {c:.0%}): se pide otra", flush=True)
+            if mejor is None or c > mejor[0]:
+                mejor = (c, wav, modelo)
+        c, wav, modelo = mejor
         open(ruta, "wb").write(wav)
+        acelerar(ruta, VELOCIDAD_VOZ)
         con_silencio(ruta)
         tiempos, metodo = alinear(ruta, trozos)
-        return tiempos, f"Gemini Mako ({modelo}, subtítulos por {metodo})", ""
+        return (tiempos, f"Gemini {VOZ} ({modelo}, subtítulos por {metodo})",
+                f"Revisa la voz: puede pasarse al inglés o saltarse texto (Whisper solo reconoce el {c:.0%} del guion)")
     except Exception as e:
         print(f"  Voz de Gemini no disponible: {str(e)[:300]}", flush=True)
         tiempos = piper(trozos, ruta)

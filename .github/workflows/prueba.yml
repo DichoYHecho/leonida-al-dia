@@ -16,7 +16,7 @@ on:
         default: ""
 
 permissions:
-  contents: write  # 31 oct (rama stock-nuevo): sube las hojas a la rama hojas-stock
+  contents: write  # 9 nov: para dejar el vídeo en la rama muestras-shorts
 
 jobs:
   prueba:
@@ -35,8 +35,18 @@ jobs:
       - uses: ./.github/actions/entorno
       - name: Hacer el vídeo de prueba
         run: python gta/prueba.py
+      - name: Dejar el vídeo en la rama muestras-shorts (no depende del almacén de artefactos)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          ls salida_prueba/*.mp4 >/dev/null 2>&1 || exit 0
+          URL="https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          git clone -q --depth 1 -b muestras-shorts "$URL" /tmp/m 2>/dev/null || (mkdir -p /tmp/m && cd /tmp/m && git init -q && git checkout -q -b muestras-shorts)
+          for f in salida_prueba/*.mp4; do cp "$f" "/tmp/m/dato_${ORDEN}_$(basename "$f")"; ffmpeg -loglevel error -y -i "$f" -vf "fps=2/3,scale=360:-1,tile=6x3" -frames:v 1 "/tmp/m/hoja_${ORDEN}_$(basename "$f" .mp4).jpg" || true; done
+          cd /tmp/m && git add -A && git -c user.name=github-actions -c user.email=actions@github.com commit -qm "Muestra del dato ${ORDEN}" && git push -q "$URL" muestras-shorts
       - uses: actions/upload-artifact@v4
         if: always()
+        continue-on-error: true  # el almacén de artefactos está lleno; el vídeo ya va a muestras-shorts
         with:
           name: video-de-prueba
           path: salida_prueba/
