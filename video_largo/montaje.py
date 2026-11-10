@@ -45,7 +45,10 @@ FUENTES = pathlib.Path(os.environ.get("DIR_FUENTES", "fuentes"))
 SOLO = [x.strip() for x in os.environ.get("BLOQUES_SOLO", "").split(",") if x.strip()]
 URL_ZIP = P._V + "GTAVI_Videos.zip"
 P.VIDEOS.update(getattr(guion_vl, "VIDEOS_EXTRA", {}))  # vídeos oficiales que añade el guion
-FIJOS = set(getattr(guion_vl, "PLANOS_FIJOS", ()))  # logos y carteles: sin movimiento de cámara
+FIJOS = set(getattr(guion_vl, "PLANOS_FIJOS", ()))
+CRISTAL = bool(getattr(guion_vl, "CRISTAL", False))  # vídeo 4: grafismo de cristal estilo Apple (cristal.py)
+if CRISTAL:
+    import cristal  # noqa: E402  # logos y carteles: sin movimiento de cámara
 for d in (OUT, HQ, FUENTES):
     d.mkdir(parents=True, exist_ok=True)
 
@@ -103,7 +106,7 @@ def fuente(video):
 
 def tabla():
     out = {}
-    for nombre in ("trozos.csv", "trozos_vl.csv", "trozos_vc.csv", "trozos_auto.csv", "trozos_auto_sg.csv"):
+    for nombre in ("trozos.csv", "trozos_vl.csv", "trozos_vc.csv", "trozos_auto.csv", "trozos_auto_sg.csv", "trozos_auto_jl.csv"):
         if not (AQUI / nombre).exists():
             continue
         with open(AQUI / nombre, encoding="utf-8") as f:
@@ -1044,8 +1047,17 @@ def main():
         if b.get("cartela"):
             k += 1
             destino = str(carpeta / f"{k:03d}_cartela.mp4")
-            P.run(["ffmpeg", "-y", "-loglevel", "error", "-f", "lavfi", "-i", f"color=c=black:s={W}x{H}:r={FPS}:d={DUR_CARTELA}",
-                   "-c:v", "libx264", "-crf", "12", "-preset", "veryfast", "-pix_fmt", "yuv420p", destino])
+            hecho = False
+            if CRISTAL and not DRY and b["plan"]:  # vídeo 4: fotograma quieto y difuminado en vez de negro
+                try:
+                    o = tb[b.get("intro_original") or b["plan"][0][0]]
+                    cristal.fotograma_cartela(fuente(o["video"]), o["ini"] + o["dur"] / 2, destino, DUR_CARTELA, FPS)
+                    hecho = True
+                except Exception as e:  # noqa: BLE001
+                    print("  cartela sin fotograma, va en negro:", e, flush=True)
+            if not hecho:
+                P.run(["ffmpeg", "-y", "-loglevel", "error", "-f", "lavfi", "-i", f"color=c=black:s={W}x{H}:r={FPS}:d={DUR_CARTELA}",
+                       "-c:v", "libx264", "-crf", "12", "-preset", "veryfast", "-pix_fmt", "yuv420p", destino])
             lista_concat.append(destino)
         if b.get("intro_original"):
             k += 1
@@ -1108,6 +1120,7 @@ def main():
     anadir_cartelas(TMP / "rotulos.ass", bloques)
     if not LINEA_ANIMADA:
         anadir_linea(TMP / "rotulos.ass", bloques, total)
+    PANELES = cristal.retocar(TMP / "rotulos.ass", total) if CRISTAL else []
     # 5) audio: voz + música que baja con la voz + sonidos originales
     n = int(total * SR)
     voz = np.zeros((n, 2), np.float32)
@@ -1153,12 +1166,14 @@ def main():
     P.crear_degradado(TMP / "degradado.png")
     linea_mov = esperar_linea(hilo_linea)
     capa_linea = (f"[3:v]format=rgba[lt];[v1][lt]overlay=0:{LT.Y0}:eof_action=pass[v1b];" if linea_mov else "")
+    ent_cristal, cad_cristal = (cristal.filtros(PANELES, 4 if linea_mov else 3, TMP, FPS, "v1b" if linea_mov else "v1", "vc")
+                                if CRISTAL else ([], ""))
     grafo = (f"[0:v]tpad=stop_mode=clone:stop_duration=3,eq=contrast=1.04:saturation=1.08,unsharp=5:5:0.4:5:5:0.0[v0];"
              f"[2:v]format=rgba[g];[v0][g]overlay=0:{H - P.ALTO_DEGRADADO}:shortest=1[v1];"
-             + capa_linea + f"[{'v1b' if linea_mov else 'v1'}]ass={TMP / 'rotulos.ass'}[v]")
+             + capa_linea + cad_cristal + f"[{'vc' if CRISTAL else ('v1b' if linea_mov else 'v1')}]ass={TMP / 'rotulos.ass'}[v]")
     final = HQ / "video_largo.mp4"
     P.run(["ffmpeg", "-y", "-loglevel", "error", "-i", TMP / "sin_audio.mp4", "-i", TMP / "mezcla.wav",
-           "-loop", "1", "-framerate", FPS, "-i", TMP / "degradado.png", *(["-i", linea_mov] if linea_mov else []),
+           "-loop", "1", "-framerate", FPS, "-i", TMP / "degradado.png", *(["-i", linea_mov] if linea_mov else []), *ent_cristal,
            "-filter_complex", grafo, "-map", "[v]",
            "-map", "1:a", "-af", "loudnorm=I=-14:TP=-1.5:LRA=11", "-c:v", "libx264", "-crf", "19", "-preset", "medium",
            "-pix_fmt", "yuv420p", "-c:a", "aac", "-b:a", "192k", "-ar", SR, "-t", f"{total:.2f}", "-movflags", "+faststart",
