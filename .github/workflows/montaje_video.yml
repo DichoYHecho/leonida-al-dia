@@ -7,7 +7,7 @@ on:
         description: "Solo estos bloques separados por comas (hook,c01,...); vacío = el vídeo entero"
         default: ""
       guion:
-        description: "Guion: guion_vl (vídeo 1), guion_vc (vídeo 2, Vice City) o guion_sg (vídeo 3, la saga)"
+        description: "Guion: guion_vl (vídeo 1), guion_vc (vídeo 2, Vice City), guion_sg (vídeo 3, la saga) o guion_jl (vídeo 4, Jason y Lucía)"
         default: "guion_vl"
       solo_voces:
         description: "1 = solo el informe del final de cada voz (sin montar)"
@@ -23,7 +23,7 @@ jobs:
     env:
       BLOQUES_SOLO: ${{ inputs.bloques }}
       GUION: ${{ inputs.guion }}
-      RAMA: ${{ inputs.guion == 'guion_vc' && 'montaje-vc' || inputs.guion == 'guion_sg' && (inputs.bloques != '' && 'montaje-sg-previa' || 'montaje-sg') || 'montaje-vl' }}
+      RAMA: ${{ inputs.guion == 'guion_vc' && 'montaje-vc' || inputs.guion == 'guion_sg' && (inputs.bloques != '' && 'montaje-sg-previa' || 'montaje-sg') || inputs.guion == 'guion_jl' && (inputs.bloques != '' && 'montaje-jl-previa' || 'montaje-jl') || 'montaje-vl' }}
       SOLO_VOCES: ${{ inputs.solo_voces }}
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
@@ -38,7 +38,7 @@ jobs:
       - name: Instalar programas
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -y -qq ffmpeg fonts-dejavu-core fonts-montserrat fonts-bebas-neue
+          sudo apt-get install -y -qq ffmpeg fonts-dejavu-core fonts-montserrat fonts-bebas-neue fonts-inter
           pip install numpy pillow faster-whisper==1.2.1
 
       - name: Trozos del stock nuevo
@@ -46,6 +46,7 @@ jobs:
           git show origin/stock-nuevo:gta/trozos.csv > video_largo/trozos.csv
           git show origin/trozos-vc:trozos_auto.csv > video_largo/trozos_auto.csv || true
           git show origin/trozos-sg:trozos_auto.csv > video_largo/trozos_auto_sg.csv || true
+          git show origin/trozos-jl:trozos_auto.csv > video_largo/trozos_auto_jl.csv || true
 
       - name: Recuperar las voces ya pedidas
         uses: actions/cache/restore@v4
