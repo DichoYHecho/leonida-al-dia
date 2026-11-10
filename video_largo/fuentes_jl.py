@@ -10,12 +10,13 @@ preparar_trozos.py (FUENTES_MOD=fuentes_jl) deja los trozos y las hojas de conta
 from fuentes_vc import RS
 
 _V = "https://media-rockstargames-com.akamaized.net/VI/downloads/videos/"
-LARGO = {"min_dur": 3.5, "max_dur": 6.0}
+LARGO = {"min_dur": 3.5, "max_dur": 6.0}  # mirada extendida: planos largos de partida
+TRAILER = {"min_dur": 2.0, "max_dur": 6.0}  # los tráileres cortan rápido: con 3,5 s apenas salía nada (1.ª prueba, 10 nov)
 
 FUENTES = {
-    "LZ": {"grupo": "GTA6_Lanzamiento", "url": _V + "GTAVI_Launch_Trailer/GTAVI_Launch_Trailer.mp4", "max": 30, **LARGO},
-    "T2": {"grupo": "GTA6_T2", "url": _V + "GTAVI_Trailer_2/GTAVI_Trailer_2.mp4", "max": 35, **LARGO},
-    "T1": {"grupo": "GTA6_T1", "url": _V + "GTAVI_Trailer_1/GTAVI_Trailer_1.mp4", "max": 25, **LARGO},
-    "MI": {"grupo": "GTA6_Mirada", "url": RS + "rk721912/flv/es-es-1080p.mp4", "max": 90, **LARGO},
-    "RDR2": {"grupo": "RDR2_2018", "url": RS + "6c8k48rr/flv/en-us-1080p.mp4", "max": 10, **LARGO},
+    "LZ": {"grupo": "GTA6_Lanzamiento", "url": _V + "GTAVI_Launch_Trailer/GTAVI_Launch_Trailer.mp4", "max": 40, **TRAILER},
+    "T2": {"grupo": "GTA6_T2", "url": _V + "GTAVI_Trailer_2/GTAVI_Trailer_2.mp4", "max": 35, **TRAILER},
+    "T1": {"grupo": "GTA6_T1", "url": _V + "GTAVI_Trailer_1/GTAVI_Trailer_1.mp4", "max": 35, **TRAILER},
+    "MI": {"grupo": "GTA6_Mirada", "url": RS + "rk721912/flv/es-es-1080p.mp4", "max": 170, **LARGO},
+    "RDR2": {"grupo": "RDR2_2018", "url": RS + "6c8k48rr/flv/en-us-1080p.mp4", "max": 10, **TRAILER},
 }
