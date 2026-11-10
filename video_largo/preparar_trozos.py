@@ -74,6 +74,22 @@ def vale(img):
     return g.mean() >= 30 and g.std() >= 18
 
 
+VISTOS = []  # firmas de los trozos ya elegidos en cualquier fuente (DEDUP=1)
+
+
+def firma(img):
+    return img.mean(axis=2)[::5, ::5].astype(np.float32)
+
+
+def repetido(img, otros=()):
+    """True si el fotograma casi coincide con uno ya elegido (de esta fuente o de otra). Solo con DEDUP=1:
+    así no salen dos veces la misma toma aunque venga en el tráiler 2, el de lanzamiento y la mirada extendida."""
+    if os.environ.get("DEDUP") != "1":
+        return False
+    f = firma(img)
+    return any(np.abs(f - v).mean() < 10 for v in VISTOS + [firma(o) for o in otros])
+
+
 def repartir(lista, n):
     if len(lista) <= n:
         return lista
@@ -96,16 +112,17 @@ def main():
         cand = []
         for a, b in zip(cs, cs[1:]):
             t = a + 0.25
-            while b - t >= 1.6:
-                cand.append((t, min(3.0, b - t - 0.15)))
+            while b - t >= f.get("min_dur", 1.6):
+                cand.append((t, min(f.get("max_dur", 3.0), b - t - 0.15)))
                 t += 8.0
         cand = repartir(cand, f.get("max", 15) * 3)
         elegidos = []
         for t, d in cand:
             img = fotograma(ruta, t + d / 2)
-            if vale(img):
+            if vale(img) and not repetido(img, [e[2] for e in elegidos]):
                 elegidos.append((t, d, img))
         elegidos = repartir(elegidos, f.get("max", 15))
+        VISTOS.extend(firma(e[2]) for e in elegidos)
         cols = 5
         hoja = Image.new("RGB", (cols * 320, max(1, (len(elegidos) + cols - 1) // cols) * 200), "black")
         dib = ImageDraw.Draw(hoja)
