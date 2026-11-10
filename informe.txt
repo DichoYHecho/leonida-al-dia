@@ -1,0 +1,29 @@
+Duración: 716.1 s (11:56)
+Tamaño: 918 MB (alta calidad), 156 MB (previa en partes de 5 min)
+Tiempo de montaje: 6053 s
+
+hook: voz 27.8 s, 10 planos, subtítulos por Whisper
+c01: voz 25.3 s, 10 planos, subtítulos por Whisper
+c02: voz 33.6 s, 12 planos, subtítulos por Whisper
+c03: voz 27.3 s, 18 planos, subtítulos por Whisper
+c04: voz 25.4 s, 11 planos, subtítulos por Whisper
+c05: voz 26.7 s, 8 planos, subtítulos por Whisper
+c06: voz 25.5 s, 10 planos, subtítulos por Whisper
+c07: voz 19.0 s, 7 planos, subtítulos por Whisper
+c08: voz 23.9 s, 9 planos, subtítulos por Whisper
+c09: voz 33.4 s, 13 planos, subtítulos por Whisper
+c10: voz 20.3 s, 4 planos, subtítulos por Whisper
+c11: voz 18.1 s, 8 planos, subtítulos por Whisper
+c12: voz 19.5 s, 7 planos, subtítulos por Whisper, sonido original Mirada_Carrera
+c13: voz 19.8 s, 7 planos, subtítulos por Whisper
+c14: voz 17.0 s, 7 planos, subtítulos por Whisper, sonido original VL_Poli_2
+c15: voz 25.6 s, 8 planos, subtítulos por Whisper
+c16: voz 21.7 s, 8 planos, subtítulos por Whisper, sonido original VL_Perro_Caricia
+c17: voz 25.6 s, 8 planos, subtítulos por Whisper
+c18: voz 29.1 s, 10 planos, subtítulos por Whisper, sonido original VL_Frase_Lucia
+c19: voz 37.3 s, 16 planos, subtítulos por Whisper
+c20: voz 29.5 s, 8 planos, subtítulos por Whisper, sonido original VL_Tele_Audio
+e1: voz 35.7 s, 15 planos, subtítulos por Whisper
+e2: voz 28.7 s, 11 planos, subtítulos por Whisper
+e3: voz 24.6 s, 9 planos, subtítulos por Whisper
+cierre: voz 46.0 s, 17 planos, subtítulos por Whisper
