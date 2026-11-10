@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       guion:
-        description: "Guion: guion_vl (vídeo 1), guion_vc (vídeo 2, Vice City) o guion_sg (vídeo 3, la saga)"
+        description: "Guion: guion_vl (vídeo 1), guion_vc (vídeo 2, Vice City), guion_sg (vídeo 3, la saga) o guion_jl (vídeo 4)"
         default: "guion_vl"
       bloques:
         description: "Solo estos bloques (hook,p02,p03...); vacío = todos"
@@ -50,7 +50,7 @@ jobs:
         if: always()
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          RAMA: ${{ inputs.guion == 'guion_vc' && 'voces-vc' || inputs.guion == 'guion_sg' && 'voces-sg' || 'voces-vl' }}
+          RAMA: ${{ inputs.guion == 'guion_vc' && 'voces-vc' || inputs.guion == 'guion_sg' && 'voces-sg' || inputs.guion == 'guion_jl' && 'voces-jl' || 'voces-vl' }}
         run: |
           cd salida_voces
           git init -q
