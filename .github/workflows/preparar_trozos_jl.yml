@@ -1,0 +1,44 @@
+name: Preparar trozos de los juegos (vídeo 4, Jason y Lucía)
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [jl]
+    paths: ["video_largo/fuentes_jl.py", "video_largo/preparar_trozos.py", ".github/workflows/preparar_trozos_jl.yml"]
+
+permissions:
+  contents: write
+
+jobs:
+  trozos:
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Instalar programas
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          pip install numpy pillow
+
+      - name: Elegir trozos y hacer las hojas de contactos
+        run: FUENTES_MOD=fuentes_jl DEDUP=1 python3 video_largo/preparar_trozos.py
+
+      - name: Publicar en la rama trozos-jl
+        run: |
+          cd salida_trozos
+          git init -q
+          git checkout -q -b trozos-jl
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add .
+          git commit -q -m "Trozos automáticos de los juegos"
+          git remote add origin "https://x-access-token:$GH_TOKEN@github.com/$GITHUB_REPOSITORY.git"
+          git push -f origin trozos-jl
