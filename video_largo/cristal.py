@@ -161,6 +161,8 @@ def filtros(paneles, idx0, tmp, fps, entrada, salida):
         return [], f"[{entrada}]null[{salida}];"
     args, partes, cur = [], [], entrada
     for i, (x, y, w, h, t0, t1) in enumerate(paneles):
+        x, y = max(0, x - x % 2), max(0, y - y % 2)  # medidas pares: el vídeo es yuv420p
+        w, h = min(W - x, w + w % 2), min(H - y, h + h % 2)
         r = 0 if (w, h) == (W, H) else min(36 if h > 400 else 28, h // 2)
         m = pathlib.Path(tmp) / f"mascara_{i:03d}.png"
         mascara(m, w, h, r)
