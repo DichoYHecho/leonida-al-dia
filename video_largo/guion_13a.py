@@ -1,4 +1,4 @@
-"""Guion del vídeo largo «¿Por qué GTA VI ha tardado 13 años?» de «Leónida al Día» (borrador 2, 11 nov 2026).
+"""Guion del vídeo largo «¿Por qué GTA VI ha tardado 13 años?» de «Leónida al Día» (borrador 3, 11 nov 2026).
 
 Mismo formato que guion_sg.py (se elige con GUION=guion_13a). No importa fuentes_sg.
 Datos y fuentes: investigacion.md. Planos NUEVO_ descritos en edicion.md (hay que producirlos y añadirlos a la tabla de trozos).
@@ -14,13 +14,13 @@ RECORTES = {}
 MARCO = True
 
 # Música por época: cambia con cada cartela (ninguna pista más de 3,5 min)
-MUSICA = {"hook": "synthwave", "p01": "chiptune", "p04": "breakbeat", "p10": "hiphop", "p13": "synthwave"}
+MUSICA = {"hook": "synthwave", "p01": "chiptune", "p06": "breakbeat", "p13": "hiphop", "p17": "synthwave"}
 
 # Línea de tiempo de abajo (años de los bloques; etiqueta_linea por bloque)
 LINEA_ANIMADA = True
 LINEA = [(2010, "RDR 2"), (2013, "GTA V"), (2018, "RDR 2 SALE"), (2022, "FILTRACIÓN"), (2026, "GTA VI")]
 
-# Pronunciación para la voz (misma cantidad de palabras que el texto)
+# Pronunciación para la voz: cada valor es UNA palabra (misma cantidad de palabras que el texto)
 FONETICA = {
     "III": "3", "IV": "4", "V": "5", "VI": "6", "City": "Siti", "Vice": "Vais",
     "Houser": "Jáuser", "Morgan": "Mórgan", "Arthur": "Árdur", "Michael": "Máikel", "Trevor": "Trévor",
@@ -30,8 +30,11 @@ FONETICA = {
     "Xbox": "Ékbox", "Series": "Síries", "Online": "Onlain", "Love": "Lov", "Road": "Roud",
     "Leonida": "Leónida", "Hot": "Jot", "Nelson": "Nélson", "IGN": "Áigen", "Red": "Red", "Redemption": "Redémption",
     "Dead": "Ded", "Arion": "Árion", "Kurtaj": "Kúrtai", "Oxford": "Óksford", "Fire": "Fáier", "Stick": "Stik",
-    "Delaware": "Délauer", "Absurd": "Absurd", "Ventures": "Véntiurs", "Southwark": "Sáuzuark", "Crown": "Cráun",
-    "Slack": "Eslak", "Stadia": "Stéidia", "Sam": "Sam",
+    "Absurd": "Absurd", "Ventures": "Véntiurs", "Slack": "Eslak", "Stadia": "Stéidia", "Sam": "Sam",
+    "Twitch": "Tuích", "NoPixel": "Nopíksel", "FiveM": "Fáivem", "RedM": "Redém", "Cfx.re": "Sefeixérre",
+    "Plus": "Plas", "Zelnick": "Zélnik", "Strauss": "Estráus", "Ruffian": "Rúfian", "Dundee": "Dandí",
+    "Crackdown": "Crákdaun", "Games": "Guéims", "Gary": "Gueri", "Liddon": "Lídon", "Billy": "Bili",
+    "Thomson": "Tomson", "Brendan": "Bréndan", "McNamara": "Macnamara", "Bondi": "Bóndi", "Deluxe": "Delúx",
 }
 
 
@@ -47,7 +50,7 @@ def _voz(texto):
     return " ".join(salida)
 
 
-T = 12
+T = 17
 
 BLOQUES = [
     # ---------------------------------------------------------------- GANCHO
@@ -86,7 +89,7 @@ BLOQUES = [
                    {"en": "atraco", "plano": "@GTA5_2013"}]},
     {"id": "p02", "num": 2, "total": T, "titulo": "2013-2026 · EL DINERO", "capitulo": "2013-2026 · El dinero",
      "overlay": "", "anio": 2013, "etiqueta_linea": "2013-2026 · DINERO",
-     "texto": ("Y después está GTA Online, el modo online que se abre en octubre de dos mil trece y no se acaba nunca. "
+     "texto": ("Y después está GTA Online, el modo online que se abre en octubre de dos mil trece y no se acaba nunca. En febrero de dos mil catorce, Take-Two dijo que cerca del setenta por ciento de los jugadores de GTA V con internet ya lo había probado. "
                "Take-Two no separa sus ingresos por juego, pero sí publica su gasto recurrente: compras dentro de los "
                "juegos, monedas virtuales y contenidos extra. En el último año fiscal, que cerró en marzo de dos mil "
                "veintiséis, ese gasto subió un dieciséis por ciento y supuso el setenta y ocho por ciento de los ingresos "
@@ -94,13 +97,36 @@ BLOQUES = [
                "grandes motores. Y un juego que sigue dando dinero cada mes no tiene por qué salir pronto."),
      "rotulos": [{"en": "octubre", "texto": "1 OCT 2013|GTA ONLINE"},
                  {"en": "dieciséis", "texto": "+16% GASTO|RECURRENTE"},
-                 {"en": "setenta", "texto": "78% DE LOS|INGRESOS"},
+                 {"en": "setenta", "n": 2, "texto": "78% DE LOS|INGRESOS"},
                  {"en": "toda", "texto": "TODA TAKE-TWO|NO SOLO GTA"}],
      "nombres": ["Online", "octubre", "toda"],
      "planos": ["@GTA_Online:4", "NUEVO_Cuentas_TakeTwo"],
      "planos_en": [{"en": "online", "plano": "@GTA_Online"},
                    {"en": "ingresos", "plano": "NUEVO_Cuentas_TakeTwo"}]},
-    {"id": "p03", "num": 3, "total": T, "titulo": "2014-2022 · REEDICIONES", "capitulo": "2014-2022 · Reediciones",
+
+    # ---------------------------------------------------------------- NUEVO · EL ROL (2019-2023)
+    {"id": "p03", "num": 3, "total": T, "titulo": "2019-2023 · EL ROL", "capitulo": "2019-2023 · El rol",
+     "overlay": "", "anio": 2019, "etiqueta_linea": "2019-2023 · EL ROL",
+     "texto": ("Y hay otra razón por la que GTA V sigue vivo: el rol. En esos servidores, la gente juega a ser policía, "
+               "ladrón o taxista dentro de una ciudad de mentira. Uno de ellos, NoPixel, un servidor hecho por streamers, se vuelve enorme en Twitch en dos "
+               "mil diecinueve. Según datos de terceros, GTA V fue el segundo juego más visto de la plataforma en dos mil "
+               "veintitrés, y el primero en dos mil veinticuatro. Esos servidores funcionan con FiveM, un proyecto de "
+               "aficionados que Rockstar había prohibido en dos mil quince, por considerarlo un servicio no autorizado. Según la prensa de entonces, Take-Two llegó a mandar investigadores privados a casa de uno de sus creadores. En "
+               "agosto de dos mil veintitrés, Rockstar anuncia que compra al equipo que lo hace, Cfx.re. Ocho años después, "
+               "la empresa que cerró la puerta la compra. Y el propio equipo deja claro que el acuerdo va de FiveM y RedM, "
+               "no de GTA VI."),
+     "rotulos": [{"en": "Twitch", "texto": "TWITCH|2019 · NOPIXEL"},
+                 {"en": "segundo", "texto": "2.º JUEGO MÁS VISTO|EN TWITCH · 2023"},
+                 {"en": "Cfx", "texto": "CFX.RE|COMPRADO EN 2023"},
+                 {"en": "quince", "texto": "PROHIBIDO|EN 2015"}],
+     "nombres": ["Twitch", "Cfx"],
+     "planos": ["NUEVO_Twitch_Captura", "NUEVO_Cfx_Comunicado", "@GTA_Online:2"],
+     "planos_en": [{"en": "Twitch", "plano": "NUEVO_Twitch_Captura"},
+                   {"en": "Cfx", "plano": "NUEVO_Cfx_Comunicado"},
+                   {"en": "quince", "plano": "NUEVO_Cfx_Comunicado"}]},
+
+    # ---------------------------------------------------------------- ACTO I (cont.) · REEDICIONES (2014-2022)
+    {"id": "p04", "num": 4, "total": T, "titulo": "2014-2022 · REEDICIONES", "capitulo": "2014-2022 · Reediciones",
      "overlay": "", "anio": 2014, "etiqueta_linea": "2014 · REEDICIÓN",
      "texto": ("Y mientras tanto, Rockstar vuelve a vender el mismo juego. GTA V sale en dos mil catorce para la nueva "
                "generación, y otra vez en dos mil veintidós para PlayStation cinco y Xbox Series. Eso no lo dice Rockstar, "
@@ -113,8 +139,24 @@ BLOQUES = [
      "planos_en": [{"en": "catorce", "plano": "NUEVO_Reediciones_Logos"},
                    {"en": "mismo", "plano": "@GTA5_2013"}]},
 
+    # ---------------------------------------------------------------- NUEVO · GTA PLUS (2022)
+    {"id": "p05", "num": 5, "total": T, "titulo": "2022 · GTA PLUS", "capitulo": "2022 · GTA Plus",
+     "overlay": "", "anio": 2022, "etiqueta_linea": "2022 · GTA PLUS",
+     "texto": ("Y en marzo de dos mil veintidós, Rockstar prueba otra manera de ganar dinero sin juego nuevo. Se llama GTA "
+               "Plus: una suscripción mensual dentro de GTA Online. Se anuncia el veinticinco de marzo y sale cuatro días "
+               "después, solo para PlayStation cinco y Xbox Series. Por una cuota al mes, el jugador recibe ventajas y "
+               "recompensas que cambian cada mes. Es el mismo principio de siempre: si cada mes entra dinero, ¿para qué "
+               "correr a sacar otro juego? Y no es un detalle menor. En dos mil veintiséis, el gasto recurrente supone el "
+               "setenta y ocho por ciento de los ingresos de Take-Two, como vimos antes."),
+     "rotulos": [{"en": "marzo", "texto": "25 MAR 2022|GTA PLUS"},
+                 {"en": "cuota", "texto": "SUSCRIPCIÓN|MENSUAL"}],
+     "nombres": [],
+     "planos": ["NUEVO_GTAPlus_Captura", "@GTA_Online:2"],
+     "planos_en": [{"en": "marzo", "plano": "NUEVO_GTAPlus_Captura"},
+                   {"en": "cuota", "plano": "@GTA_Online"}]},
+
     # ---------------------------------------------------------------- ACTO II · EL OTRO GRAN PROYECTO (2010-2018)
-    {"id": "p04", "num": 4, "total": T, "titulo": "2010-2018 · RED DEAD REDEMPTION 2",
+    {"id": "p06", "num": 6, "total": T, "titulo": "2010-2018 · RED DEAD REDEMPTION 2",
      "capitulo": "2010-2018 · Red Dead Redemption 2", "overlay": "", "anio": 2010, "etiqueta_linea": "2010 · RDR 2",
      "cartela": {"anio": "2010", "acto": "ACTO II", "titulo": "EL OTRO GRAN PROYECTO"},
      "texto": ("Rockstar tiene a la vez otro proyecto enorme: Red Dead Redemption dos. Según Rob Nelson, de Rockstar North, "
@@ -130,13 +172,14 @@ BLOQUES = [
      "planos": ["NUEVO_RDR2_Paisaje", "NUEVO_RDR2_Arthur", "NUEVO_RDR2_Caballo"],
      "planos_en": [{"en": "western", "plano": "NUEVO_RDR2_Paisaje"},
                    {"en": "morgan", "plano": "NUEVO_RDR2_Arthur"}]},
-    {"id": "p05", "num": 5, "total": T, "titulo": "2018-2019 · RED DEAD ONLINE", "capitulo": "2018-2019 · Red Dead Online",
+    {"id": "p07", "num": 7, "total": T, "titulo": "2018-2019 · RED DEAD ONLINE", "capitulo": "2018-2019 · Red Dead Online",
      "overlay": "", "anio": 2018, "etiqueta_linea": "2018 · RED DEAD ONLINE",
-     "texto": ("Y un mes después, el veintisiete de noviembre de dos mil dieciocho, abre en beta Red Dead Online, el modo online del juego. Otra vez un mundo que no se acaba, con "
+     "texto": ("Y un mes después, el veintisiete de noviembre de dos mil dieciocho, abre en beta Red Dead Online, el modo online del juego. El juego, según Take-Two, ya suma más de ochenta y cinco millones de copias. Otra vez un mundo que no se acaba, con "
                "actualizaciones y dinero que entra cada mes. Es el mismo esquema que GTA Online. Y es lo que GTA VI hereda: "
                "un juego que no es solo una historia, sino un lugar al que volver."),
      "rotulos": [{"en": "veintisiete", "texto": "27 NOV 2018|BETA"},
                  {"en": "online", "texto": "RED DEAD ONLINE|EL MODO ONLINE"},
+                 {"en": "ochenta", "texto": "+85 MILLONES|RED DEAD 2"},
                  {"en": "hereda", "texto": "LO QUE HEREDA|GTA VI"}],
      "nombres": ["Online"],
      "planos": ["NUEVO_RDO_Captura", "NUEVO_RDR2_Paisaje"],
@@ -144,7 +187,7 @@ BLOQUES = [
                    {"en": "lugar", "plano": "NUEVO_RDR2_Paisaje"}]},
 
     # ---------------------------------------------------------------- ACTO III · EL CAMBIO Y EL SUSTO (2020-2022)
-    {"id": "p06", "num": 6, "total": T, "titulo": "2020-2023 · DAN HOUSER SE VA", "capitulo": "2020-2023 · Dan Houser se va",
+    {"id": "p08", "num": 8, "total": T, "titulo": "2020-2023 · DAN HOUSER SE VA", "capitulo": "2020-2023 · Dan Houser se va",
      "overlay": "", "anio": 2020, "etiqueta_linea": "2020 · HOUSER",
      "cartela": {"anio": "2020", "acto": "ACTO III", "titulo": "EL CAMBIO Y EL SUSTO"},
      "texto": ("En febrero de dos mil veinte, Take-Two anuncia algo que casi nadie esperaba: Dan Houser deja Rockstar. Es "
@@ -161,7 +204,24 @@ BLOQUES = [
      "planos": ["NUEVO_Houser_Captura", "NUEVO_Absurd_Logo", "Mirada_Mar_Atardecer"],
      "planos_en": [{"en": "houser", "plano": "NUEVO_Houser_Captura"},
                    {"en": "absurd", "plano": "NUEVO_Absurd_Logo"}]},
-    {"id": "p07", "num": 7, "total": T, "titulo": "2021 · THE TRILOGY", "capitulo": "2021 · The Trilogy",
+
+    # ---------------------------------------------------------------- NUEVO · RUFFIAN (2020)
+    {"id": "p09", "num": 9, "total": T, "titulo": "2020 · RUFFIAN", "capitulo": "2020 · Rockstar Dundee",
+     "overlay": "", "anio": 2020, "etiqueta_linea": "2020 · RUFFIAN",
+     "texto": ("Y mientras tanto, Rockstar crece. En octubre de dos mil veinte compra Ruffian Games, un estudio de Dundee "
+               "con unos cuarenta empleados. Había hecho Crackdown dos para Microsoft y llevaba un año trabajando con "
+               "Rockstar. Lo renombra Rockstar Dundee, y sus dos fundadores, Gary Liddon y Billy Thomson, siguen al frente "
+               "como codirectores. Según Game Developer, era la primera compra de Rockstar en años. Y ese es el punto: para "
+               "un juego que tarda años en hacerse, hacen falta manos. Eso es lectura de este canal, no un comunicado."),
+     "rotulos": [{"en": "octubre", "texto": "OCT 2020|RUFFIAN GAMES"},
+                 {"en": "Dundee", "texto": "DUNDEE|→ ROCKSTAR DUNDEE"},
+                 {"en": "cuarenta", "texto": "~40 EMPLEADOS"}],
+     "nombres": ["Dundee"],
+     "planos": ["NUEVO_Ruffian_Captura", "Mirada_Skyline_Azotea", "T1_Lancha_Rapida"],
+     "planos_en": [{"en": "octubre", "plano": "NUEVO_Ruffian_Captura"},
+                   {"en": "cuarenta", "plano": "Mirada_Skyline_Azotea"}]},
+
+    {"id": "p10", "num": 10, "total": T, "titulo": "2021 · THE TRILOGY", "capitulo": "2021 · The Trilogy",
      "overlay": "", "anio": 2021, "etiqueta_linea": "2021 · TRILOGY",
      "texto": ("En noviembre de dos mil veintiuno, Rockstar saca The Trilogy: The Definitive Edition. GTA III, Vice City y "
                "San Andreas, remasterizados en un solo paquete, veinte años después de aquella primera calle. Otra vez el "
@@ -172,7 +232,7 @@ BLOQUES = [
      "planos": ["@GTA3_DE:3", "@VC_DE:3", "@SA_DE:2"],
      "planos_en": [{"en": "trilogy", "plano": "@VC_DE"},
                    {"en": "veinte", "plano": "@GTA3_DE"}]},
-    {"id": "p08", "num": 8, "total": T, "titulo": "2022 · CÓMO OCURRIÓ", "capitulo": "2022 · Cómo ocurrió",
+    {"id": "p11", "num": 11, "total": T, "titulo": "2022 · CÓMO OCURRIÓ", "capitulo": "2022 · Cómo ocurrió",
      "overlay": "", "anio": 2022, "etiqueta_linea": "2022 · FILTRACIÓN",
      "texto": ("Y en septiembre de dos mil veintidós llega el susto. Entra en los sistemas de Rockstar un chico de Oxford, "
                "Arion Kurtaj. Según el tribunal, estaba en libertad bajo fianza por otros hackeos. Según la prensa, lo hizo "
@@ -187,7 +247,7 @@ BLOQUES = [
      "planos": ["NUEVO_Filtracion_Foro", "NUEVO_Texto_Hechos", "T1_Playa_Aerea"],
      "planos_en": [{"en": "hotel", "plano": "NUEVO_Texto_Hechos"},
                    {"en": "foro", "plano": "NUEVO_Filtracion_Foro"}]},
-    {"id": "p09", "num": 9, "total": T, "titulo": "2022-2023 · EL MENSAJE Y EL JUICIO",
+    {"id": "p12", "num": 12, "total": T, "titulo": "2022-2023 · EL MENSAJE Y EL JUICIO",
      "capitulo": "2022-2023 · El mensaje y el juicio", "overlay": "", "anio": 2022, "etiqueta_linea": "2022 · JUICIO",
      "texto": ("El diecinueve de septiembre, Rockstar lo confirma: un tercero accedió sin permiso a sus sistemas y descargó "
                "información confidencial, incluido material de desarrollo del próximo GTA. Dice que está muy decepcionado, "
@@ -204,7 +264,7 @@ BLOQUES = [
                    {"en": "londres", "plano": "NUEVO_Juicio_Southwark"}]},
 
     # ---------------------------------------------------------------- ACTO IV · LA ESPERA (2023-2026)
-    {"id": "p10", "num": 10, "total": T, "titulo": "2023 · EL PRIMER TRÁILER", "capitulo": "2023 · El primer tráiler",
+    {"id": "p13", "num": 13, "total": T, "titulo": "2023 · EL PRIMER TRÁILER", "capitulo": "2023 · El primer tráiler",
      "overlay": "", "anio": 2023, "etiqueta_linea": "2023 · TRÁILER 1",
      "cartela": {"anio": "2023", "acto": "ACTO IV", "titulo": "LA ESPERA"}, "intro_original": "T1_Musica_Petty",
      "texto": ("En diciembre de dos mil veintitrés llega el primer tráiler. Se filtra una versión de baja calidad un día "
@@ -219,7 +279,7 @@ BLOQUES = [
      "planos_en": [{"en": "vuelve", "plano": "T1_Neones"},
                    {"en": "vice", "plano": "T1_Autopista"},
                    {"en": "petty", "plano": "T1_Musica_Petty"}]},
-    {"id": "p11", "num": 11, "total": T, "titulo": "2025-2026 · LOS RETRASOS", "capitulo": "2025-2026 · Los retrasos",
+    {"id": "p14", "num": 14, "total": T, "titulo": "2025-2026 · LOS RETRASOS", "capitulo": "2025-2026 · Los retrasos",
      "overlay": "", "anio": 2025, "etiqueta_linea": "2025 · RETRASOS",
      "texto": ("Rockstar tenía fecha para el otoño de dos mil veinticinco. En mayo de ese año la mueve al veintiséis de mayo "
                "de dos mil veintiséis. Ese mismo mes llega el segundo tráiler, con The Pointer Sisters de fondo. Y en "
@@ -235,7 +295,7 @@ BLOQUES = [
      "planos_en": [{"en": "otoño", "plano": "T2_Autopista"},
                    {"en": "pointer", "plano": "T2_Muelle_Atardecer"},
                    {"en": "diecinueve", "plano": "VL_Fecha"}]},
-    {"id": "p12", "num": 12, "total": T, "titulo": "2025 · LO QUE SE CUENTA", "capitulo": "2025 · Lo que se cuenta desde dentro",
+    {"id": "p15", "num": 15, "total": T, "titulo": "2025 · LO QUE SE CUENTA", "capitulo": "2025 · Lo que se cuenta desde dentro",
      "overlay": "", "anio": 2025, "etiqueta_linea": "2025 · DESDE DENTRO",
      "texto": ("Jason Schreier, de Bloomberg, escribió en redes que nadie de Rockstar creía "
                "en la ventana de otoño desde hacía tiempo. Él mismo matizó después que el retraso no era inevitable sin más. "
@@ -248,19 +308,43 @@ BLOQUES = [
      "planos": ["NUEVO_Schreier_Bluesky", "Mirada_Mar_Atardecer", "Mirada_Skyline_Azotea"],
      "planos_en": [{"en": "schreier", "plano": "NUEVO_Schreier_Bluesky"},
                    {"en": "crunch", "plano": "Mirada_Skyline_Azotea"}]},
-    {"id": "p13", "num": 13, "total": T, "titulo": "2026 · HOY", "capitulo": "2026 · Hoy",
+
+    # ---------------------------------------------------------------- NUEVO · TAKE-TWO (2026)
+    {"id": "p16", "num": 16, "total": T, "titulo": "2026 · TAKE-TWO", "capitulo": "2026 · Lo que dice Take-Two",
+     "overlay": "", "anio": 2026, "etiqueta_linea": "2026 · TAKE-TWO",
+     "texto": ("Y ¿qué dice la empresa? Strauss Zelnick, consejero delegado de Take-Two, ha dicho en otra ocasión que nunca "
+               "se han arrepentido de retrasar un juego, porque buscan la perfección. En el informe de mayo de dos mil "
+               "veintiséis volvió a fijar el diecinueve de noviembre, y dijo que no iba a haber otro retraso. Para el año "
+               "fiscal en curso, que va de abril de dos mil veintiséis a marzo de dos mil veintisiete, habla de récords de "
+               "resultados impulsados por el lanzamiento de GTA VI."),
+     "rotulos": [{"en": "Zelnick", "texto": "STRAUSS ZELNICK|TAKE-TWO"},
+                 {"en": "diecinueve", "texto": "19 NOV|SIN OTRO RETRASO"},
+                 {"en": "récords", "texto": "RÉCORDS|AÑO FISCAL 2027"}],
+     "nombres": ["Zelnick"],
+     "planos": ["NUEVO_Zelnick_Captura", "VL_Fecha", "Mirada_Vista_Aerea"],
+     "planos_en": [{"en": "Zelnick", "plano": "NUEVO_Zelnick_Captura"},
+                   {"en": "diecinueve", "plano": "VL_Fecha"},
+                   {"en": "récords", "plano": "Mirada_Vista_Aerea"}]},
+
+    # ---------------------------------------------------------------- ACTO IV · HOY (2026)
+    {"id": "p17", "num": 17, "total": T, "titulo": "2026 · HOY", "capitulo": "2026 · Hoy",
      "overlay": "", "anio": 2026,
      "texto": ("Y llegamos a hoy. El diecinueve de noviembre de dos mil veintiséis sale GTA VI en PlayStation cinco y Xbox "
                "Series. Trece años después de GTA V, y un juego que sigue vendiendo: casi doscientos treinta millones de "
                "copias. Take-Two prevé para el año fiscal siguiente entre ocho mil y ocho mil doscientos millones de dólares "
-               "en reservas netas, con GTA VI como motor. La pregunta ya no es cuándo, sino si la espera ha valido la pena."),
+               "en reservas netas, con GTA VI como motor. Y en marzo de dos mil veinticinco, Rockstar compra también Video "
+               "Games Deluxe, un estudio de Sídney, fundado en dos mil trece, que pasa a llamarse Rockstar Australia. Su fundador, Brendan McNamara, "
+               "había dirigido Team Bondi, y el estudio ya había trabajado con Rockstar en varias reediciones. La pregunta "
+               "ya no es cuándo, sino si la espera ha valido la pena."),
      "rotulos": [{"en": "diecinueve", "texto": "19 NOV 2026|PS5 · XBOX SERIES"},
                  {"en": "trece", "texto": "13 AÑOS|DESPUÉS"},
-                 {"en": "doscientos", "texto": "CASI 230 MILLONES|GTA V"}],
-     "nombres": [],
-     "planos": ["VL_Fecha", "T2_Casa_Aerea", "T2_Gimnasio_Playa", "Mirada_Vista_Aerea", "@Vice_City:3"],
+                 {"en": "doscientos", "texto": "CASI 230 MILLONES|GTA V"},
+                 {"en": "Sídney", "texto": "VIDEO GAMES DELUXE|→ ROCKSTAR AUSTRALIA"}],
+     "nombres": ["Sídney"],
+     "planos": ["VL_Fecha", "T2_Casa_Aerea", "T2_Gimnasio_Playa", "Mirada_Vista_Aerea", "@Vice_City:3", "NUEVO_VGD_Captura"],
      "planos_en": [{"en": "diecinueve", "plano": "VL_Fecha"},
-                   {"en": "espera", "plano": "Mirada_Vista_Aerea"}]},
+                   {"en": "espera", "plano": "Mirada_Vista_Aerea"},
+                   {"en": "Sídney", "plano": "NUEVO_VGD_Captura"}]},
 
     # ---------------------------------------------------------------- CIERRE
     {"id": "cierre", "num": None, "titulo": "", "overlay": "", "capitulo": "Cierre", "anio": 2026,
