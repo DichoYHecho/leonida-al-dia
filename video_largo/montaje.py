@@ -14,6 +14,12 @@ Vídeo 3 (guion_sg, rama saga), todo opcional y solo si el guion lo pide:
                      suena más de MAX_PISTA s seguidos (se cambia de variante en el bloque más cercano a la mitad)
   "VIDEO@ini+dur" -> plano escrito en el propio guion (por ejemplo "IV_T2@12.5+3")
   "@Grupo:N"      -> N trozos distintos del grupo (en vez de 5)
+Vídeo 7 (guion_rad):
+  canciones       -> lista de {"en", "titulo", "seg", "archivo"?, "desde"?}: al acabar la frase donde la voz dice «en»
+                     se abre un hueco en la voz y suena «seg» segundos de la canción (desde el segundo «desde» del
+                     archivo), con la música de fondo bajada unos 14 dB. Archivo: «archivo» o, si no, el título en
+                     minúsculas con guiones bajos dentro de DIR_CANCIONES (por defecto «canciones»), en mp3, wav, m4a,
+                     flac u ogg. Si no está, se avisa y ese bloque se monta sin hueco.
 Controles (paran el montaje): trozos repetidos (PERMITIR_REPETIDOS=1 para saltarlo) y voces cuyo final no se oye
 (FORZAR_FINALES=1). SOLO_VOCES=1 hace solo el informe de finales de voz (salida_montaje/finales) y para."""
 import csv
@@ -880,6 +886,98 @@ def golpe():
     return np.stack([x, x], axis=1).astype(np.float32) * 0.55
 
 
+# ---------------------------------------------------------------- canciones en huecos de la voz (vídeo 7)
+DIR_CANCIONES = pathlib.Path(os.environ.get("DIR_CANCIONES", "canciones"))
+MARGEN_CANCION = 0.35  # silencio antes y después del fragmento
+FONDO_EN_CANCION = 0.2  # música de fondo durante la canción (0,2 ≈ -14 dB)
+FINAL_FRASE = (".", "?", "!", "…", ";")
+
+
+def archivo_cancion(c):
+    """Ruta del audio de la canción, o None si el usuario aún no lo ha puesto."""
+    if c.get("archivo"):
+        r = pathlib.Path(c["archivo"])
+        return r if r.exists() else None
+    base = "".join(ch if ch.isalnum() else "_" for ch in P.normalizar(c["titulo"])).strip("_")
+    while "__" in base:
+        base = base.replace("__", "_")
+    for ext in (".mp3", ".wav", ".m4a", ".flac", ".ogg"):
+        r = DIR_CANCIONES / (base + ext)
+        if r.exists():
+            return r
+    return None
+
+
+def fin_de_frase(b, palabra):
+    """Segundo de la voz (del bloque) en que acaba la frase donde se dice «palabra»; None si no aparece en el texto."""
+    texto = b["texto"].split()
+    voz = (b.get("voz") or b["texto"]).split()
+    clave = P.normalizar(palabra)
+    ini = next((i for i, w in enumerate(texto) if P.normalizar(w).startswith(clave)), None)
+    if ini is None:
+        return None
+    fin = next((j for j in range(ini, len(texto)) if texto[j].rstrip("»)\"'").endswith(FINAL_FRASE)), len(texto) - 1)
+    # la palabra que cierra la frase, en el texto y en la voz fonética, y cuántas veces sale antes
+    formas = {P.normalizar(texto[fin]), P.normalizar(voz[fin]) if fin < len(voz) else ""} - {""}
+    vez = sum(1 for w in texto[: fin + 1] if P.normalizar(w) in formas)
+    vistos = 0
+    for w, a, e in b.get("ws") or []:
+        if P.normalizar(w) in formas:
+            vistos += 1
+            if vistos == vez:
+                return silencio_tras(b["audio"], e - 0.05)
+    # Whisper no la oye: posición en el texto, ajustada al primer silencio
+    aprox = (fin + 1) / max(1, len(texto)) * b["dur_voz"]
+    return silencio_tras(b["audio"], max(0.0, aprox - 0.3))
+
+
+def aplicar_canciones(bloques):
+    """Abre un hueco en la voz para cada canción del guion y apunta dónde suena. Devuelve los avisos."""
+    avisos = []
+    for b in bloques:
+        cortes = []
+        for c in b.get("canciones") or []:
+            ruta = archivo_cancion(c)
+            if ruta is None:
+                avisos.append(f"{b['id']}: falta el audio de «{c['titulo']}» (sin hueco)")
+                continue
+            t = fin_de_frase(b, c["en"])
+            if t is None:
+                avisos.append(f"{b['id']}: «{c['en']}» no está en el texto; «{c['titulo']}» no suena")
+                continue
+            cortes.append((min(t, b["dur_voz"]), float(c.get("seg", 5)), ruta, float(c.get("desde", 0)), c["titulo"]))
+        if not cortes:
+            continue
+        cortes.sort(key=lambda x: x[0])
+        audio, ws, b["canciones_t"], movido = b["audio"], b["ws"], [], 0.0
+        trozos, previo = [], 0
+        for t, seg, ruta, desde, titulo in cortes:
+            hueco = seg + 2 * MARGEN_CANCION
+            i = int(t * SR)
+            trozos += [audio[previo:i], np.zeros((int(hueco * SR),) + audio.shape[1:], np.float32)]
+            previo = i
+            b["canciones_t"].append({"t": t + movido + MARGEN_CANCION, "seg": seg, "ruta": ruta, "desde": desde,
+                                     "titulo": titulo})
+            movido += hueco
+        trozos.append(audio[previo:])
+        b["audio"] = np.concatenate(trozos).astype(np.float32)
+
+        def desplazar(x):
+            return x + sum(seg + 2 * MARGEN_CANCION for t, seg, *_ in cortes if t <= x)
+        b["ws"] = [(w, desplazar(a), desplazar(e)) for w, a, e in ws]
+        b["dur_voz"] = len(b["audio"]) / SR
+        print(f"  {b['id']}: {len(cortes)} canción(es), la voz pasa a {b['dur_voz']:.1f} s", flush=True)
+    return avisos
+
+
+def audio_cancion(c):
+    """Fragmento de la canción a SR y en estéreo, con fundidos."""
+    destino = TMP / ("cancion_" + hashlib.sha1(f"{c['ruta']}{c['desde']}{c['seg']}".encode()).hexdigest()[:10] + ".wav")
+    P.run(["ffmpeg", "-y", "-loglevel", "error", "-ss", f"{c['desde']:.2f}", "-t", f"{c['seg']:.2f}", "-i", str(c["ruta"]),
+           "-vn", "-ar", SR, "-ac", 2, "-c:a", "pcm_s16le", destino])
+    return P.fundir(P.leer_wav(destino), 0.15, 0.6)
+
+
 def comprobar_repetidos(bloques):
     """Ningún trozo puede salir dos veces en el vídeo (se prepara material de sobra para eso)."""
     vistos, rep = {}, []
@@ -1022,6 +1120,9 @@ def main():
         print("PARADO: revisa el final de estas voces antes de montar:", ", ".join(malos))
         sys.exit(3)
     ajustar_frase_lucia(tb)
+    avisos_canciones = aplicar_canciones(bloques)
+    for a in avisos_canciones:
+        print("  AVISO:", a, flush=True)
     # 2) línea de tiempo (la pausa de después compensa lo recortado del final de la voz, para mantener el ritmo)
     t = 0.0
     for i, b in enumerate(bloques):
@@ -1162,6 +1263,13 @@ def main():
                 o = P.fundir(P.leer_wav(b["orig_wav"]), 0.06, 0.15)
                 i0 = int(b["orig_ini"] * SR)
                 orig[i0:i0 + len(o)] += o[: n - i0] * 0.95
+        for c in b.get("canciones_t", []):
+            ini = b["voz_ini"] + c["t"]
+            mudo[int((ini - 0.2) * 100):int((ini + c["seg"] + 0.2) * 100)] = FONDO_EN_CANCION
+            if not DRY:
+                o = audio_cancion(c)
+                i0 = int(ini * SR)
+                orig[i0:i0 + len(o)] += o[: max(0, n - i0)] * 0.8
     mudo = P.suavizar(mudo, 100, 0.02, 0.04)
     silencio = np.interp(tt, np.arange(len(mudo)) / 100, mudo)
     mezcla = np.clip(voz + (mus * ganancia * silencio)[:, None] + orig, -1, 1)
@@ -1211,7 +1319,10 @@ def main():
     for b in bloques:
         informe.append(f"{b['id']}: voz {b['dur_voz']:.1f} s, {len(b['plan'])} planos, subtítulos por {b['metodo']}"
                        + (f", sonido original {b['original']}" if b.get("original") else "")
-                       + (", AVISO: revisar el final de la voz" if b.get("aviso_final") else ""))
+                       + (", AVISO: revisar el final de la voz" if b.get("aviso_final") else "")
+                       + "".join(f", canción «{c['titulo']}» en {hms(b['voz_ini'] + c['t'])}"
+                                 for c in b.get("canciones_t", [])))
+    informe += ["AVISO: " + a for a in avisos_canciones]
     (OUT / "informe.txt").write_text("\n".join(informe), encoding="utf-8")
     print("\n".join(informe))
     resumen = os.environ.get("GITHUB_STEP_SUMMARY")
