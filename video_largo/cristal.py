@@ -79,16 +79,20 @@ def _limpio(texto):
 
 
 def _caja_texto(tx):
-    """Agranda el texto de un cartel para la tarjeta a pantalla completa y lo centra."""
-    tx = re.sub(r"\\pos\(\d+,\d+\)", r"\\pos(960,560)", tx)
-    tx = re.sub(r"\\fs(\d+)", lambda m: "\\fs" + str(min(170, round(int(m.group(1)) * (1.75 if int(m.group(1)) < 100 else 1.3)))), tx)
-    return tx.replace("\\c&H0000D7FF&", "\\c&HFFFFFF&")
+    """Texto de un cartel a pantalla completa: centrado en la tarjeta de cristal, grande pero con aire."""
+    tx = re.sub(r"\\pos\(\d+,\d+\)", r"\\pos(960,575)", tx)
+    tx = re.sub(r"\\fs(\d+)", lambda m: "\\fs" + str(min(132, round(int(m.group(1)) * (1.35 if int(m.group(1)) < 100 else 1.06)))), tx)
+    return tx.replace("\\c&H0000D7FF&", "\\c&HFFFFFF&").replace("\\fad(150,200)", "\\fad(250,250)")
+
+
+CONGELAR = []  # (ini, fin) de los carteles a pantalla completa: fondo = fotograma quieto y difuminado
 
 
 def retocar(ruta, total):
     """Cambios del 11 nov: subtítulos sin pastilla y con borde suave; sin barra de progreso; los carteles del
     centro pasan a tarjeta a pantalla completa (fondo liso, sin vídeo detrás, texto grande); los que empiezan por
     «@» son etiquetas pequeñas arriba a la izquierda (nombre y papel de quien sale en pantalla)."""
+    CONGELAR.clear()
     ruta = pathlib.Path(ruta)
     txt = ruta.read_text(encoding="utf-8")
     cab, cuerpo = txt.split("[Events]", 1)
@@ -109,7 +113,7 @@ def retocar(ruta, total):
         if est == "SubSombra":
             continue
         if est == "Sub":
-            ln = f"Dialogue: 1,{a},{z},{est},{nom},{ml},{mr},{mv},{ef},{{\\blur0.6}}{tx}"
+            ln = f"Dialogue: 11,{a},{z},{est},{nom},{ml},{mr},{mv},{ef},{{\\blur0.6}}{tx}"
         elif est == "Dibujo" and "\\c&H000000&" in tx:
             caja = re.search(r"m 0 0 l (\d+) 0 \1 (\d+) 0 \2", tx)
             if not caja:
@@ -117,11 +121,20 @@ def retocar(ruta, total):
                 continue
             if (a, z) in etiquetas:
                 continue
-            # tarjeta a pantalla completa: fondo liso morado oscuro + línea turquesa, sin vídeo detrás
-            ln = (f"Dialogue: 8,{a},{z},Dibujo,,0,0,0,,{{\\pos(0,0)\\c{TINTE}\\1a&H00&\\bord0\\shad0\\fad(120,160)\\p1}}"
+            # 11 nov (2.ª versión): pantalla completa en estilo cristal. Fondo = fotograma quieto y muy difuminado
+            # (lo hace filtros() con CONGELAR + panel de toda la pantalla), velo oscuro y tarjeta de cristal en el centro.
+            t0, t1 = s_ass(a), s_ass(z)
+            CONGELAR.append((t0, t1))
+            paneles.append((0, 0, W, H, t0, t1))
+            fad = "\\fad(250,250)"
+            ln = (f"Dialogue: 8,{a},{z},Dibujo,,0,0,0,,{{\\pos(0,0)\\c{TINTE}\\1a&H78&\\bord0\\shad0{fad}\\p1}}"
                   f"m 0 0 l {W} 0 {W} {H} 0 {H}")
-            extra.append(f"Dialogue: 9,{a},{z},Dibujo,,0,0,0,,{{\\pos(880,330)\\c{TURQUESA}\\bord0\\shad0\\fad(120,160)\\p1}}"
-                         "m 0 0 l 160 0 160 8 0 8")
+            cx, cy, cw, ch = 300, 330, 1320, 420
+            extra.append(tarjeta(9, a, z, cx, cy, cw, ch, alfa="&HA0&", r=48, fad=fad))
+            extra.append(f"Dialogue: 9,{a},{z},Dibujo,,0,0,0,,{{\\pos({cx + 48},{cy + 2})\\c&HFFFFFF&\\1a&HC8&\\bord0\\shad0{fad}\\p1}}"
+                         f"m 0 0 l {cw - 96} 0 {cw - 96} 2 0 2")  # brillo de la arista de arriba
+            extra.append(f"Dialogue: 10,{a},{z},Dato,,0,0,0,,{{\\an5\\pos(960,{cy + 62})\\fs28\\fsp6\\c{TURQUESA}{fad}}}"
+                         "● LEÓNIDA AL DÍA")
         elif est == "Dato":
             limpio = _limpio(tx).lstrip()
             if limpio.startswith("@"):
@@ -153,9 +166,14 @@ def mascara(ruta, w, h, r):
 def filtros(paneles, idx0, tmp, fps, entrada, salida):
     """Entradas extra y trozo de filter_complex: desenfoque real detrás de cada panel, solo durante su tiempo."""
     escala = f"scale={SALIDA[0]}:{SALIDA[1]}:flags=lanczos"
+    partes, cur = [], entrada
+    for k, (t0, t1) in enumerate(CONGELAR):  # fondo quieto en los carteles a pantalla completa
+        f0, f1 = int(round(t0 * fps)), int(round(t1 * fps))
+        partes.append(f"[{cur}]split[fz{k}a][fz{k}b];[fz{k}a][fz{k}b]freezeframes=first={f0}:last={f1}:replace={f0}[fz{k}];")
+        cur = f"fz{k}"
     if not paneles:
-        return [], f"[{entrada}]{escala}[{salida}];"
-    args, partes, cur = [], [], entrada
+        return [], "".join(partes) + f"[{cur}]{escala}[{salida}];"
+    args = []
     for i, (x, y, w, h, t0, t1) in enumerate(paneles):
         x, y = max(0, x - x % 2), max(0, y - y % 2)  # medidas pares: el vídeo es yuv420p
         w, h = min(W - x, w + w % 2), min(H - y, h + h % 2)
@@ -164,7 +182,7 @@ def filtros(paneles, idx0, tmp, fps, entrada, salida):
         mascara(m, w, h, r)
         d = max(0.1, t1 - t0)
         args += ["-loop", "1", "-framerate", str(fps), "-t", f"{d:.2f}", "-i", str(m)]
-        sig = 30 if (w, h) == (W, H) else 22
+        sig = 40 if (w, h) == (W, H) else 22
         sal = "crfin" if i == len(paneles) - 1 else f"cr{i}"
         partes.append(
             f"[{cur}]split[c{i}][s{i}];"
