@@ -1,0 +1,8 @@
+Duración: 95.7 s (1:36)
+Tamaño: 160 MB (alta calidad), 19 MB (previa en partes de 5 min)
+Tiempo de montaje: 441 s
+
+hook: voz 22.3 s, 5 planos, subtítulos por Whisper
+p01: voz 22.7 s, 7 planos, subtítulos por Whisper
+p07: voz 18.7 s, 7 planos, subtítulos por Whisper
+p13: voz 25.4 s, 6 planos, subtítulos por Whisper

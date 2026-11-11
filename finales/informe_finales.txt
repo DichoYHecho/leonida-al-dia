@@ -1,0 +1,4 @@
+hook: bien · guion «empezamos por ella.» · oído «empezamos por ella.» · recortado 0.34 s
+p01: bien · guion «Ya quisieran muchos.» · oído «aquí serán muchos.» · recortado 0.25 s
+p07: bien · guion «vigila a todos.» · oído «vigila a todos.» · recortado 0.28 s
+p13: bien · guion «la de Arthur.» · oído «la de Arthur.» · recortado 0.29 s
