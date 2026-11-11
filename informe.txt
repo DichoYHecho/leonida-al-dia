@@ -1,0 +1,3 @@
+Voces listas: 2 de 17 (esta vez se pidieron 2)
+hook: hecho con gemini-3.8-flash-lite-tts (31.2 s)
+p01: hecho con gemini-3.8-flash-lite-tts (57.8 s)
