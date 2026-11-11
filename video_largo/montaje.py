@@ -892,6 +892,22 @@ def comprobar_repetidos(bloques):
     return rep
 
 
+def quitar_chasquido(x, nombre=""):
+    """11 nov (p08 del vídeo 4): golpe de ruido al final de la voz, después de un silencio. Si en los últimos 0,6 s
+    hay al menos 0,15 s de silencio seguidos de sonido fuerte, se corta al acabar ese silencio."""
+    mono = x if x.ndim == 1 else x.mean(axis=1)
+    v = int(0.05 * SR)
+    n = len(mono) // v
+    if n < 14:
+        return x
+    rms = [float(np.sqrt(np.mean(mono[i * v:(i + 1) * v] ** 2))) for i in range(n)]
+    for k in range(n - 1, n - 13, -1):
+        if rms[k] < 0.008 and rms[k - 1] < 0.008 and rms[k - 2] < 0.008 and max(rms[k + 1:] or [0]) > 0.15:
+            print(f"  {nombre}: chasquido al final quitado ({(n - k - 1) * 0.05:.2f} s)", flush=True)
+            return x[:(k + 1) * v]
+    return x
+
+
 def informe_finales(bloques):
     """Antes de montar: el final de cada voz por separado (mp3 de los últimos 2,5 s, dibujo de la onda e informe)."""
     from PIL import Image, ImageDraw
@@ -971,6 +987,7 @@ def main():
         if b["recorte"]:
             b["audio"] = b["audio"][int(b["recorte"] * SR):]
             ws = [(w, a - b["recorte"], e - b["recorte"]) for w, a, e in ws if e > b["recorte"]]
+        b["audio"] = quitar_chasquido(b["audio"], b["id"])
         dur_antes = len(b["audio"]) / SR
         fin_g = P.fin_guion(pal, ws)
         b["cola_cortada"] = 0.0
@@ -1011,6 +1028,9 @@ def main():
         oidas = [P.normalizar(w[0]) for w in b["ws"] if w[1] < b["dur_voz"]][-6:]
         b["aviso_final"] = bool(b["ws"]) and not any(u in oidas for u in ult if len(u) >= 3) and \
             parecido_final(b, [w for w in b["ws"] if w[1] < b["dur_voz"]]) < 0.7
+        if b["aviso_final"] and b.get("final_revisado"):  # revisado a mano (p. ej. Whisper escribe la cifra en número)
+            print("  Final marcado como revisado en el guion: no se para el montaje", flush=True)
+            b["aviso_final"] = False
         if b["aviso_final"]:
             print("  AVISO: Whisper no oye el final del guion en la voz montada", flush=True)
         print(f"  {b['dur_voz']:.1f} s (final recortado {b['cola_cortada']:.2f} s)", flush=True)
