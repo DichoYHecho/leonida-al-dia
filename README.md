@@ -22,7 +22,7 @@ para que las revise y publica las aprobadas con Buffer. Todo a 0 €.
 
 ## Secrets (los pego yo en Settings › Secrets and variables › Actions)
 
-- `AIRTABLE_TOKEN`: token de la base «Panel GTA 6» (cuenta de adria.sanandreas).
+- `AIRTABLE_TOKEN`: token de la base «Panel GTA 6» (cuenta principal).
 - `GEMINI_API_KEY`: clave de AI Studio del proyecto GTA.
 - `BUFFER_API_KEY`: clave de la API de la segunda cuenta de Buffer.
 
