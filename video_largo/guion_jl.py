@@ -96,7 +96,7 @@ BLOQUES = [
                "en una vida con él su manera de salir de todo esto."),
      "rotulos": [{"en": "penitenciaría", "texto": "@LUCÍA CAMINOS|RECIÉN SALIDA DE PRISIÓN"}],
      "nombres": ["gimnasio"],
-     "planos": ["CL_Lucia", "LZ_07", "T2_10", "MI_90", "MI_30", "T2_17", "MI_48"],
+     "planos": ["CL_Lucia", "LZ_07", "T2_10", "MI_90", "T2_17", "MI_48"],
      "planos_en": [{"en": "gimnasio", "plano": "T2_06"}, {"en": "penitenciaría", "plano": "MI_96"}]},
 
     {"id": "p03", "num": None, "titulo": "", "overlay": "", "capitulo": "El grillete",
@@ -255,9 +255,9 @@ BLOQUES = [
                "Red Dead: la historia irá por capítulos, como la de Arthur."),
      "rotulos": [{"en": "arthur", "texto": "@ARTHUR MORGAN|RED DEAD REDEMPTION 2"}],
      "nombres": ["arthur", "piso"],
-     "planos": ["RDR2_02", "RDR2_04", "MI_36", "MI_37"],
+     "planos": ["RDR2_02", "RDR2_04", "MI_37", "MI_116"],
      "planos_en": [{"en": "sientas", "plano": "Mirada_Terraza"}, {"en": "arthur", "plano": "RDR2@25.6+3.4"},
-                   {"en": "piso", "plano": "MI_116"}, {"en": "escaleras", "plano": "MI_129"}]},
+                   {"en": "sientas", "plano": "MI_30"}, {"en": "piso", "plano": "MI_36"}, {"en": "escaleras", "plano": "MI_129"}]},
 
     {"id": "p13b", "num": None, "titulo": "", "overlay": "", "capitulo": "Ochenta horas con ellos",
      "texto": ("¿Y cuánto tiempo vamos a pasar con esta pareja? Nelson le contó al New York Times que su última "
