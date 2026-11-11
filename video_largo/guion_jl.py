@@ -256,7 +256,8 @@ BLOQUES = [
      "rotulos": [{"en": "arthur", "texto": "@ARTHUR MORGAN|RED DEAD REDEMPTION 2"}],
      "nombres": ["arthur", "piso"],
      "planos": ["RDR2_02", "RDR2_04", "MI_36", "MI_37"],
-     "planos_en": [{"en": "arthur", "plano": "RDR2@25.6+3.4"}, {"en": "piso", "plano": "MI_116"}, {"en": "escaleras", "plano": "MI_129"}]},
+     "planos_en": [{"en": "sientas", "plano": "Mirada_Terraza"}, {"en": "arthur", "plano": "RDR2@25.6+3.4"},
+                   {"en": "piso", "plano": "MI_116"}, {"en": "escaleras", "plano": "MI_129"}]},
 
     {"id": "p13b", "num": None, "titulo": "", "overlay": "", "capitulo": "Ochenta horas con ellos",
      "texto": ("¿Y cuánto tiempo vamos a pasar con esta pareja? Nelson le contó al New York Times que su última "
