@@ -22,15 +22,15 @@ PLANOS_FIJOS = {"GTA_15_01", "Mirada_Logo", "VL_Fecha", "VCA_Logo", "Portada_Ani
                 "IMG_RaceNChase", "IMG_VC_Portada"}
 
 # Música por época (hecha con código en el propio montaje: sin pistas con licencia)
-MUSICA = {"hook": "synthwave", "p01": "chiptune", "p03": "breakbeat", "p06": "hiphop", "p08": "synthwave",
-          "p10": "synthwave"}
+MUSICA = {"hook": "synthwave", "p01": "chiptune", "p03": "breakbeat", "p07": "chiptune", "p09": "hiphop",
+          "p12": "synthwave", "p14": "synthwave"}
 
 # Línea de tiempo de abajo
 LINEA_ANIMADA = True
-LINEA = [(1997, "GTA"), (2001, "GTA III"), (2002, "VICE CITY"), (2004, "SAN ANDREAS"), (2008, "GTA IV"),
-         (2013, "GTA V"), (2018, "LICENCIAS"), (2021, "THE CONTRACT"), (2026, "GTA VI")]
+LINEA = [(1997, "GTA"), (2001, "GTA III"), (2002, "VICE CITY"), (2004, "SAN ANDREAS"), (2005, "PSP"),
+         (2008, "GTA IV"), (2013, "GTA V"), (2018, "LICENCIAS"), (2021, "THE CONTRACT"), (2026, "GTA VI")]
 
-# Pronunciación para la voz (nombres ingleses de radios, artistas y títulos)
+# Pronunciación para la voz: cada valor es UNA palabra (nombres ingleses de radios, artistas y títulos)
 FONETICA = {
     "III": "3", "IV": "4", "V": "5", "VI": "6", "Liberty": "Líberti", "City": "Siti", "Miami": "Maiámi",
     "Rock": "Rok", "Radio": "Radio", "Craig": "Creig", "Conner": "Cóner", "Colin": "Cólin", "Anderson": "Ándersson",
@@ -60,6 +60,13 @@ FONETICA = {
     "RAGE": "Reich", "Claude": "Clod", "Tommy": "Tomi", "Vercetti": "Verchéti", "Samuel": "Sámuel",
     "Liotta": "Lióta", "Tenpenny": "Tenpeni", "Jackson": "Yákson", "CJ": "Siyéi", "London": "Lóndon",
     "Leonida": "Leónida", "Leónida": "Leónida", "Michael": "Máikel", "Online": "Onlain", "Bronx": "Bronks",
+    "Houser": "Jáuser", "Degenatron": "Degenatrón", "Cluckin'": "Clókin", "Bell": "Bel", "Richards": "Rítchards",
+    "Stories": "Stóris", "Lips": "Lips", "Free": "Frí", "Rise": "Ráis", "Jam": "Yam", "Entertaining": "Entertenin",
+    "America": "América", "WCTR": "Dábliu-Ce-Té-Erre", "Integrity": "Intégriti", "Algonquin": "Algonkin",
+    "FlyLo": "Fláilo", "Flying": "Fláin", "Lotus": "Lótus", "Self": "Self", "Media": "Mídia", "Player": "Pléier",
+    "Locker": "Lóquer", "Music": "Miusik", "User": "Iúser", "Diamond": "Dáimond", "MP3": "Eme-Pe-Tres",
+    "PSP": "Pe-Ese-Pe", "Billy": "Bili", "Dexter": "Dékster", "Absurd": "Absurd", "Ventures": "Véntures",
+    "MF": "Eme-Efe", "DOOM": "Dum", "Krayzie": "Kréisi", "Bone": "Boun",
 }
 
 
@@ -75,7 +82,7 @@ def _voz(texto):
     return " ".join(salida)
 
 
-T = 11
+T = 15
 
 BLOQUES = [
     # ---------------------------------------------------------------- HOOK
@@ -118,7 +125,7 @@ BLOQUES = [
     {"id": "p02", "num": 2, "total": T, "titulo": "1999 · GTA 2", "capitulo": "1999 · GTA 2", "overlay": "",
      "anio": 1999,
      "texto": ("Dos años después llega GTA 2, en la ciudad sin nombre real que es Anywhere City. Tiene radio, claro: "
-               "en Funami FM, la emisora de la banda yakuza, suena esto. Su historia musical merece un vídeo aparte. "
+               "en Funami FM, la emisora de la banda yakuza, suena esto. Casi toda la música de GTA 2 es original, hecha para el juego. Su historia musical merece un vídeo aparte. "
                "Así que aquí la marcamos en el mapa, y seguimos."),
      "rotulos": [{"en": "Anywhere", "texto": "GTA 2|ANYWHERE CITY"},
                  {"en": "Funami", "texto": "FUNAMI FM|YAKUZA"}],
@@ -173,7 +180,30 @@ BLOQUES = [
      "planos": ["@Vice_City_2002:6", "@VC_DE:4", "NUEVO_Caja_Vice_CD", "VCA_Logo", "IMG_VC_Portada"],
      "planos_en": [{"en": "caja", "plano": "NUEVO_Caja_Vice_CD"},
                    {"en": "Miami", "plano": "@Vice_City_2002"}]},
-    {"id": "p05", "num": 5, "total": T, "titulo": "2004 · SAN ANDREAS", "capitulo": "2004 · San Andreas", "overlay": "",
+
+    # ---------------------------------------------------------------- ANUNCIOS (2001-2004)
+    {"id": "p05", "num": 5, "total": T, "titulo": "2001-2004 · LOS ANUNCIOS", "capitulo": "2001-2004 · Los anuncios",
+     "overlay": "", "anio": 2001, "etiqueta_linea": "2001-2004 · ANUNCIOS",
+     "texto": ("Y no solo hay música. Entre canción y canción, las emisoras meten anuncios, y están escritos con mala "
+               "leche. En GTA III los escribieron Dan Houser y Lazlow, que además los produjo. Son marcas inventadas que "
+               "se burlan de la publicidad de la época, y algunos de Vice City usan el anticomunismo de los ochenta. En Vice City "
+               "aparece el Degenatron, una parodia de las primeras "
+               "consolas, y la estatua de la salvación del pastor Richards, que se ríe de los anuncios de donativos "
+               "religiosos. En San Andreas, la comida rápida tiene nombre propio: Cluckin' Bell. Rockstar copió el formato "
+               "de la publicidad de verdad, y llamó a publicistas para crearla. Por eso la sátira es tan exagerada, y tan "
+               "exacta."),
+     "rotulos": [{"en": "Houser", "texto": "DAN HOUSER|Y LAZLOW"},
+                 {"en": "Degenatron", "texto": "DEGENATRON|PARODIA DE CONSOLAS"},
+                 {"en": "Cluckin'", "texto": "CLUCKIN' BELL|SAN ANDREAS"}],
+     "nombres": ["Houser", "Degenatron", "Cluckin'"],
+     "canciones": [],
+     "planos": ["@GTA3_2001:2", "@Vice_City_2002:2", "@SA_2004:2", "GTA_15_12"],
+     "planos_en": [{"en": "Houser", "plano": "@GTA3_2001"},
+                   {"en": "Degenatron", "plano": "@Vice_City_2002"},
+                   {"en": "Cluckin'", "plano": "@SA_2004"}]},
+
+    # ---------------------------------------------------------------- SAN ANDREAS (2004)
+    {"id": "p06", "num": 6, "total": T, "titulo": "2004 · SAN ANDREAS", "capitulo": "2004 · San Andreas", "overlay": "",
      "anio": 2004,
      "texto": ("En dos mil cuatro, San Andreas es un estado entero, con tres ciudades y muchas emisoras. Radio Los "
                "Santos pone el hip hop de la Costa Oeste, con Julio G a los mandos. Y K-DST es de rock clásico, y su DJ, "
@@ -195,9 +225,50 @@ BLOQUES = [
                    {"en": "Axl", "plano": "NUEVO_K_DST_Menu"},
                    {"en": "consecuencias", "plano": "NUEVO_Interfaz_Trilogy"}]},
 
-    # ---------------------------------------------------------------- ACTO III · LA ERA HD (2008-2013)
-    {"id": "p06", "num": 6, "total": T, "titulo": "2008 · GTA IV", "capitulo": "2008 · GTA IV", "overlay": "",
-     "anio": 2008, "cartela": {"anio": "2008", "acto": "ACTO III", "titulo": "LA ERA HD"},
+    # ---------------------------------------------------------------- PORTÁTILES (2005-2006)
+    {"id": "p07", "num": 7, "total": T, "titulo": "2005-2006 · LAS PORTÁTILES", "capitulo": "2005-2006 · Las portátiles",
+     "overlay": "", "anio": 2005, "etiqueta_linea": "2005-2006 · PORTÁTILES",
+     "cartela": {"anio": "2005", "acto": "ACTO III", "titulo": "EN TODAS PARTES"},
+     "texto": ("Mientras tanto, la radio se mete en el bolsillo. Liberty City Stories, de dos mil cinco, en la PSP, "
+               "tiene diez emisoras. Lips ciento seis, Head Radio, Rise FM, The Liberty Jam o Flashback FM. Y Chatterbox "
+               "vuelve, con Lazlow otra vez al micrófono. Vice City Stories, de dos mil seis, también en PSP, tiene nueve "
+               "emisoras. Ahí están Flash FM, V-Rock, Wave ciento tres, Emotion noventa y ocho coma tres, y Radio "
+               "Espantoso. Las dos son de la PSP, la portátil de Sony. Dos ciudades en el bolsillo, y la misma idea: que la radio "
+               "nunca se calle."),
+     "rotulos": [{"en": "Stories", "texto": "LIBERTY CITY STORIES|PSP · 2005"},
+                 {"en": "Lips", "texto": "LIPS 106|LIBERTY CITY STORIES"},
+                 {"en": "Espantoso", "texto": "RADIO ESPANTOSO|VICE CITY STORIES"}],
+     "nombres": ["Stories", "Lips", "Chatterbox"],
+     "canciones": [],
+     "planos": ["@LCS_2005:6", "@VCS_2006:4", "@Advance_2004:2", "GTA_15_21"],
+     "planos_en": [{"en": "Lips", "plano": "@LCS_2005"},
+                   {"en": "Chatterbox", "plano": "NUEVO_Chatterbox_Cabina"},
+                   {"en": "Stories", "plano": "@VCS_2006"}]},
+
+    # ---------------------------------------------------------------- CHARLA (2004-2008)
+    {"id": "p08", "num": 8, "total": T, "titulo": "2004-2008 · LAS RADIOS DE CHARLA",
+     "capitulo": "2004-2008 · Las radios de charla", "overlay": "", "anio": 2004,
+     "etiqueta_linea": "2004-2008 · CHARLA",
+     "texto": ("Hay un nombre que aparece en varias de estas radios: Lazlow Jones. Escribió las emisoras de GTA junto a "
+               "Dan Houser, desde GTA III. En GTA III es la voz de Chatterbox, la única emisora de charla de su juego. En "
+               "San Andreas, Lazlow se hace cargo de Entertaining America, un programa de WCTR, la emisora de charla de "
+               "la costa oeste. Antes lo presentaba Billy Dexter, hasta que lo mata en antena un personaje del juego. "
+               "Y en GTA IV aparece Integrity dos punto cero, otra emisora de charla. Aquí Lazlow sale a "
+               "la calle, en Algonquin, y habla con la gente que se cruza. Tres juegos, "
+               "y la misma voz al micrófono."),
+     "rotulos": [{"en": "WCTR", "texto": "WCTR|CHARLA DE LA COSTA OESTE"},
+                 {"en": "Integrity", "texto": "INTEGRITY 2.0|GTA IV"},
+                 {"en": "Lazlow", "texto": "LAZLOW JONES|VOZ DE LA SAGA"}],
+     "nombres": ["Lazlow", "WCTR", "Integrity", "Algonquin"],
+     "canciones": [],
+     "planos": ["@SA_2004:3", "@GTA4_2008:2", "NUEVO_Chatterbox_Cabina"],
+     "planos_en": [{"en": "WCTR", "plano": "@SA_2004"},
+                   {"en": "Algonquin", "plano": "@GTA4_2008"},
+                   {"en": "Lazlow", "plano": "NUEVO_Chatterbox_Cabina"}]},
+
+    # ---------------------------------------------------------------- GTA IV (2008)
+    {"id": "p09", "num": 9, "total": T, "titulo": "2008 · GTA IV", "capitulo": "2008 · GTA IV", "overlay": "",
+     "anio": 2008,
      "texto": ("En dos mil ocho volvemos a Liberty City, y la radio cambia de tono. Aquí está Liberty Rock Radio, "
                "noventa y siete coma ocho, con rock clásico. Y su presentador es Iggy Pop. Entre canción y canción "
                "suelta su opinión sobre lo que se le ocurre. Suena Jailbreak, de Thin Lizzy. Y en Vladivostok FM suena "
@@ -213,7 +284,9 @@ BLOQUES = [
      "planos": ["@GTA4_2008:4", "NUEVO_Iggy_Liberty_Rock", "NUEVO_Vladivostok_Menu"],
      "planos_en": [{"en": "Iggy", "plano": "NUEVO_Iggy_Liberty_Rock"},
                    {"en": "Vladivostok", "plano": "NUEVO_Vladivostok_Menu"}]},
-    {"id": "p07", "num": 7, "total": T, "titulo": "2013 · GTA V", "capitulo": "2013 · GTA V", "overlay": "",
+
+    # ---------------------------------------------------------------- GTA V (2013)
+    {"id": "p10", "num": 10, "total": T, "titulo": "2013 · GTA V", "capitulo": "2013 · GTA V", "overlay": "",
      "anio": 2013,
      "texto": ("En dos mil trece, GTA V reparte la radio entre emisoras que parecen de verdad. Non Stop Pop FM, con "
                "éxitos de pop. Los Santos Rock Radio, con Kenny Loggins como locutor, pone rock clásico. Y The Lab emite "
@@ -231,8 +304,32 @@ BLOQUES = [
                    {"en": "Lab", "plano": "@GTA5_2013"},
                    {"en": "Sleepwalking", "plano": "@GTA5_2013"}]},
 
+    # ---------------------------------------------------------------- LA RADIO QUE ELIGES (2013-2021)
+    {"id": "p11", "num": 11, "total": T, "titulo": "2013-2021 · LA RADIO QUE ELIGES",
+     "capitulo": "2013-2021 · La radio que eliges", "overlay": "", "anio": 2013,
+     "etiqueta_linea": "2013-2021 · TU MÚSICA",
+     "texto": ("Y en GTA V, la radio también puede ser tuya. FlyLo FM es la emisora de Flying Lotus, con hip hop "
+               "alternativo y electrónica, y sin anuncios ni noticias. En una edición posterior sumó temas nuevos de MF DOOM "
+               "y Krayzie Bone. Y si juegas en PC, puedes meter tu propia música. "
+               "Se llama Self Radio: copias tus archivos MP3 en la carpeta User Music, dentro de Documentos, y el juego "
+               "crea una emisora nueva con tus canciones. Hacen falta unas cuatro, como mínimo, y puedes elegir si suenan en "
+               "orden, al azar o en modo radio, con charla de DJ entre canción y canción. Eso sí, esas canciones no sirven "
+               "para los clips del editor de Rockstar. Ya en GTA Online, en dos mil veintiuno llega el Media Player, "
+               "con música de unos soportes repartidos por Los Santos. Y en el club Music Locker, bajo el casino Diamond, "
+               "suena house, disco y techno. Tú eliges qué escuchar, y la ciudad se adapta."),
+     "rotulos": [{"en": "FlyLo", "texto": "FLYLO FM|FLYING LOTUS"},
+                 {"en": "Self", "texto": "SELF RADIO|SOLO PC"},
+                 {"en": "Media", "texto": "MEDIA PLAYER|GTA ONLINE"},
+                 {"en": "Locker", "texto": "MUSIC LOCKER|CLUB"}],
+     "nombres": ["FlyLo", "Self", "Media", "Locker"],
+     "canciones": [],
+     "planos": ["@GTA5_2013:3", "NUEVO_Dial_Coche", "@GTA_Online:4"],
+     "planos_en": [{"en": "FlyLo", "plano": "@GTA5_2013"},
+                   {"en": "Self", "plano": "NUEVO_Dial_Coche"},
+                   {"en": "Locker", "plano": "@GTA_Online"}]},
+
     # ---------------------------------------------------------------- ACTO IV · LAS LICENCIAS (2018-2022)
-    {"id": "p08", "num": 8, "total": T, "titulo": "2018 · LAS LICENCIAS", "capitulo": "2018 · Las licencias",
+    {"id": "p12", "num": 12, "total": T, "titulo": "2018 · LAS LICENCIAS", "capitulo": "2018 · Las licencias",
      "overlay": "", "anio": 2018, "etiqueta_linea": "2018 · LICENCIAS",
      "cartela": {"anio": "2018", "acto": "ACTO IV", "titulo": "LAS LICENCIAS"},
      "texto": ("Y aquí aparece el problema: las licencias caducan. En abril de dos mil dieciocho, Rockstar quita "
@@ -248,7 +345,7 @@ BLOQUES = [
      "planos": ["NUEVO_Interfaz_Trilogy", "@GTA3_DE:2", "@SA_DE:2", "@VC_DE:2", "NUEVO_Vladivostok_Menu"],
      "planos_en": [{"en": "Vladivostok", "plano": "NUEVO_Vladivostok_Menu"},
                    {"en": "Trilogy", "plano": "NUEVO_Interfaz_Trilogy"}]},
-    {"id": "p09", "num": 9, "total": T, "titulo": "2021-2022 · THE CONTRACT", "capitulo": "2021-2022 · The Contract",
+    {"id": "p13", "num": 13, "total": T, "titulo": "2021-2022 · THE CONTRACT", "capitulo": "2021-2022 · The Contract",
      "overlay": "", "anio": 2021, "etiqueta_linea": "2021 · THE CONTRACT",
      "texto": ("En diciembre de dos mil veintiuno llega GTA Online: The Contract, y la radio se pone de fiesta con Dr. "
                "Dre. Radio Los Santos añade temas exclusivos de artistas como Hit-Boy o Freddie Gibbs con Pusha T. West "
@@ -267,7 +364,7 @@ BLOQUES = [
                    {"en": "MOTOMAMI", "plano": "@GTA_Online"}]},
 
     # ---------------------------------------------------------------- ACTO V · RUMBO A GTA VI (2023-2026)
-    {"id": "p10", "num": 10, "total": T, "titulo": "2023 · LOS TRÁILERES", "capitulo": "2023-2026 · Los tráileres",
+    {"id": "p14", "num": 14, "total": T, "titulo": "2023 · LOS TRÁILERES", "capitulo": "2023-2026 · Los tráileres",
      "overlay": "", "anio": 2023, "cartela": {"anio": "2023", "acto": "ACTO V", "titulo": "RUMBO A GTA VI"},
      "texto": ("Y llegamos a GTA VI. En el primer tráiler, de diciembre de dos mil veintitrés, suena Love Is a Long "
                "Road, de Tom Petty. En el segundo, del seis de mayo de dos mil veinticinco, el tema principal es Hot "
@@ -286,7 +383,7 @@ BLOQUES = [
      "planos_en": [{"en": "Petty", "plano": "T1_Playa_Aerea"},
                    {"en": "Hot", "plano": "T2_Jason_Tejado"},
                    {"en": "Spotify", "plano": "T2_Autopista"}]},
-    {"id": "p11", "num": 11, "total": T, "titulo": "2026 · LAS RADIOS DE GTA VI",
+    {"id": "p15", "num": 15, "total": T, "titulo": "2026 · LAS RADIOS DE GTA VI",
      "capitulo": "2026 · Las radios de GTA VI", "overlay": "", "anio": 2026, "etiqueta_linea": "2026 · GTA VI",
      "texto": ("Y ahora, las radios de GTA VI, lo que se sabe hasta ahora. Según la prensa especializada, en octubre de "
                "dos mil veintiséis se mostraron seis emisoras: Flash FM, que vuelve de Vice City; The Chamber; Cocoteo "
