@@ -96,7 +96,7 @@ BLOQUES = [
                "en una vida con él su manera de salir de todo esto."),
      "rotulos": [{"en": "penitenciaría", "texto": "@LUCÍA CAMINOS|RECIÉN SALIDA DE PRISIÓN"}],
      "nombres": ["gimnasio"],
-     "planos": ["CL_Lucia", "LZ_07", "T2_10", "MI_90", "MI_30", "T2_16", "T2_17", "MI_48"],
+     "planos": ["CL_Lucia", "LZ_07", "T2_10", "MI_90", "MI_30", "T2_17", "MI_48"],
      "planos_en": [{"en": "gimnasio", "plano": "T2_06"}, {"en": "penitenciaría", "plano": "MI_96"}]},
 
     {"id": "p03", "num": None, "titulo": "", "overlay": "", "capitulo": "El grillete",
@@ -153,7 +153,7 @@ BLOQUES = [
                  {"en": "amigo", "texto": "@CAL HAMPTON|SU MEJOR AMIGO"}],
      "nombres": ["jefe", "amigo"],
      "planos": ["T2_05", "T2_13", "MI_55", "MI_122"],
-     "planos_en": [{"en": "jefe", "plano": "CL_Brian"}, {"en": "casero", "plano": "T2_01"}, {"en": "amigo", "plano": "CL_Cal"}]},
+     "planos_en": [{"en": "jefe", "plano": "CL_Brian"}, {"en": "casero", "plano": "T2_01"}, {"en": "amigo", "plano": "CL_Cal"}, {"en": "tardes", "plano": "T2@81.2+3.4"}, {"en": "cervezas", "plano": "T2_16"}]},
 
     {"id": "p07b", "num": None, "titulo": "", "overlay": "", "capitulo": "El resto del reparto",
      "texto": ("Y no son los únicos. Rockstar ha presentado a seis personajes más, y todos tienen pinta de cruzarse en "
