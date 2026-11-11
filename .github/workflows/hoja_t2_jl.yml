@@ -1,0 +1,32 @@
+name: Hoja segundo a segundo del tráiler 2 (vídeo 4)
+
+# 11 nov: para encontrar en qué segundo del tráiler 2 salen Cal, Brian, Jason y Lucía. Deja las hojas en «t2-jl».
+
+on:
+  push:
+    branches: [jl]
+    paths: [".github/workflows/hoja_t2_jl.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  hoja:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - name: Programas
+        run: sudo apt-get update -q && sudo apt-get install -y -q ffmpeg
+      - name: Hojas (1 fotograma por segundo, con el segundo escrito)
+        run: |
+          mkdir -p salida
+          curl -sSL -A "Mozilla/5.0" -o t2.mp4 https://media-rockstargames-com.akamaized.net/VI/downloads/videos/GTAVI_Trailer_2/GTAVI_Trailer_2.mp4
+          ffmpeg -v error -i t2.mp4 -vf "fps=1,scale=320:-2,drawtext=fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf:text='%{eif\:t\:d}':x=6:y=6:fontsize=26:fontcolor=yellow:box=1:boxcolor=black@0.7,tile=8x6" salida/t2_%02d.jpg
+      - name: Publicar en la rama t2-jl
+        run: |
+          cd salida
+          git init -q && git checkout -q -b t2-jl
+          git config user.name "github-actions" && git config user.email "actions@github.com"
+          git add . && git commit -q -m "Hoja del tráiler 2"
+          git push -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}" t2-jl
