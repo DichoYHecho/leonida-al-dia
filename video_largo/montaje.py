@@ -648,15 +648,24 @@ def fin_por_energia(x):
     return (fin + 1) * 0.02
 
 
+NUMEROS = {"cero", "uno", "una", "dos", "tres", "cuatro", "cinco", "seis", "siete", "ocho", "nueve", "diez", "once",
+           "doce", "trece", "catorce", "quince", "dieciseis", "diecisiete", "dieciocho", "diecinueve", "veinte",
+           "treinta", "cuarenta", "cincuenta", "sesenta", "setenta", "ochenta", "noventa", "cien", "ciento", "mil",
+           "millon", "millones"}
+
+
 def fin_oido(b, ws):
     """Segundo en que Whisper oye acabar la última palabra del guion (texto o voz fonética); None si no la oye."""
     claves = set()
     for txt in (b["texto"], b.get("voz") or ""):
         claves |= {P.normalizar(w) for w in txt.split()[-2:]}
     claves = {c for c in claves if len(c) >= 3}
+    acaba_en_numero = any(c in NUMEROS or c.endswith("cientos") for c in claves)
     for w, a, e in reversed(ws[-8:]):
         n = P.normalizar(w)
         if len(n) >= 3 and any(n == c or n[:4] == c[:4] for c in claves):
+            return e
+        if acaba_en_numero and n.isdigit():  # Whisper escribe en cifra lo que el guion dice en letra («365»)
             return e
     if ws and parecido_final(b, ws) >= 0.7:  # Whisper lo escribe distinto («BICITY» por «Vice City»), pero es el final
         return ws[-1][2]
