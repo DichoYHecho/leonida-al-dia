@@ -498,7 +498,8 @@ def cortar_plano(nombre, t, dur, destino, sentido):
     for _ in range(3):
         try:
             run(["ffmpeg", "-y", "-loglevel", "error", *pre, *fuente, "-t", f"{dur:.2f}", "-an", "-vf", vf,
-                 "-c:v", "libx264", "-crf", "12", "-preset", "veryfast", destino])
+                 "-c:v", "libx264", "-crf", "20" if os.environ.get("RAPIDO") == "1" else "12",
+                 "-preset", "ultrafast" if os.environ.get("RAPIDO") == "1" else "veryfast", destino])
             return
         except RuntimeError as e:
             print("  reintento", nombre, str(e)[-200:], flush=True)

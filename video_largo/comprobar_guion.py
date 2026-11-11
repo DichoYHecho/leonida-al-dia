@@ -26,8 +26,9 @@ def aparece(texto, palabra, n=1):
 
 def main():
     tb = M.tabla()
+    solo = [x.strip() for x in os.environ.get("BLOQUES_SOLO", "").split(",") if x.strip()]
     bloques = [dict(b, planos=list(b["planos"]), planos_en=[dict(r) for r in b.get("planos_en", [])])
-               for b in G.BLOQUES]
+               for b in G.BLOQUES if not solo or b["id"] in solo]
     errores, avisos, palabras, t = [], [], 0, 0.0
     M.planos_en_linea(bloques, tb)
     grupos = collections.Counter(v.get("grupo", "") for v in tb.values())
@@ -67,6 +68,33 @@ def main():
         for b in bloques:
             if b.get("alargado", 0) > 1.5:
                 avisos.append(f"{b['id']}: faltan planos, el último se alarga {b['alargado']:.1f} s (añade más al guion)")
+        usados_v = {tb[n]["video"] for b in bloques for n, _ in b.get("plan", []) if n in tb}
+        usados_v |= {tb[b[k]]["video"] for b in bloques for k in ("original", "intro_original") if b.get(k) in tb}
+        sin_dir = sorted(v for v in usados_v if not v.startswith(("Clips:", "Imagen:")) and v not in P.VIDEOS)
+        if sin_dir:
+            errores.append("Vídeos sin dirección (añádelos a VIDEOS_EXTRA): " + ", ".join(sin_dir))
+        if os.environ.get("COMPROBAR_ENLACES") == "1":  # que cada vídeo siga descargable (solo pide la cabecera)
+            import urllib.request
+            from concurrent.futures import ThreadPoolExecutor
+
+            def caido(v):
+                url = P.VIDEOS[v].split("#")[0]
+                try:
+                    req = urllib.request.Request(url, method="HEAD", headers={"User-Agent": "Mozilla/5.0"})
+                    with urllib.request.urlopen(req, timeout=30) as r:
+                        return None if r.status < 400 else f"{v} (HTTP {r.status})"
+                except Exception as e:  # noqa: BLE001
+                    return f"{v} ({type(e).__name__})"
+            con_url = sorted(v for v in usados_v if v in P.VIDEOS and str(P.VIDEOS[v]).startswith("http"))
+            with ThreadPoolExecutor(8) as ex:
+                caidos = [x for x in ex.map(caido, con_url) if x]
+            (errores if caidos else avisos).append("Vídeos que no se pueden bajar: " + ", ".join(caidos) if caidos
+                                                  else f"Enlaces comprobados: {len(con_url)} bien")
+        if os.environ.get("COMPROBAR_VOCES") == "1":
+            import voces as V
+            sin_voz = [b["id"] for b in bloques if not V.ruta_wav(b).exists()]
+            if sin_voz:
+                errores.append("Faltan voces: " + ", ".join(sin_voz) + " (lanza el paso «voces»)")
         rep = M.comprobar_repetidos(bloques)
         if rep:
             errores.append(f"{len(rep)} trozos saldrían repetidos: " + "; ".join(rep[:12]) + (" …" if len(rep) > 12 else ""))

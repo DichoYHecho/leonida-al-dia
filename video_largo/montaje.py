@@ -39,6 +39,14 @@ import prototipo as P  # noqa: E402
 import voces as V  # noqa: E402
 
 DRY = P.DRY
+RAPIDO = os.environ.get("RAPIDO") == "1"  # previa entera rápida: misma edición, compresión más ligera
+CRF_T, PRESET_T = ("20", "ultrafast") if RAPIDO else ("12", "veryfast")
+TIEMPOS = []
+
+
+def marca(fase, t0):
+    TIEMPOS.append(f"{fase}: {time.time() - t0:.0f} s")
+    print("TIEMPO", TIEMPOS[-1], flush=True)
 W, H, FPS, SR = P.W, P.H, P.FPS, P.SR
 TMP, OUT, HQ = P.TMP, pathlib.Path("salida_montaje"), pathlib.Path("salida_hq")
 FUENTES = pathlib.Path(os.environ.get("DIR_FUENTES", "fuentes"))
@@ -122,7 +130,7 @@ def cortar(nombre, t, dur_out, destino, sentido):
                "-i", str(fuente(t["video"])), "-vf",
                "scale=1600:880:force_original_aspect_ratio=decrease:flags=lanczos,"
                "pad=1920:1080:(ow-iw)/2:(oh-ih)/2:color=black,format=yuv420p",
-               "-t", f"{dur_out:.2f}", "-c:v", "libx264", "-crf", "12", "-preset", "veryfast", destino])
+               "-t", f"{dur_out:.2f}", "-c:v", "libx264", "-crf", CRF_T, "-preset", PRESET_T, destino])
         return
     lento = t["lento"]
     dur_in = dur_out / lento
@@ -150,7 +158,7 @@ def cortar(nombre, t, dur_out, destino, sentido):
     for _ in range(3):
         try:
             P.run(["ffmpeg", "-y", "-loglevel", "error", *pre, *entrada, "-an", "-vf", vf, "-t", f"{dur_out:.2f}",
-                   "-c:v", "libx264", "-crf", "12", "-preset", "veryfast", destino])
+                   "-c:v", "libx264", "-crf", CRF_T, "-preset", PRESET_T, destino])
             return
         except RuntimeError as e:
             print("  reintento", nombre, str(e)[-200:], flush=True)
@@ -1003,6 +1011,7 @@ def main():
         if b["aviso_final"]:
             print("  AVISO: Whisper no oye el final del guion en la voz montada", flush=True)
         print(f"  {b['dur_voz']:.1f} s (final recortado {b['cola_cortada']:.2f} s)", flush=True)
+    marca("voces y Whisper", t0)
     malos = informe_finales(bloques)
     if os.environ.get("SOLO_VOCES") == "1":
         print("Solo el informe de los finales de voz (SOLO_VOCES=1).")
@@ -1046,7 +1055,7 @@ def main():
             k += 1
             destino = str(carpeta / f"{k:03d}_cartela.mp4")
             P.run(["ffmpeg", "-y", "-loglevel", "error", "-f", "lavfi", "-i", f"color=c=black:s={W}x{H}:r={FPS}:d={DUR_CARTELA}",
-                   "-c:v", "libx264", "-crf", "12", "-preset", "veryfast", "-pix_fmt", "yuv420p", destino])
+                   "-c:v", "libx264", "-crf", CRF_T, "-preset", PRESET_T, "-pix_fmt", "yuv420p", destino])
             lista_concat.append(destino)
         if b.get("intro_original"):
             k += 1
@@ -1092,6 +1101,7 @@ def main():
         for f in futuros:
             f.result()
     print(f"{len(tareas)} planos cortados ({time.time() - t0:.0f} s)", flush=True)
+    marca("descargas y planos cortados", t0)
     (TMP / "lista.txt").write_text("".join(f"file '{pathlib.Path(p).resolve()}'\n" for p in lista_concat))
     P.run(["ffmpeg", "-y", "-loglevel", "error", "-f", "concat", "-safe", "0", "-i", TMP / "lista.txt", "-c", "copy",
            TMP / "sin_audio.mp4"])
@@ -1150,6 +1160,7 @@ def main():
         f.setframerate(SR)
         f.writeframes((mezcla * 32767).astype("<i2").tobytes())
     del voz, mus, orig, mezcla
+    marca("subtítulos, rótulos y música", t0)
     # 6) montaje final
     P.crear_degradado(TMP / "degradado.png")
     linea_mov = esperar_linea(hilo_linea)
@@ -1161,10 +1172,11 @@ def main():
     P.run(["ffmpeg", "-y", "-loglevel", "error", "-i", TMP / "sin_audio.mp4", "-i", TMP / "mezcla.wav",
            "-loop", "1", "-framerate", FPS, "-i", TMP / "degradado.png", *(["-i", linea_mov] if linea_mov else []),
            "-filter_complex", grafo, "-map", "[v]",
-           "-map", "1:a", "-af", "loudnorm=I=-14:TP=-1.5:LRA=11", "-c:v", "libx264", "-crf", "19", "-preset", "medium",
+           "-map", "1:a", "-af", "loudnorm=I=-14:TP=-1.5:LRA=11", "-c:v", "libx264", "-crf", "26" if RAPIDO else "19", "-preset", "veryfast" if RAPIDO else "medium",
            "-pix_fmt", "yuv420p", "-c:a", "aac", "-b:a", "192k", "-ar", SR, "-t", f"{total:.2f}", "-movflags", "+faststart",
            final])
     print(f"Vídeo final listo ({time.time() - t0:.0f} s)", flush=True)
+    marca("vídeo final", t0)
     P.run(["ffmpeg", "-y", "-loglevel", "error", "-i", final, "-vf", "scale=1280:720", "-c:v", "libx264", "-crf", "27",
            "-maxrate", "2000k", "-bufsize", "4000k", "-preset", "fast", "-force_key_frames", "expr:gte(t,n_forced*300)",
            "-c:a", "aac", "-b:a", "112k", "-f", "segment", "-segment_time", "300", "-reset_timestamps", "1",
@@ -1184,7 +1196,8 @@ def main():
             caps.append(f"{hms(b['ini'])} {b.get('capitulo') or 'Lo que Rockstar aún no ha contado'}")
     (OUT / "capitulos.txt").write_text("\n".join(caps), encoding="utf-8")
     informe = [f"Duración: {dur:.1f} s ({hms(dur)})", f"Tamaño: {final.stat().st_size / 1e6:.0f} MB (alta calidad), "
-               f"{sum(p.stat().st_size for p in OUT.glob('previa_*.mp4')) / 1e6:.0f} MB (previa en partes de 5 min)", f"Tiempo de montaje: {time.time() - t0:.0f} s", ""]
+               f"{sum(p.stat().st_size for p in OUT.glob('previa_*.mp4')) / 1e6:.0f} MB (previa en partes de 5 min)", f"Tiempo de montaje: {time.time() - t0:.0f} s" + (" (previa rápida)" if RAPIDO else ""),
+               "Tiempos acumulados: " + " · ".join(TIEMPOS), ""]
     for b in bloques:
         informe.append(f"{b['id']}: voz {b['dur_voz']:.1f} s, {len(b['plan'])} planos, subtítulos por {b['metodo']}"
                        + (f", sonido original {b['original']}" if b.get("original") else "")

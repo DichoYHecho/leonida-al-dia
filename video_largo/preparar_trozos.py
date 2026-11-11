@@ -81,9 +81,30 @@ def repartir(lista, n):
     return [lista[i] for i in idx]
 
 
+def previos():
+    """Trozos ya preparados en una tanda anterior (carpeta TROZOS_PREVIOS): se reutilizan si la fuente no cambió."""
+    d = pathlib.Path(os.environ.get("TROZOS_PREVIOS", "trozos_previos"))
+    if not (d / "trozos_auto.csv").exists():
+        return d, {}
+    out = {}
+    with open(d / "trozos_auto.csv", encoding="utf-8") as fh:
+        for r in csv.DictReader(fh):
+            out.setdefault(r["Vídeo"], []).append(r)
+    return d, out
+
+
 def main():
     filas, resumen = [], []
+    dir_prev, prev = previos()
     for clave, f in FUENTES.items():
+        viejas = prev.get(clave, [])
+        hoja_vieja = dir_prev / "hojas" / f"{clave}.jpg"
+        if viejas and all(r["Notas"] == f["url"] and r["Grupo"] == f["grupo"] for r in viejas) and hoja_vieja.exists() \
+                and len(viejas) <= f.get("max", 15):
+            filas += viejas
+            (OUT / "hojas" / f"{clave}.jpg").write_bytes(hoja_vieja.read_bytes())
+            resumen.append(f"| {clave} | {f['grupo']} | (reutilizado) | - | {len(viejas)} trozos |")
+            continue
         ruta = TMP / (clave + ".mp4")
         try:
             bajar(f["url"], ruta)
