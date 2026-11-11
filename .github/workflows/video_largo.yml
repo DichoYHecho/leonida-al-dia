@@ -73,6 +73,12 @@ jobs:
           path: cache/whisper-base
           key: whisper-base-directo-v1
 
+      - name: Voces guardadas para siempre (Releases voces-<id>), por si la caché caducó
+        run: |
+          mkdir -p cache/voz_vl
+          gh release download "voces-$VID" -D cache/voz_vl --skip-existing 2>/dev/null || true
+          touch /tmp/inicio
+
       - name: Ejecutar el paso
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY_VIDEO }}
@@ -92,6 +98,14 @@ jobs:
         with:
           path: cache/voz_vl
           key: voz-${{ inputs.video }}-${{ github.run_id }}
+
+      - name: Copiar las voces nuevas a Releases voces-<id>
+        if: always() && inputs.paso == 'voces'
+        run: |
+          NUEVAS=$(find cache/voz_vl -name '*.wav' -newer /tmp/inicio)
+          [ -n "$NUEVAS" ] || exit 0
+          gh release view "voces-$VID" >/dev/null 2>&1 || gh release create "voces-$VID" --prerelease --target "$GITHUB_SHA" --title "Voces del vídeo largo $VID (WAV)" --notes "Copia permanente de las voces."
+          gh release upload "voces-$VID" $NUEVAS --clobber
 
       - name: Publicar resultados en su rama
         if: always()
