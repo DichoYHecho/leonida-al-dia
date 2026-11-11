@@ -83,11 +83,17 @@ def repartir(lista, n):
     return [lista[i] for i in idx]
 
 
+VIEJA_VERSION = ""
+
+
 def previos():
     """Trozos ya preparados en una tanda anterior (carpeta TROZOS_PREVIOS): se reutilizan si la fuente no cambió."""
     d = pathlib.Path(os.environ.get("TROZOS_PREVIOS", "trozos_previos"))
     if not (d / "trozos_auto.csv").exists():
         return d, {}
+    global VIEJA_VERSION
+    v = d / "etiquetas_version.txt"
+    VIEJA_VERSION = v.read_text().strip() if v.exists() else ""
     out = {}
     with open(d / "trozos_auto.csv", encoding="utf-8") as fh:
         for r in csv.DictReader(fh):
@@ -103,7 +109,7 @@ def main():
         hoja_vieja = dir_prev / "hojas" / f"{clave}.jpg"
         if viejas and all(r["Notas"] == f["url"] and r["Grupo"] == f["grupo"] for r in viejas) and hoja_vieja.exists() \
                 and len(viejas) <= f.get("max", 15):
-            if any(not r.get("Etiquetas") for r in viejas) and os.environ.get("ETIQUETAR", "1") == "1":
+            if (any(not r.get("Etiquetas") for r in viejas) or VIEJA_VERSION != E.VERSION) and os.environ.get("ETIQUETAR", "1") == "1":
                 orden = sorted(viejas, key=lambda r: r["Trozo"])
                 tags = E.etiquetar(E.recortes_de_hoja(Image.open(hoja_vieja), len(orden)))
                 for r, tg in zip(orden, tags):
@@ -156,6 +162,7 @@ def main():
         w = csv.DictWriter(fh, fieldnames=CAMPOS, extrasaction="ignore")
         w.writeheader()
         w.writerows(filas)
+    (OUT / "etiquetas_version.txt").write_text(E.VERSION)
     texto = "## Trozos automáticos\n\n| Fuente | Grupo | Duración | Cortes | Trozos |\n|---|---|---|---|---|\n" + "\n".join(resumen)
     texto += f"\n\nTotal: {len(filas)} trozos\n"
     (OUT / "informe.md").write_text(texto, encoding="utf-8")

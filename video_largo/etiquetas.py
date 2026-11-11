@@ -5,24 +5,26 @@ Usa la miniatura de cada trozo en su hoja de contactos (no hace falta bajar los 
 """
 import numpy as np
 
+VERSION = "2"  # al cambiar las frases o el criterio, los trozos ya preparados se vuelven a etiquetar
+PLANTILLA = "a video game screenshot of {}"
 ETIQUETAS = {
-    "coche": "a car driving in a video game",
-    "moto": "a motorcycle in a video game",
-    "barco": "a boat or speedboat on the water",
-    "avion": "a plane or helicopter in the sky",
-    "persecucion": "a police chase with police cars",
-    "tiroteo": "a shootout with guns",
-    "cara": "a close-up of a character's face",
-    "personas": "a group of people",
-    "playa": "a sunny beach with palm trees",
-    "noche": "a city at night with neon lights",
-    "ciudad": "city streets and buildings",
-    "aerea": "an aerial view of a city",
-    "naturaleza": "swamp, forest or countryside",
-    "interior": "inside a building or room",
-    "texto": "a logo or text on screen",
+    "coche": "a car or truck driving on a road",
+    "moto": "a person riding a motorcycle",
+    "barco": "a boat on the water",
+    "avion": "an airplane or helicopter flying",
+    "persecucion": "police cars chasing someone",
+    "tiroteo": "a person aiming or shooting a gun",
+    "cara": "a close-up portrait of a person's face",
+    "personas": "people standing and talking",
+    "playa": "a beach with sand, sea and palm trees",
+    "noche": "a city street at night",
+    "ciudad": "city streets and buildings in daylight",
+    "aerea": "an aerial view looking down on a city",
+    "naturaleza": "a forest, swamp or countryside landscape",
+    "interior": "the inside of a room or building",
+    "texto": "a logo or title text on a plain background",
 }
-UMBRAL = 0.18  # probabilidad mínima; siempre se queda con la mejor si ninguna llega
+UMBRAL = 0.25  # además de la mejor, otras etiquetas solo si pasan este umbral y la mitad de la mejor
 
 _MODELO = None
 
@@ -35,7 +37,7 @@ def _modelo():
         m, _, pre = open_clip.create_model_and_transforms("ViT-B-32", pretrained="laion2b_s34b_b79k")
         tok = open_clip.get_tokenizer("ViT-B-32")
         with torch.no_grad():
-            t = m.encode_text(tok(list(ETIQUETAS.values())))
+            t = m.encode_text(tok([PLANTILLA.format(x) for x in ETIQUETAS.values()]))
             t /= t.norm(dim=-1, keepdim=True)
         _MODELO = (m.eval(), pre, t)
     return _MODELO
@@ -57,7 +59,7 @@ def etiquetar(imagenes):
             p = (100 * f @ t.T).softmax(dim=-1).numpy()
             for fila in p:
                 orden = np.argsort(-fila)
-                elegidas = [claves[k] for k in orden[:3] if fila[k] >= UMBRAL] or [claves[orden[0]]]
+                elegidas = [claves[orden[0]]] + [claves[k] for k in orden[1:3] if fila[k] >= max(UMBRAL, fila[orden[0]] / 2)]
                 salida.append("|".join(elegidas))
     return salida
 
