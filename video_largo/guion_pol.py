@@ -16,11 +16,13 @@ PLANOS_FIJOS = {"GTA_15_01", "GTA_15_02", "GTA_15_03", "IMG_GTA1", "IMG_GTA1_Caj
                 "VCA_Logo", "Mirada_Logo", "VL_Fecha", "Portada_Animada",
                 "NUEVO_Recorte_Prensa_1997", "NUEVO_Captura_ESRB_AO", "NUEVO_Captura_Clasificacion_AU",
                 "NUEVO_Mazo_Juez", "NUEVO_Tribunal_Florida", "NUEVO_Tribunal_NY", "NUEVO_Bully_Portada", "NUEVO_Bully_Captura",
-                "NUEVO_Titular_Prensa_2013", "NUEVO_Pantalla_Texto_Hack"}
+                "NUEVO_Titular_Prensa_2013", "NUEVO_Pantalla_Texto_Hack",
+                "NUEVO_Estanteria_Tienda", "NUEVO_Captura_Peticion", "NUEVO_Captura_Steam_Resenas",
+                "NUEVO_Captura_Entrevista", "NUEVO_Captura_Disculpa_Rockstar"}
 
 # Música por acto: cambia con cada cartela
 MUSICA = {"hook": "synthwave", "p01": "chiptune", "p02": "breakbeat", "p04": "hiphop", "p08": "synthwave",
-          "p10": "breakbeat"}
+          "p13": "breakbeat"}
 
 # Línea de tiempo de abajo
 LINEA_ANIMADA = True
@@ -39,6 +41,8 @@ FONETICA = {
     "FTC": "efe-te-ce", "ESRB": "e-ese-erre-be", "AO": "a-o", "Miami": "Maiami",
     "Tony": "Toni", "Nueva": "Nueva", "Estados": "Estados",
     "Scholarship": "Escólarship", "Edition": "Edíshon",
+    "Kmart": "Kmárt", "Collective": "Colectiv", "Shout": "Shaut", "OpenIV": "Opénaivi", "Steam": "Stim",
+    "Shark": "Shárk", "Sarwar": "Sarwár", "The": "De", "Trilogy": "Trílogi", "Definitive": "Definitiv",
 }
 
 
@@ -54,7 +58,7 @@ def _voz(texto):
     return " ".join(salida)
 
 
-T = 12
+T = 16
 
 BLOQUES = [
     # ---------------------------------------------------------------- GANCHO
@@ -194,7 +198,8 @@ BLOQUES = [
                "alegando que el juego había influido en el crimen. Pero su propia carrera acabó en los tribunales. El "
                "colegio de abogados investigó su conducta, y el juez que llevó el caso le halló culpable en veintisiete de "
                "los treinta y un cargos. El veinticinco de septiembre de 2008, el Tribunal Supremo de Florida lo inhabilitó de "
-               "forma permanente para ejercer la abogacía."),
+               "forma permanente para ejercer la abogacía. Además, tuvo que pagar las costas del colegio: cuarenta y tres mil "
+               "seiscientos setenta y cinco dólares."),
      "rotulos": [{"en": "thompson", "texto": "JACK THOMPSON|ABOGADO DE FLORIDA"},
                  {"en": "alabama", "texto": "ALABAMA · 2003|2 POLICÍAS + 1"},
                  {"en": "veintisiete", "texto": "27 DE 31 CARGOS"},
@@ -240,10 +245,76 @@ BLOQUES = [
                    {"en": "jonas", "plano": "@GTA5_2013"},
                    {"en": "2016", "plano": "NUEVO_Tribunal_NY"},
                    {"en": "2018", "plano": "NUEVO_Tribunal_NY"}]},
+    {"id": "p10", "num": 10, "total": T, "titulo": "2014 · GTA V FUERA DE LAS TIENDAS",
+     "capitulo": "2014 · Target y Kmart en Australia", "overlay": "", "anio": 2014, "etiqueta_linea": "2014 · AUSTRALIA",
+     "texto": ("Y en diciembre de 2014 llega una polémica sin tribunales. En Australia, las cadenas Target y Kmart retiran "
+               "GTA V de sus tiendas. El motivo: una petición que pedía retirarlo por la violencia contra las mujeres que "
+               "muestra. Más de cuarenta mil personas firmaron la campaña, impulsada por Collective Shout. La petición nombraba a Target, y Kmart lo siguió aunque no estaba en ella. Kmart explicó que "
+               "había revisado todo el contenido de la saga y que tomaba la decisión. El consejero delegado de Take-Two criticó "
+               "la retirada: que un grupo decida por millones de personas, dijo, está mal. Los jugadores también se volvieron "
+               "contra las cadenas. Target de Estados Unidos aseguró que en Norteamérica seguiría vendiéndolo."),
+     "rotulos": [{"en": "australia", "texto": "AUSTRALIA · 2014|TARGET Y KMART"},
+                 {"en": "cuarenta", "texto": "+40.000 FIRMAS|COLLECTIVE SHOUT"},
+                 {"en": "consejero", "texto": "TAKE-TWO|CRITICA LA RETIRADA"}],
+     "nombres": ["australia", "cuarenta", "consejero"],
+     "planos": ["@GTA5_2013:4", "NUEVO_Estanteria_Tienda", "@GTA_Online:2"],
+     "planos_en": [{"en": "australia", "plano": "NUEVO_Estanteria_Tienda"},
+                   {"en": "cuarenta", "plano": "NUEVO_Captura_Peticion"},
+                   {"en": "consejero", "plano": "@GTA5_2013"}]},
+    {"id": "p11", "num": 11, "total": T, "titulo": "2017 · OPENIV Y LOS MODS", "capitulo": "2017 · OpenIV",
+     "overlay": "", "anio": 2017, "etiqueta_linea": "2017 · OPENIV",
+     "texto": ("Y en 2017, la polémica llega al PC. OpenIV es una herramienta gratuita con la que la comunidad crea mods para "
+               "GTA V. En junio, los abogados de Take-Two envían una carta de cese y desista a sus creadores, y la herramienta "
+               "deja de distribuirse. La reacción fue inmediata: una avalancha de reseñas negativas en la página del juego en "
+               "Steam, y peticiones en internet. Dos semanas después, Take-Two da marcha atrás. La herramienta vuelve a estar "
+               "disponible, y los mods para un jugador vuelven a estar permitidos. Sus creadores dijeron después que nunca apoyaron los mods de GTA Online. Los jugadores "
+               "también tienen algo que decir."),
+     "rotulos": [{"en": "openiv", "texto": "OPENIV|HERRAMIENTA DE MODS"},
+                 {"en": "junio", "texto": "JUN 2017|CESE Y DESISTA"},
+                 {"en": "reseñas", "texto": "RESEÑAS NEGATIVAS|EN STEAM"},
+                 {"en": "marcha", "texto": "TAKE-TWO|DA MARCHA ATRÁS"}],
+     "nombres": ["openiv", "junio", "reseñas", "marcha"],
+     "planos": ["NUEVO_Captura_Steam_Resenas", "@GTA5_2013:4", "@GTA_Online:2"],
+     "planos_en": [{"en": "openiv", "plano": "@GTA5_2013"},
+                   {"en": "junio", "plano": "NUEVO_Captura_Steam_Resenas"},
+                   {"en": "reseñas", "plano": "NUEVO_Captura_Steam_Resenas"},
+                   {"en": "marcha", "plano": "@GTA5_2013"}]},
+    {"id": "p12", "num": 12, "total": T, "titulo": "2017 · SHARK CARDS", "capitulo": "2017 · Shark Cards",
+     "overlay": "", "anio": 2017, "etiqueta_linea": "2017 · SHARK CARDS",
+     "texto": ("En octubre de 2017, otra discusión: el dinero. GTA Online vende las Shark Cards, paquetes de dinero del "
+               "juego que se compran con dinero real. Rockstar lo defiende. Su director de diseño, Imran Sarwar, dijo en Game "
+               "Informer que la gente puede jugar sin gastarse un dólar, aparte de comprar el juego, porque todas las "
+               "actualizaciones son gratis. Y que las críticas aparecen con cada gran cambio de la saga. Los críticos responden que la economía del juego está pensada para empujar a comprar. Hay quien lo ve como "
+               "un modelo justo. Esa discusión sigue abierta."),
+     "rotulos": [{"en": "shark", "texto": "SHARK CARDS|DINERO REAL"},
+                 {"en": "sarwar", "texto": "IMRAN SARWAR|DIRECTOR DE DISEÑO"},
+                 {"en": "gratis", "texto": "ACTUALIZACIONES|GRATIS"}],
+     "nombres": ["shark", "sarwar", "gratis"],
+     "planos": ["@GTA_Online:4", "NUEVO_Captura_Entrevista", "@GTA5_2013:2"],
+     "planos_en": [{"en": "shark", "plano": "@GTA_Online"},
+                   {"en": "sarwar", "plano": "NUEVO_Captura_Entrevista"},
+                   {"en": "gratis", "plano": "@GTA_Online"}]},
 
-    # ---------------------------------------------------------------- ACTO V · RUMBO A GTA VI (2022-2026)
-    {"id": "p10", "num": 10, "total": T, "titulo": "2022 · EL HACKEO DE ROCKSTAR", "capitulo": "2022 · El hackeo",
-     "overlay": "", "anio": 2022, "cartela": {"anio": "2022", "acto": "ACTO V", "titulo": "RUMBO A GTA VI"},
+    # ---------------------------------------------------------------- ACTO V · RUMBO A GTA VI (2021-2026)
+    {"id": "p13", "num": 13, "total": T, "titulo": "2021 · THE TRILOGY", "capitulo": "2021 · The Trilogy",
+     "overlay": "", "anio": 2021, "etiqueta_linea": "2021 · TRILOGÍA",
+     "cartela": {"anio": "2021", "acto": "ACTO V", "titulo": "RUMBO A GTA VI"},
+     "texto": ("En noviembre de 2021, Rockstar lanza The Trilogy: Definitive Edition. Son GTA III, Vice City y San Andreas, "
+               "remasterizados, con gráficos nuevos y en un solo paquete. Pero llega con problemas técnicos. Y Rockstar retira del mercado las "
+               "versiones clásicas de PC de los tres juegos. Una semana después de su lanzamiento, la empresa pide disculpas "
+               "y promete arreglos. Y vuelve a poner las versiones antiguas a la venta, en su propia tienda para PC. Quien comprara la trilogía antes del 30 de junio de 2022 recibiría los clásicos para PC gratis. Una "
+               "remasterización también puede ser una polémica."),
+     "rotulos": [{"en": "noviembre", "texto": "11 NOV 2021|THE TRILOGY"},
+                 {"en": "problemas", "texto": "PROBLEMAS TÉCNICOS|AL SALIR"},
+                 {"en": "disculpas", "texto": "ROCKSTAR|PIDE DISCULPAS"},
+                 {"en": "tienda", "texto": "VERSIONES CLÁSICAS|DE NUEVO A LA VENTA"}],
+     "nombres": ["noviembre", "disculpas", "tienda"],
+     "planos": ["@GTA3_DE:3", "@VC_DE:3", "@SA_DE:3", "NUEVO_Captura_Disculpa_Rockstar"],
+     "planos_en": [{"en": "noviembre", "plano": "@SA_DE"},
+                   {"en": "disculpas", "plano": "NUEVO_Captura_Disculpa_Rockstar"},
+                   {"en": "tienda", "plano": "@GTA3_DE"}]},
+    {"id": "p14", "num": 14, "total": T, "titulo": "2022 · EL HACKEO DE ROCKSTAR", "capitulo": "2022 · El hackeo",
+     "overlay": "", "anio": 2022,
      "texto": ("Septiembre de 2022. Rockstar sufre un hackeo, y aparece en internet material de GTA VI, un juego que todavía "
                "no había salido. Rockstar lo confirma al día siguiente y dice que el desarrollo sigue. Un juego que despierta "
                "tanto interés que cualquier filtración se convierte en noticia. Y deja una pregunta en el aire: cómo protege "
@@ -252,13 +323,13 @@ BLOQUES = [
      "nombres": ["septiembre"],
      "planos": ["NUEVO_Pantalla_Texto_Hack", "@GTA_Online:3"],
      "planos_en": [{"en": "septiembre", "plano": "NUEVO_Pantalla_Texto_Hack"}]},
-    {"id": "p11", "num": 11, "total": T, "titulo": "2026 · EL DEBATE SOBRE GTA VI",
+    {"id": "p15", "num": 15, "total": T, "titulo": "2026 · EL DEBATE SOBRE GTA VI",
      "capitulo": "2026 · El debate sobre GTA VI", "overlay": "", "anio": 2026,
      "texto": ("Y llegamos a hoy. GTA VI sale el diecinueve de noviembre, con Vice City otra vez como telón de fondo. Y la "
                "prensa debate tres cosas. La primera: cómo se retratan las comunidades de la ciudad, algo que ya se discutió "
                "con la demanda haitiana. La segunda: hasta dónde llega la sátira. La tercera: el papel de la polémica en el "
                "marketing. En Miami Beach, según la emisora WLRN, la comisión municipal aprobó una campaña de marketing del "
-               "juego a cambio de un pago. Hay opiniones para todos los gustos."),
+               "juego a cambio de un pago. La votación fue este mismo año. Hay opiniones para todos los gustos."),
      "rotulos": [{"en": "diecinueve", "texto": "19 NOV 2026|GTA VI"},
                  {"en": "comunidades", "texto": "REPRESENTACIÓN|DE LAS COMUNIDADES"},
                  {"en": "miami", "texto": "MIAMI BEACH|CAMPAÑA DE MARKETING"},
@@ -268,7 +339,7 @@ BLOQUES = [
      "planos_en": [{"en": "vice", "plano": "@Vice_City"},
                    {"en": "miami", "plano": "T2_Autopista"},
                    {"en": "diecinueve", "plano": "VL_Fecha"}]},
-    {"id": "p12", "num": 12, "total": T, "titulo": "2026 · ¿POR QUÉ ROCKSTAR SIEMPRE GANA?",
+    {"id": "p16", "num": 16, "total": T, "titulo": "2026 · ¿POR QUÉ ROCKSTAR SIEMPRE GANA?",
      "capitulo": "¿Por qué Rockstar siempre gana?", "overlay": "", "anio": 2026,
      "texto": ("Así que la pregunta de fondo: ¿por qué Rockstar parece salir ganando siempre? Primero, la publicidad. En "
                "1997, la polémica de GTA 1 se convirtió en titulares gratis, según los propios creadores. Después, Hot "
