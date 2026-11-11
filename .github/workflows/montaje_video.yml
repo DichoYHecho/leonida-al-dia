@@ -85,6 +85,7 @@ jobs:
         if: always()
         run: |
           cd salida_montaje
+          find . -type f -size +95M -print -delete  # GitHub no acepta archivos de más de 100 MB (el vídeo bueno va a Releases)
           git init -q
           git checkout -q -b "$RAMA"
           git config user.name "github-actions"
