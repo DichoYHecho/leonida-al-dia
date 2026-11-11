@@ -171,7 +171,7 @@ BLOQUES = [
      "planos_en": [{"en": "raúl", "plano": "CL_Raul"}, {"en": "inmuebles", "plano": "CL_Boobie"}, {"en": "triunfar", "plano": "CL_DreQuan"}, {"en": "fichar", "plano": "CL_Real"}]},
 
     # ---------------------------------------------------------------- ACTO III · JUNTOS
-    {"id": "p08", "num": None, "titulo": "", "overlay": "", "capitulo": "Juntos",
+    {"id": "p08", "final_revisado": True, "num": None, "titulo": "", "overlay": "", "capitulo": "Juntos",
      "cartela": {"anio": "03", "acto": "ACTO III", "titulo": "JUNTOS"},
      "texto": ("¿Y cómo se mete esta pareja en un lío de este tamaño? Rockstar lo resume así: los dos saben desde "
                "siempre que tienen las de perder, pero un golpe que parecía fácil sale mal y acaban metidos en una "
