@@ -81,7 +81,7 @@ BLOQUES = [
                "récord mundial sin salir de la celda. Ya quisieran muchos."),
      "rotulos": [{"en": "noventa", "texto": "90,4 MILLONES|DE VISITAS EN 24 H"}],
      "nombres": ["lucía"],
-     "planos": ["T1_04", "T1_07", "T1_05", "MI_87", "T1_11", "MI_99", "MI_27"],
+     "planos": ["T1_07", "T1_05", "MI_87", "T1_11", "MI_99", "MI_27"],
      "planos_en": [{"en": "lucía", "plano": "T1_03"}]},
 
     {"id": "p02", "num": None, "titulo": "", "overlay": "", "capitulo": "Quién es Lucía",
