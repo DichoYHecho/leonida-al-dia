@@ -103,7 +103,8 @@ def fuente(video):
 
 def tabla():
     out = {}
-    for nombre in ("trozos.csv", "trozos_vl.csv", "trozos_vc.csv", "trozos_auto.csv", "trozos_auto_sg.csv"):
+    extra = sorted(p.name for p in AQUI.glob("trozos_auto_*.csv") if p.name != "trozos_auto_sg.csv")
+    for nombre in ("trozos.csv", "trozos_vl.csv", "trozos_vc.csv", "trozos_auto.csv", "trozos_auto_sg.csv", *extra):
         if not (AQUI / nombre).exists():
             continue
         with open(AQUI / nombre, encoding="utf-8") as f:
