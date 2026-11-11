@@ -17,6 +17,8 @@ from PIL import Image, ImageDraw
 sys.path.insert(0, str(pathlib.Path(__file__).parent))
 import importlib  # noqa: E402
 
+import etiquetas as E  # noqa: E402
+
 FUENTES = importlib.import_module(os.environ.get("FUENTES_MOD", "fuentes_vc")).FUENTES  # fuentes_sg = vídeo 3
 
 TMP = pathlib.Path("tmp_trozos")
@@ -24,7 +26,7 @@ OUT = pathlib.Path("salida_trozos")
 TMP.mkdir(exist_ok=True)
 (OUT / "hojas").mkdir(parents=True, exist_ok=True)
 CAMPOS = ["Trozo", "Grupo", "Inicio (s)", "Duración (s)", "Qué se ve", "Foco (0 izquierda - 1 derecha)", "Uso", "Sonido",
-          "Notas", "Vídeo", "Lento"]
+          "Notas", "Vídeo", "Lento", "Etiquetas"]
 
 
 def bajar(url, destino):
@@ -101,6 +103,11 @@ def main():
         hoja_vieja = dir_prev / "hojas" / f"{clave}.jpg"
         if viejas and all(r["Notas"] == f["url"] and r["Grupo"] == f["grupo"] for r in viejas) and hoja_vieja.exists() \
                 and len(viejas) <= f.get("max", 15):
+            if any(not r.get("Etiquetas") for r in viejas) and os.environ.get("ETIQUETAR", "1") == "1":
+                orden = sorted(viejas, key=lambda r: r["Trozo"])
+                tags = E.etiquetar(E.recortes_de_hoja(Image.open(hoja_vieja), len(orden)))
+                for r, tg in zip(orden, tags):
+                    r["Etiquetas"] = tg
             filas += viejas
             (OUT / "hojas" / f"{clave}.jpg").write_bytes(hoja_vieja.read_bytes())
             resumen.append(f"| {clave} | {f['grupo']} | (reutilizado) | - | {len(viejas)} trozos |")
@@ -138,11 +145,15 @@ def main():
             filas.append({"Trozo": nombre, "Grupo": f["grupo"], "Inicio (s)": f"{t:.2f}", "Duración (s)": f"{d:.2f}",
                           "Qué se ve": "automático", "Foco (0 izquierda - 1 derecha)": "0.5", "Uso": "principal",
                           "Sonido": "no", "Notas": f["url"], "Vídeo": clave, "Lento": "1"})
+        if os.environ.get("ETIQUETAR", "1") == "1":
+            nuevas = [r for r in filas if r["Vídeo"] == clave]
+            for r, tg in zip(nuevas, E.etiquetar([Image.fromarray(img) for _, _, img in elegidos])):
+                r["Etiquetas"] = tg
         hoja.save(OUT / "hojas" / f"{clave}.jpg", quality=80)
         resumen.append(f"| {clave} | {f['grupo']} | {dur:.0f} s | {len(cs) - 2} cortes | {len(elegidos)} trozos |")
         ruta.unlink()
     with open(OUT / "trozos_auto.csv", "w", newline="", encoding="utf-8") as fh:
-        w = csv.DictWriter(fh, fieldnames=CAMPOS)
+        w = csv.DictWriter(fh, fieldnames=CAMPOS, extrasaction="ignore")
         w.writeheader()
         w.writerows(filas)
     texto = "## Trozos automáticos\n\n| Fuente | Grupo | Duración | Cortes | Trozos |\n|---|---|---|---|---|\n" + "\n".join(resumen)

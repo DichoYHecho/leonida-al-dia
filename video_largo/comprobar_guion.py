@@ -39,8 +39,11 @@ def main():
         for p in b["planos"] + [r["plano"] for r in b["planos_en"]] + [b[k] for k in ("original", "intro_original") if b.get(k)]:
             if p.startswith("@"):
                 g = p[1:].partition(":")[0]
-                if not grupos.get(g):
-                    errores.append(f"{b['id']}: el grupo @{g} no tiene trozos")
+                base, _, tag = g.partition("#")
+                n_g = sum(1 for v in tb.values() if (not base or v.get("grupo", "") == base)
+                          and (not tag or tag in v.get("etiquetas", []))) if tag else grupos.get(g)
+                if not n_g:
+                    errores.append(f"{b['id']}: @{g} no tiene trozos" + (" con esa etiqueta" if tag else ""))
             elif p not in tb:
                 errores.append(f"{b['id']}: el plano {p} no está en los CSV de trozos")
         for r in b.get("rotulos", []) + b["planos_en"]:

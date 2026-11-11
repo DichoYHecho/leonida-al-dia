@@ -119,7 +119,8 @@ def tabla():
             for r in csv.DictReader(f):
                 out[r["Trozo"]] = {"ini": float(r["Inicio (s)"]), "dur": float(r["Duración (s)"]),
                                    "video": (r.get("Vídeo") or "Mirada").strip(), "lento": float(r.get("Lento") or 1),
-                                   "grupo": (r.get("Grupo") or "").strip()}
+                                   "grupo": (r.get("Grupo") or "").strip(),
+                                   "etiquetas": [x for x in (r.get("Etiquetas") or "").split("|") if x]}
     return out
 
 
@@ -724,14 +725,24 @@ def expandir_grupos(bloques, tb):
     explicitos = {p for b in bloques for p in list(b["planos"]) + [r["plano"] for r in b.get("planos_en", [])]
                   + [b[k] for k in ("original", "intro_original") if b.get(k)] if not p.startswith("@")}  # los planos que el guion pide por su nombre no salen también por grupo
 
+    ya = set()  # trozos ya repartidos por cualquier grupo o etiqueta
+
+    def lista_de(g):
+        if g not in grupos and "#" in g:  # «@Grupo#etiqueta» o «@#etiqueta» (todos los grupos)
+            base, _, tag = g.partition("#")
+            todos = grupos.get(base, []) if base != "@" else [n for k, v in sorted(grupos.items()) if k != "@" for n in v]
+            grupos[g] = [n for n in todos if tag in tb[n].get("etiquetas", [])]
+        return grupos.get(g) or []
+
     def siguiente(g):
-        lista = grupos.get(g) or []
+        lista = lista_de(g)
         if not lista:
             return None
         while usados.get(g, 0) < len(lista):  # cuando el grupo se acaba, no se repite: se usan los demás planos
             i = usados.get(g, 0)
             usados[g] = i + 1
-            if lista[i] not in explicitos:
+            if lista[i] not in explicitos and lista[i] not in ya:
+                ya.add(lista[i])
                 return lista[i]
         return None
 
@@ -1202,6 +1213,13 @@ def main():
         informe.append(f"{b['id']}: voz {b['dur_voz']:.1f} s, {len(b['plan'])} planos, subtítulos por {b['metodo']}"
                        + (f", sonido original {b['original']}" if b.get("original") else "")
                        + (", AVISO: revisar el final de la voz" if b.get("aviso_final") else ""))
+    try:
+        import calidad
+        inf_c, avisos_c = calidad.revisar(final, TMP / "rotulos.ass", bloques, tb, es_fijo, globals().get("PISTAS", []),
+                                          total, DUR_CARTELA, hms)
+        informe += ["", "Calidad:"] + inf_c + ([f"AVISO: {a}" for a in avisos_c] or ["Sin avisos de calidad"])
+    except Exception as e:  # noqa: BLE001
+        informe += ["", f"Calidad: no se pudo revisar ({type(e).__name__} {e})"]
     (OUT / "informe.txt").write_text("\n".join(informe), encoding="utf-8")
     print("\n".join(informe))
     resumen = os.environ.get("GITHUB_STEP_SUMMARY")
