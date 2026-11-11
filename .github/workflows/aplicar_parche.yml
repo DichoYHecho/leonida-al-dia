@@ -1,0 +1,62 @@
+name: Aplicar parche
+
+# Aplica un parche (git diff comprimido en gzip y pasado a base64) en una rama y, si se pide, lanza un paso
+# del vídeo largo (el workflow vive en main y coge el código de la rama). Así el asistente sube solo los cambios, sin subir archivos uno a uno.
+# No sirve para cambiar .github/workflows (GitHub no lo permite con este método).
+on:
+  workflow_dispatch:
+    inputs:
+      rama:
+        description: "Rama donde aplicar (se crea desde «desde» si no existe)"
+        required: true
+      desde:
+        description: "Rama base si hay que crearla"
+        default: main
+      parche:
+        description: "git diff | gzip | base64 -w0"
+        required: true
+      mensaje:
+        description: "Mensaje del commit"
+        default: "Cambios del asistente"
+      video:
+        description: "Opcional: id del vídeo largo para lanzar después"
+        default: ""
+      paso:
+        description: "Opcional: paso a lanzar después (comprobar, trozos, voces, previa, montaje)"
+        default: ""
+      bloques:
+        default: ""
+
+permissions:
+  contents: write
+  actions: write
+
+jobs:
+  parche:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      RAMA: ${{ inputs.rama }}
+      DESDE: ${{ inputs.desde }}
+      PARCHE: ${{ inputs.parche }}
+      MENSAJE: ${{ inputs.mensaje }}
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Aplicar y guardar
+        run: |
+          git config user.name github-actions && git config user.email actions@github.com
+          if git rev-parse -q --verify "origin/$RAMA" >/dev/null; then git checkout -q "$RAMA"; else git checkout -q -b "$RAMA" "origin/$DESDE"; fi
+          printf '%s' "$PARCHE" | base64 -d | gunzip | git apply --index --whitespace=nowarn
+          git commit -q -m "$MENSAJE"
+          git push -q origin "$RAMA"
+          echo "Commit: $(git rev-parse --short HEAD) en $RAMA" >> "$GITHUB_STEP_SUMMARY"
+      - name: Lanzar el siguiente paso
+        if: inputs.paso != ''
+        env:
+          VID: ${{ inputs.video }}
+          PASO: ${{ inputs.paso }}
+          BLOQ: ${{ inputs.bloques }}
+        run: gh workflow run video_largo.yml --ref main -f rama="$RAMA" -f video="$VID" -f paso="$PASO" -f bloques="$BLOQ"
