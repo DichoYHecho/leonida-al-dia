@@ -1,0 +1,41 @@
+name: Hojas de los clips de personajes (vídeo 4)
+
+# 11 nov: duración y hoja de contacto de los 9 clips oficiales de personajes, para saber en qué segundo sale
+# la cara de cada uno (Cal, Brian, Jason, Lucía...). Deja todo en la rama «clips-jl». No publica nada.
+
+on:
+  push:
+    branches: [jl]
+    paths: [".github/workflows/hojas_clips_jl.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  hojas:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Programas
+        run: sudo apt-get update -q && sudo apt-get install -y -q ffmpeg unzip
+      - name: Bajar y descomprimir los clips oficiales
+        run: |
+          curl -sSL -A "Mozilla/5.0" -o clips.zip https://media-rockstargames-com.akamaized.net/VI/downloads/videos/GTAVI_Videos.zip
+          mkdir -p clips salida && unzip -q -o clips.zip -d clips
+      - name: Duraciones y hojas (un fotograma cada 0,5 s)
+        run: |
+          for f in $(find clips -name '*Video_Clip.mp4' | sort); do
+            n=$(basename "$f" _Video_Clip.mp4)
+            d=$(ffprobe -v error -show_entries format=duration -of csv=p=0 "$f")
+            echo "$n $d" >> salida/duraciones.txt
+            ffmpeg -v error -y -i "$f" -vf "fps=2,scale=320:-2,drawtext=fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf:text='%{pts\:hms}':x=6:y=6:fontsize=20:fontcolor=yellow:box=1:boxcolor=black@0.6,tile=6x5" -frames:v 1 "salida/$n.jpg"
+          done
+          cat salida/duraciones.txt >> "$GITHUB_STEP_SUMMARY"
+      - name: Publicar en la rama clips-jl
+        run: |
+          cd salida
+          git init -q && git checkout -q -b clips-jl
+          git config user.name "github-actions" && git config user.email "actions@github.com"
+          git add . && git commit -q -m "Hojas de los clips de personajes"
+          git push -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}" clips-jl
