@@ -1,6 +1,9 @@
 """Guion del vídeo largo 4 de «Leónida al Día»: «Jason y Lucía: todo lo que sabemos» (sale el mié 18 nov 2026, 18:00).
 
-Mismo formato que guion_sg.py (se elige con GUION=guion_jl). Novedades del vídeo 4 (pedidas por mí el 10 nov):
+Mismo formato que guion_sg.py (se elige con GUION=guion_jl). Novedades del vídeo 4 (pedidas por mí el 10 y 11 nov):
+  carteles      -> los del centro, a pantalla completa con fondo liso; los que empiezan por «@» son etiquetas
+                   pequeñas de personaje arriba a la izquierda (nombre|papel) mientras sale su clip oficial.
+  subtítulos    -> sin cartel detrás; sin barra de progreso; vídeo final en 2K (2560x1440).
   CRISTAL = True -> grafismo de cristal estilo Apple con colores Miami (cristal.py): subtítulos en pastilla,
                     carteles en tarjeta de cristal, cartelas sobre un fotograma quieto y difuminado, barra de progreso.
   planos largos  -> trozos de 2 a 6 s (fuentes_jl.py) para que el vídeo tenga más calma.
@@ -81,7 +84,7 @@ BLOQUES = [
                "récord mundial sin salir de la celda. Ya quisieran muchos."),
      "rotulos": [{"en": "noventa", "texto": "90,4 MILLONES|DE VISITAS EN 24 H"}],
      "nombres": ["lucía"],
-     "planos": ["T1_07", "T1_05", "MI_87", "T1_11", "MI_99", "MI_27"],
+     "planos": ["T1_04", "T1_07", "T1_05", "MI_87", "T1_11", "MI_99", "MI_27"],
      "planos_en": [{"en": "lucía", "plano": "T1_03"}]},
 
     {"id": "p02", "num": None, "titulo": "", "overlay": "", "capitulo": "Quién es Lucía",
@@ -91,9 +94,9 @@ BLOQUES = [
                "y no lo va a soltar cueste lo que cueste. Por eso en las capturas la ves en el gimnasio, con los "
                "guantes puestos. No es postureo: es su historia. Y en ese plan entra Jason: según Rockstar, Lucía ve "
                "en una vida con él su manera de salir de todo esto."),
-     "rotulos": [{"en": "penitenciaría", "texto": "LUCÍA CAMINOS|RECIÉN SALIDA DE PRISIÓN"}],
+     "rotulos": [{"en": "penitenciaría", "texto": "@LUCÍA CAMINOS|RECIÉN SALIDA DE PRISIÓN"}],
      "nombres": ["gimnasio"],
-     "planos": ["LZ_07", "T2_10", "MI_90", "MI_30", "T2_16", "T2_17", "MI_48"],
+     "planos": ["Clips:Lucia_Caminos_Video_Clip.mp4@0.3+3.5", "LZ_07", "T2_10", "MI_90", "MI_30", "T2_16", "T2_17", "MI_48"],
      "planos_en": [{"en": "gimnasio", "plano": "T2_06"}, {"en": "penitenciaría", "plano": "MI_96"}]},
 
     {"id": "p03", "num": None, "titulo": "", "overlay": "", "capitulo": "El grillete",
@@ -126,10 +129,10 @@ BLOQUES = [
                "para salir de ese ambiente, y al volver acabó trabajando para traficantes de los Cayos de Leónida. "
                "Plan de vida impecable, como ves. Su ficha añade que conocer a Lucía puede ser lo mejor o lo peor "
                "que le ha pasado. Él sabe cómo le gustaría que acabara. Nosotros, todavía no."),
-     "rotulos": [{"en": "ejército", "texto": "JASON DUVAL|EXMILITAR"}],
+     "rotulos": [{"en": "jason", "texto": "@JASON DUVAL|EXMILITAR"}],
      "nombres": ["jason", "cayos"],
-     "planos": ["T2_03", "T2_08", "T2_09", "T2_02", "MI_38"],
-     "planos_en": [{"en": "jason", "plano": "MI_26"}, {"en": "cayos", "plano": "LZ_01"}]},
+     "planos": ["MI_26", "T2_03", "T2_08", "T2_09", "T2_02", "MI_38"],
+     "planos_en": [{"en": "jason", "plano": "Clips:Jason_Duval_Video_Clip.mp4@0.3+3.5"}, {"en": "cayos", "plano": "LZ_01"}]},
 
     {"id": "p06", "num": None, "titulo": "", "overlay": "", "capitulo": "El tráiler de lanzamiento",
      "texto": ("Ese pasado militar no es relleno. El tráiler de lanzamiento, que salió el quince de octubre, arranca "
@@ -146,11 +149,11 @@ BLOQUES = [
                "alquiler es el mismo que le da trabajo; escapatoria, poca. Y su mejor amigo es Cal Hampton, un tipo "
                "que se pasa las tardes escuchando las comunicaciones de la Guardia Costera con unas cervezas, "
                "convencido de que alguien nos vigila a todos."),
-     "rotulos": [{"en": "brian", "texto": "BRIAN HEDER|CASERO Y CONTRABANDISTA"},
-                 {"en": "cal", "texto": "CAL HAMPTON|SU MEJOR AMIGO"}],
+     "rotulos": [{"en": "brian", "texto": "@BRIAN HEDER|CASERO Y CONTRABANDISTA"},
+                 {"en": "cal", "texto": "@CAL HAMPTON|SU MEJOR AMIGO"}],
      "nombres": ["brian", "cal"],
      "planos": ["T2_04", "T2_05", "T2_13"],
-     "planos_en": [{"en": "brian", "plano": "Clip_Brian"}, {"en": "casero", "plano": "T2_01"}, {"en": "cal", "plano": "Clip_Cal"}]},
+     "planos_en": [{"en": "brian", "plano": "Clips:Brian_Heder_Video_Clip.mp4@0.3+3.5"}, {"en": "casero", "plano": "T2_01"}, {"en": "cal", "plano": "Clips:Cal_Hampton_Video_Clip.mp4@0.3+3.5"}]},
 
     {"id": "p07b", "num": None, "titulo": "", "overlay": "", "capitulo": "El resto del reparto",
      "texto": ("Y no son los únicos. Rockstar ha presentado a seis personajes más, y todos tienen pinta de cruzarse en "
@@ -159,12 +162,13 @@ BLOQUES = [
                "Dre'Quan Priest quiere triunfar con su sello, Only Raw Records, y acaba de fichar a Real Dimez, un dúo "
                "de rap que arrasa en redes. Eso sí: Rockstar no ha contado todavía qué pinta cada uno en la historia "
                "de Jason y Lucía."),
-     "rotulos": [{"en": "raúl", "texto": "RAÚL BAUTISTA|ATRACADOR DE BANCOS"},
-                 {"en": "boobie", "texto": "BOOBIE IKE|CLUB Y ESTUDIO"},
-                 {"en": "dre'quan", "texto": "DRE'QUAN PRIEST|ONLY RAW RECORDS"}],
+     "rotulos": [{"en": "raúl", "texto": "@RAÚL BAUTISTA|ATRACADOR DE BANCOS"},
+                 {"en": "boobie", "texto": "@BOOBIE IKE|INMUEBLES, CLUB Y ESTUDIO"},
+                 {"en": "dre'quan", "texto": "@DRE'QUAN PRIEST|ONLY RAW RECORDS"},
+                 {"en": "dimez", "texto": "@REAL DIMEZ|DÚO DE RAP"}],
      "nombres": ["raúl", "boobie", "dre'quan", "dimez"],
      "planos": ["T2_11", "T2_12", "T2_15", "MI_106", "MI_107"],
-     "planos_en": [{"en": "raúl", "plano": "Clips:Raul_Bautista_Video_Clip.mp4@0+3"}, {"en": "boobie", "plano": "Clip_Boobie"}, {"en": "dre'quan", "plano": "Clip_DreQuan"}, {"en": "dimez", "plano": "Clip_Real_Dimez"}]},
+     "planos_en": [{"en": "raúl", "plano": "Clips:Raul_Bautista_Video_Clip.mp4@0.3+3.5"}, {"en": "boobie", "plano": "Clips:Boobie_Ike_Video_Clip.mp4@0.3+3.5"}, {"en": "dre'quan", "plano": "Clips:DreQuan_Priest_Video_Clip.mp4@0.3+3.5"}, {"en": "dimez", "plano": "Clips:Real_Dimez_Video_Clip.mp4@0.3+3.5"}]},
 
     # ---------------------------------------------------------------- ACTO III · JUNTOS
     {"id": "p08", "num": None, "titulo": "", "overlay": "", "capitulo": "Juntos",
@@ -249,7 +253,7 @@ BLOQUES = [
                "habrá ratos tranquilos en su piso, del día a día, para que los momentos duros peguen más. Su ejemplo: "
                "Lucía se cae por unas escaleras, cambias a Jason, y ya no la oyes. Angustia de la buena. Y hasta la estructura mira a "
                "Red Dead: la historia irá por capítulos, como la de Arthur."),
-     "rotulos": [{"en": "arthur", "texto": "LA META|ARTHUR MORGAN"}],
+     "rotulos": [{"en": "arthur", "texto": "@ARTHUR MORGAN|RED DEAD REDEMPTION 2"}],
      "nombres": ["arthur", "piso"],
      "planos": ["RDR2_02", "RDR2_04", "MI_36", "MI_37"],
      "planos_en": [{"en": "arthur", "plano": "RDR2@25.6+3.4"}, {"en": "piso", "plano": "MI_116"}, {"en": "escaleras", "plano": "MI_129"}]},
@@ -282,7 +286,7 @@ BLOQUES = [
      "texto": ("Tres extra de regalo. El primero: en una captura oficial, Jason posa delante del hotel Ocean View con "
                "una camisa que recuerda muchísimo a la de Tommy Vercetti en el Vice City de dos mil dos. Rockstar no ha "
                "dicho que sea un guiño, pero tampoco hace falta."),
-     "rotulos": [{"en": "tommy", "texto": "¿GUIÑO A|TOMMY VERCETTI?"}],
+     "rotulos": [{"en": "tommy", "texto": "@TOMMY VERCETTI|VICE CITY (2002)"}],
      "nombres": ["tommy", "camisa"],
      "planos": ["MI_40", "MI_75", "@Vice_City_2002:1"],
      "planos_en": [{"en": "tommy", "plano": "@Vice_City_2002"}, {"en": "camisa", "plano": "MI_39"}]},
@@ -291,7 +295,7 @@ BLOQUES = [
      "texto": ("El segundo: en la mirada extendida aparece Valentina, un personaje que ya conocían los jugadores de "
                "GTA Online, y es quien les ofrece a Jason y Lucía un trabajo de escoltas en la fiesta de Megamundo, una cadena de televisión en español. Es el primer personaje de "
                "GTA Online que salta a GTA VI."),
-     "rotulos": [{"en": "valentina", "texto": "VALENTINA|DE GTA ONLINE A GTA VI"}],
+     "rotulos": [{"en": "valentina", "texto": "@VALENTINA|DE GTA ONLINE A GTA VI"}],
      "nombres": ["valentina"],
      "planos": ["MI_56", "MI_57", "MI_58", "MI_59", "MI_60"],
      "planos_en": [{"en": "valentina", "plano": "MI_103"}]},
