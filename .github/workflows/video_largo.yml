@@ -50,6 +50,10 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -y -qq ffmpeg fonts-dejavu-core fonts-montserrat fonts-bebas-neue
           pip install -q numpy pillow faster-whisper==1.2.1
+          if [ "$PASO" = trozos ]; then
+            pip install -q torch --index-url https://download.pytorch.org/whl/cpu
+            pip install -q open_clip_torch
+          fi
 
       - name: Trozos ya preparados (stock + vídeos anteriores + este vídeo)
         run: |
@@ -77,6 +81,13 @@ jobs:
           restore-keys: |
             voz-${{ inputs.video }}-
             voz-vl-
+
+      - name: Recuperar el modelo de etiquetas (CLIP)
+        if: inputs.paso == 'trozos'
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/huggingface
+          key: clip-vit-b32-laion-v1
 
       - name: Recuperar el modelo de Whisper
         uses: actions/cache@v4
