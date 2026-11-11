@@ -7,12 +7,12 @@ AQUI = os.path.dirname(os.path.abspath(__file__))
 RAIZ = os.path.dirname(AQUI)
 MADRID = ZoneInfo("Europe/Madrid")
 
-# Airtable (cuenta de adria.sanandreas, base «Panel GTA 6»)
+# Airtable (cuenta principal, base «Panel GTA 6»)
 BASE = "appLYUwqO5EjDfQtX"
 T_PUB = "Publicaciones"
 T_DATOS = "Datos"
 
-# Buffer (segunda cuenta Free, la de adria.sanandreas)
+# Buffer (segunda cuenta Free, la de la cuenta principal)
 CANAL_IG = "6ad768d7778b240e2f697abc"
 CANAL_TT = "6ad7696b778b240e2f69823a"
 CANAL_YT = "6ae49b912f1f5ed648202118"  # canal nuevo @LeonidaalDiaGTA6 (30 oct 2026)

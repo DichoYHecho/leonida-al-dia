@@ -1,6 +1,6 @@
 """Tus partidas de GTA 6 (PS5) como fondo de los vídeos, desde el 19 de noviembre (decidido el 22 oct).
 
-- Subes los clips a la carpeta de Google Drive «Leónida al Día - Clips» (cuenta adria.sanandreas). El nombre del
+- Subes los clips a la carpeta de Google Drive «Leónida al Día - Clips» (cuenta principal). El nombre del
   archivo dice qué se ve (p. ej. «Lucía en moto por Vice City.mp4»). Sin destripes de la historia ni escenas.
 - Se usan SIN su sonido (con nuestra música): la radio del juego tiene canciones con derechos.
 - De cada clip se cogen 8 segundos del centro, en vertical (1080×1920).

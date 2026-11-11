@@ -5,7 +5,7 @@
 
 Lo llama comprobar.py después de cada publicación; repasa los vídeos subidos en los últimos 2 días y solo hace lo que
 falte (no comenta dos veces). Gasto: unas 110 unidades por vídeo de las 10.000 diarias gratis.
-Necesita los secrets GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET y GOOGLE_REFRESH_TOKEN (cuenta adria.sanandreas);
+Necesita los secrets GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET y GOOGLE_REFRESH_TOKEN (cuenta principal);
 si no están, no hace nada."""
 import os, re, unicodedata
 import requests
