@@ -96,7 +96,7 @@ BLOQUES = [
                "en una vida con él su manera de salir de todo esto."),
      "rotulos": [{"en": "penitenciaría", "texto": "@LUCÍA CAMINOS|RECIÉN SALIDA DE PRISIÓN"}],
      "nombres": ["gimnasio"],
-     "planos": ["Clips:Lucia_Caminos_Video_Clip.mp4@0.3+3.5", "LZ_07", "T2_10", "MI_90", "MI_30", "T2_16", "T2_17", "MI_48"],
+     "planos": ["CL_Lucia", "LZ_07", "T2_10", "MI_90", "MI_30", "T2_16", "T2_17", "MI_48"],
      "planos_en": [{"en": "gimnasio", "plano": "T2_06"}, {"en": "penitenciaría", "plano": "MI_96"}]},
 
     {"id": "p03", "num": None, "titulo": "", "overlay": "", "capitulo": "El grillete",
@@ -132,7 +132,7 @@ BLOQUES = [
      "rotulos": [{"en": "jason", "texto": "@JASON DUVAL|EXMILITAR"}],
      "nombres": ["jason", "cayos"],
      "planos": ["MI_26", "T2_03", "T2_08", "T2_09", "T2_02", "MI_38"],
-     "planos_en": [{"en": "jason", "plano": "Clips:Jason_Duval_Video_Clip.mp4@0.3+3.5"}, {"en": "cayos", "plano": "LZ_01"}]},
+     "planos_en": [{"en": "jason", "plano": "CL_Jason"}, {"en": "cayos", "plano": "LZ_01"}]},
 
     {"id": "p06", "num": None, "titulo": "", "overlay": "", "capitulo": "El tráiler de lanzamiento",
      "texto": ("Ese pasado militar no es relleno. El tráiler de lanzamiento, que salió el quince de octubre, arranca "
@@ -149,11 +149,11 @@ BLOQUES = [
                "alquiler es el mismo que le da trabajo; escapatoria, poca. Y su mejor amigo es Cal Hampton, un tipo "
                "que se pasa las tardes escuchando las comunicaciones de la Guardia Costera con unas cervezas, "
                "convencido de que alguien nos vigila a todos."),
-     "rotulos": [{"en": "brian", "texto": "@BRIAN HEDER|CASERO Y CONTRABANDISTA"},
-                 {"en": "cal", "texto": "@CAL HAMPTON|SU MEJOR AMIGO"}],
-     "nombres": ["brian", "cal"],
-     "planos": ["T2_04", "T2_05", "T2_13"],
-     "planos_en": [{"en": "brian", "plano": "Clips:Brian_Heder_Video_Clip.mp4@0.3+3.5"}, {"en": "casero", "plano": "T2_01"}, {"en": "cal", "plano": "Clips:Cal_Hampton_Video_Clip.mp4@0.3+3.5"}]},
+     "rotulos": [{"en": "jefe", "texto": "@BRIAN HEDER|CASERO Y CONTRABANDISTA"},
+                 {"en": "amigo", "texto": "@CAL HAMPTON|SU MEJOR AMIGO"}],
+     "nombres": ["jefe", "amigo"],
+     "planos": ["T2_05", "T2_13", "MI_55", "MI_122"],
+     "planos_en": [{"en": "jefe", "plano": "CL_Brian"}, {"en": "casero", "plano": "T2_01"}, {"en": "amigo", "plano": "CL_Cal"}]},
 
     {"id": "p07b", "num": None, "titulo": "", "overlay": "", "capitulo": "El resto del reparto",
      "texto": ("Y no son los únicos. Rockstar ha presentado a seis personajes más, y todos tienen pinta de cruzarse en "
@@ -163,12 +163,12 @@ BLOQUES = [
                "de rap que arrasa en redes. Eso sí: Rockstar no ha contado todavía qué pinta cada uno en la historia "
                "de Jason y Lucía."),
      "rotulos": [{"en": "raúl", "texto": "@RAÚL BAUTISTA|ATRACADOR DE BANCOS"},
-                 {"en": "boobie", "texto": "@BOOBIE IKE|INMUEBLES, CLUB Y ESTUDIO"},
-                 {"en": "dre'quan", "texto": "@DRE'QUAN PRIEST|ONLY RAW RECORDS"},
-                 {"en": "dimez", "texto": "@REAL DIMEZ|DÚO DE RAP"}],
-     "nombres": ["raúl", "boobie", "dre'quan", "dimez"],
+                 {"en": "inmuebles", "texto": "@BOOBIE IKE|INMUEBLES, CLUB Y ESTUDIO"},
+                 {"en": "triunfar", "texto": "@DRE'QUAN PRIEST|ONLY RAW RECORDS"},
+                 {"en": "fichar", "texto": "@REAL DIMEZ|DÚO DE RAP"}],
+     "nombres": ["raúl", "inmuebles", "triunfar", "fichar"],
      "planos": ["T2_11", "T2_12", "T2_15", "MI_106", "MI_107"],
-     "planos_en": [{"en": "raúl", "plano": "Clips:Raul_Bautista_Video_Clip.mp4@0.3+3.5"}, {"en": "boobie", "plano": "Clips:Boobie_Ike_Video_Clip.mp4@0.3+3.5"}, {"en": "dre'quan", "plano": "Clips:DreQuan_Priest_Video_Clip.mp4@0.3+3.5"}, {"en": "dimez", "plano": "Clips:Real_Dimez_Video_Clip.mp4@0.3+3.5"}]},
+     "planos_en": [{"en": "raúl", "plano": "CL_Raul"}, {"en": "inmuebles", "plano": "CL_Boobie"}, {"en": "triunfar", "plano": "CL_DreQuan"}, {"en": "fichar", "plano": "CL_Real"}]},
 
     # ---------------------------------------------------------------- ACTO III · JUNTOS
     {"id": "p08", "num": None, "titulo": "", "overlay": "", "capitulo": "Juntos",
