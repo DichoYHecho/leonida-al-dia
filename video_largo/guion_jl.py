@@ -71,7 +71,7 @@ BLOQUES = [
                "por ella."),
      "rotulos": [{"t": 0.0, "dur": 2.6, "negro": True, "texto": "JASON Y LUCÍA|TODO LO QUE SABEMOS"}],
      "nombres": ["jason", "lucía"],
-     "planos": ["LZ_04", "T2_18", "MI_91", "MI_46", "MI_29", "T1_02"],
+     "planos": ["T2_18", "LZ_04", "MI_91", "MI_46", "MI_29", "T1_02"],
      "planos_en": [{"en": "jason", "plano": "LZ_02"}, {"en": "lucía", "plano": "MI_32"}]},
 
     # ---------------------------------------------------------------- ACTO I · ELLA

@@ -167,9 +167,9 @@ def filtros(paneles, idx0, tmp, fps, entrada, salida):
     """Entradas extra y trozo de filter_complex: desenfoque real detrás de cada panel, solo durante su tiempo."""
     escala = f"scale={SALIDA[0]}:{SALIDA[1]}:flags=lanczos"
     partes, cur = [], entrada
-    for k, (t0, t1) in enumerate(CONGELAR):  # fondo quieto en los carteles a pantalla completa
+    for k, (t0, t1) in enumerate(CONGELAR):  # fondo quieto (fotograma del centro del cartel) en los carteles a pantalla completa
         f0, f1 = int(round(t0 * fps)), int(round(t1 * fps))
-        partes.append(f"[{cur}]split[fz{k}a][fz{k}b];[fz{k}a][fz{k}b]freezeframes=first={f0}:last={f1}:replace={f0}[fz{k}];")
+        partes.append(f"[{cur}]split[fz{k}a][fz{k}b];[fz{k}a][fz{k}b]freezeframes=first={f0}:last={f1}:replace={(f0 + f1) // 2}[fz{k}];")
         cur = f"fz{k}"
     if not paneles:
         return [], "".join(partes) + f"[{cur}]{escala}[{salida}];"
