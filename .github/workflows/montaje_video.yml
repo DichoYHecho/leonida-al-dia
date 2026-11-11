@@ -62,7 +62,15 @@ jobs:
           key: whisper-base-directo-v1
 
       - name: Montar el vídeo
-        run: python3 video_largo/montaje.py
+        shell: bash
+        run: |
+          # 11 nov: el registro completo no se podía abrir en GitHub; el final queda en el resumen de la ejecución
+          mkdir -p salida_montaje
+          set -o pipefail
+          python3 video_largo/montaje.py 2>&1 | tee salida_montaje/registro.txt
+          s=$?
+          { echo "### Final del registro del montaje"; echo '```'; tail -n 80 salida_montaje/registro.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+          exit $s
 
       - name: Guardar el vídeo en alta calidad (en Releases, sin el límite de espacio de los artefactos)
         if: always()
