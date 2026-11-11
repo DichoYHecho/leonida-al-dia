@@ -9,7 +9,7 @@ on:
         description: "Id del vídeo: vl, vc, sg o el nuevo"
         required: true
       paso:
-        description: "comprobar, trozos, voces, previa (solo los bloques indicados) o montaje (entero)"
+        description: "comprobar, trozos, voces, previa (rápida; entera o los bloques indicados) o montaje (alta calidad)"
         required: true
         default: comprobar
       bloques:
@@ -57,6 +57,17 @@ jobs:
           git show origin/trozos-vc:trozos_auto.csv > video_largo/trozos_auto.csv || true
           git show origin/trozos-sg:trozos_auto.csv > video_largo/trozos_auto_sg.csv || true
           case "$VID" in vc|sg) ;; *) git show "origin/trozos-$VID:trozos_auto.csv" > "video_largo/trozos_auto_$VID.csv" 2>/dev/null || rm -f "video_largo/trozos_auto_$VID.csv";; esac
+          if [ "$PASO" = trozos ] && git rev-parse -q --verify "origin/trozos-$VID" >/dev/null; then
+            mkdir -p trozos_previos && git archive "origin/trozos-$VID" | tar -x -C trozos_previos
+          fi
+
+      - name: Recuperar los vídeos de las fuentes ya bajados
+        if: inputs.paso == 'previa' || inputs.paso == 'montaje'
+        uses: actions/cache/restore@v4
+        with:
+          path: fuentes
+          key: fuentes-${{ inputs.video }}-${{ github.run_id }}
+          restore-keys: fuentes-${{ inputs.video }}-
 
       - name: Recuperar caché de voces
         uses: actions/cache/restore@v4
@@ -84,11 +95,19 @@ jobs:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY_VIDEO }}
         run: |
           python3 -m py_compile video_largo/*.py
+          echo "::group::Comprobación previa (para antes de gastar tiempo)"
           case "$PASO" in
-            comprobar) python3 video_largo/comprobar_guion.py ;;
+            previa|montaje) COMPROBAR_VOCES=1 COMPROBAR_ENLACES=1 python3 video_largo/comprobar_guion.py ;;
+            voces) python3 video_largo/comprobar_guion.py ;;
+            comprobar) COMPROBAR_ENLACES=1 python3 video_largo/comprobar_guion.py ;;
+          esac
+          echo "::endgroup::"
+          case "$PASO" in
+            comprobar) ;;
             trozos)    python3 video_largo/preparar_trozos.py ;;
             voces)     python3 video_largo/voces.py ;;
-            previa|montaje) python3 video_largo/montaje.py ;;
+            previa) RAPIDO=1 python3 video_largo/montaje.py ;;
+            montaje) python3 video_largo/montaje.py ;;
             *) echo "Paso desconocido: $PASO"; exit 1 ;;
           esac
 
@@ -98,6 +117,13 @@ jobs:
         with:
           path: cache/voz_vl
           key: voz-${{ inputs.video }}-${{ github.run_id }}
+
+      - name: Guardar los vídeos de las fuentes para el próximo montaje
+        if: always() && (inputs.paso == 'previa' || inputs.paso == 'montaje')
+        uses: actions/cache/save@v4
+        with:
+          path: fuentes
+          key: fuentes-${{ inputs.video }}-${{ github.run_id }}
 
       - name: Copiar las voces nuevas a Releases voces-<id>
         if: always() && inputs.paso == 'voces'
