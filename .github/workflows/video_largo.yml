@@ -1,0 +1,115 @@
+name: Vídeo largo (todo en uno)
+
+# Un solo workflow para todos los vídeos largos. «video» = id del guion (guion_<id>.py, fuentes_<id>.py).
+# Ramas de salida siempre iguales: trozos-<id>, voces-<id>, montaje-<id>-previa, montaje-<id>.
+on:
+  workflow_dispatch:
+    inputs:
+      video:
+        description: "Id del vídeo: vl, vc, sg o el nuevo"
+        required: true
+      paso:
+        description: "comprobar, trozos, voces, previa (solo los bloques indicados) o montaje (entero)"
+        required: true
+        default: comprobar
+      bloques:
+        description: "Bloques separados por comas (vacío = todos)"
+        default: ""
+      rama:
+        description: "Rama con el código y los guiones"
+        default: plantilla
+
+permissions:
+  contents: write
+
+jobs:
+  paso:
+    concurrency: video-largo-${{ inputs.video }}-${{ inputs.paso }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    env:
+      VID: ${{ inputs.video }}
+      PASO: ${{ inputs.paso }}
+      GUION: guion_${{ inputs.video }}
+      FUENTES_MOD: fuentes_${{ inputs.video }}
+      BLOQUES_SOLO: ${{ inputs.bloques }}
+      SOLO_VOCES: "0"
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.rama }}
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Instalar programas
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg fonts-dejavu-core fonts-montserrat fonts-bebas-neue
+          pip install -q numpy pillow faster-whisper==1.2.1
+
+      - name: Trozos ya preparados (stock + vídeos anteriores + este vídeo)
+        run: |
+          git show origin/stock-nuevo:gta/trozos.csv > video_largo/trozos.csv
+          git show origin/trozos-vc:trozos_auto.csv > video_largo/trozos_auto.csv || true
+          git show origin/trozos-sg:trozos_auto.csv > video_largo/trozos_auto_sg.csv || true
+          case "$VID" in vc|sg) ;; *) git show "origin/trozos-$VID:trozos_auto.csv" > "video_largo/trozos_auto_$VID.csv" 2>/dev/null || rm -f "video_largo/trozos_auto_$VID.csv";; esac
+
+      - name: Recuperar caché de voces
+        uses: actions/cache/restore@v4
+        with:
+          path: cache/voz_vl
+          key: voz-${{ inputs.video }}-${{ github.run_id }}
+          restore-keys: |
+            voz-${{ inputs.video }}-
+            voz-vl-
+
+      - name: Recuperar el modelo de Whisper
+        uses: actions/cache@v4
+        with:
+          path: cache/whisper-base
+          key: whisper-base-directo-v1
+
+      - name: Ejecutar el paso
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY_VIDEO }}
+        run: |
+          python3 -m py_compile video_largo/*.py
+          case "$PASO" in
+            comprobar) python3 video_largo/comprobar_guion.py ;;
+            trozos)    python3 video_largo/preparar_trozos.py ;;
+            voces)     python3 video_largo/voces.py ;;
+            previa|montaje) python3 video_largo/montaje.py ;;
+            *) echo "Paso desconocido: $PASO"; exit 1 ;;
+          esac
+
+      - name: Guardar caché de voces
+        if: always() && inputs.paso == 'voces'
+        uses: actions/cache/save@v4
+        with:
+          path: cache/voz_vl
+          key: voz-${{ inputs.video }}-${{ github.run_id }}
+
+      - name: Publicar resultados en su rama
+        if: always()
+        run: |
+          case "$PASO" in
+            trozos) DIR=salida_trozos; RAMA="trozos-$VID" ;;
+            voces)  DIR=salida_voces;  RAMA="voces-$VID" ;;
+            previa) DIR=salida_montaje; RAMA="montaje-$VID-previa" ;;
+            montaje) DIR=salida_montaje; RAMA="montaje-$VID" ;;
+            *) exit 0 ;;
+          esac
+          if [ "$PASO" = montaje ] && ls salida_hq/* >/dev/null 2>&1; then
+            TAG="$RAMA-alta-calidad"
+            gh release view "$TAG" >/dev/null 2>&1 || gh release create "$TAG" --prerelease --target "$GITHUB_SHA" --title "Vídeo largo $VID en alta calidad" --notes "Se sustituye en cada montaje."
+            gh release upload "$TAG" salida_hq/* --clobber
+          fi
+          [ -d "$DIR" ] || { echo "Sin salida"; exit 0; }
+          cd "$DIR" && git init -q && git checkout -q -b "$RAMA"
+          git config user.name github-actions && git config user.email actions@github.com
+          git add . && git commit -q -m "$PASO del vídeo largo $VID"
+          git push -f -q "https://x-access-token:$GH_TOKEN@github.com/$GITHUB_REPOSITORY.git" "$RAMA"
