@@ -359,3 +359,19 @@ BLOQUES = [
 
 for _b in BLOQUES:
     _b["voz"] = _voz(_b["texto"])
+
+# ---------------------------------------------------------------- vídeos oficiales de los vídeos 2 a 4
+# Los trozos de las tablas salen de esos vídeos: se toman sus direcciones, recortes de marca de agua y planos fijos.
+import guion_jl as _jl  # noqa: E402
+import guion_sg as _sg  # noqa: E402
+import guion_vc as _vc  # noqa: E402
+
+VIDEOS_EXTRA = dict(globals().get("VIDEOS_EXTRA", {}))
+RECORTES = dict(globals().get("RECORTES", {}))
+for _m in (_vc, _sg, _jl):
+    for _k, _v in getattr(_m, "VIDEOS_EXTRA", {}).items():
+        VIDEOS_EXTRA.setdefault(_k, _v)
+    for _k, _v in getattr(_m, "RECORTES", {}).items():
+        RECORTES.setdefault(_k, _v)
+PLANOS_FIJOS = set(globals().get("PLANOS_FIJOS", ())) | set(_vc.PLANOS_FIJOS) | set(_sg.PLANOS_FIJOS) | set(_jl.PLANOS_FIJOS)
+MARCO = True
