@@ -1,4 +1,4 @@
-# Créditos de las imágenes de video_largo/imagenes
+﻿# Créditos de las imágenes de video_largo/imagenes
 
 Las tarjetas de texto (PNG) son del canal, hechas con tarjetas.py.
 
@@ -28,6 +28,8 @@ Capturas de páginas web (cita breve con fines informativos; se nombra el medio 
 | NUEVO_Cfx_Comunicado.png | https://gameworldobserver.com/2023/08/11/cfx-re-joins-rockstar-deal-fivem-redm-roleplay |
 | NUEVO_Houser_Captura.png | https://www.gamesradar.com/rockstar-games-dan-houser-leaves-studio |
 | NUEVO_Captura_Steam_Resenas.png | https://store.steampowered.com/app/271590/ |
+| NUEVO_Cuentas_TakeTwo.png | https://www.businesswire.com/news/home/20260521450562/en/ (recortada sin los contactos de prensa) |
+| NUEVO_Zelnick_Captura.png | https://www.businesswire.com/news/home/20260521450562/en/ (recortada sin los contactos de prensa) |
 | NUEVO_Twitch_Captura.png | https://twitchtracker.com/games/32982 |
 
-Texto para la descripción (vídeos 5 y 6): Capturas: Rockstar Newswire, Take-Two, Game Developer, PC Gamer, Game World Observer, GamesRadar+, Steam y TwitchTracker.
+Texto para la descripción (vídeos 5 y 6): Capturas: Rockstar Newswire, Take-Two, Business Wire, Game Developer, PC Gamer, Game World Observer, GamesRadar+, Steam y TwitchTracker.

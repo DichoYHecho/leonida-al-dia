@@ -16,6 +16,8 @@ CAPTURAS = {  # nombre: (qué se ve, fuente)
     "NUEVO_Cfx_Comunicado": ("Cobertura: Cfx.re se une a Rockstar (11 ago 2023)", "gameworldobserver.com"),
     "NUEVO_Houser_Captura": ("Cobertura: Dan Houser deja Rockstar (feb 2020)", "gamesradar.com"),
     "NUEVO_Captura_Steam_Resenas": ("Ficha de GTA V en Steam con el resumen de reseñas (sin usuarios)", "store.steampowered.com"),
+    "NUEVO_Cuentas_TakeTwo": ("Resultados de Take-Two del año fiscal 2026: gasto recurrente y net bookings", "Business Wire (Take-Two)"),
+    "NUEVO_Zelnick_Captura": ("Declaración de Strauss Zelnick en los resultados de mayo de 2026", "Business Wire (Take-Two)"),
     "NUEVO_Twitch_Captura": ("Estadísticas de GTA V en Twitch", "twitchtracker.com"),
 }
 
