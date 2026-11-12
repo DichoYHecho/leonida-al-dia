@@ -19,7 +19,7 @@ permissions:
 jobs:
   montaje:
     runs-on: ubuntu-latest
-    timeout-minutes: 180
+    timeout-minutes: 300
     env:
       BLOQUES_SOLO: ${{ inputs.bloques }}
       GUION: ${{ inputs.guion }}
