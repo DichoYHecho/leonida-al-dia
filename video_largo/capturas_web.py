@@ -25,6 +25,14 @@ CAPTURAS = {  # nombre: (qué se ve, fuente)
     "NUEVO_Absurd_Logo": ("Web de Absurd Ventures con su logo", "absurdventures.com"),
     "NUEVO_Ruffian_Captura": ("Titular de la compra de Ruffian Games (oct 2020)", "gamesradar.com"),
     "NUEVO_Captura_Clasificacion_AU": ("GTA V recibe la R18+ en Australia (1 ago 2013)", "stevivor.com"),
+    "NUEVO_Schreier_Bluesky": ("Titular con la cita de Jason Schreier en Bluesky (mayo 2025)", "gamesradar.com"),
+    "NUEVO_Reediciones_Logos": ("GTA V y GTA Online en PS5 y Xbox Series (Newswire, mar 2022)", "rockstargames.com/newswire"),
+    "NUEVO_Bully_Portada": ("Portada oficial de Bully en la web de Rockstar", "rockstargames.com/bully"),
+    "NUEVO_Pantalla_Emisoras": ("Web oficial de GTA VI (todavía sin lista de emisoras)", "rockstargames.com/VI"),
+    "NUEVO_Dial_Coche": ("Dial de una radio de coche antigua (foto libre)", "Feddacheenee, CC BY-SA 3.0, Wikimedia Commons"),
+    "NUEVO_Chatterbox_Cabina": ("Estudio de una radio local, sin personas (foto libre)", "M4th5, CC BY-SA 3.0, Wikimedia Commons"),
+    "NUEVO_Dr_Dre_Estudio": ("Mesa de mezclas de un estudio de grabación (foto libre)", "VACANT FEVER, CC BY-SA 2.0, Wikimedia Commons"),
+    "NUEVO_Bully_Captura": ("Presentación oficial del internado de Bullworth (sin escenas de acoso)", "rockstargames.com/bully"),
     "NUEVO_Twitch_Captura": ("Estadísticas de GTA V en Twitch", "twitchtracker.com"),
 }
 
@@ -36,11 +44,12 @@ iv = cab.index("Vídeo")
 hechas = []
 for f in cuerpo:
     if f and f[0] in CAPTURAS:
-        assert (AQUI / "imagenes" / f"{f[0]}.png").exists(), f[0]
-        f[1] = "Capturas_57"
+        ext = ".jpg" if (AQUI / "imagenes" / f"{f[0]}.jpg").exists() else ".png"
+        assert (AQUI / "imagenes" / f"{f[0]}{ext}").exists(), f[0]
+        f[1] = "Fotos_57" if ext == ".jpg" else "Capturas_57"
         f[4] = CAPTURAS[f[0]][0]
-        f[8] = f"Captura de {CAPTURAS[f[0]][1]}"
-        f[iv] = BASE + f"{f[0]}.png"
+        f[8] = (f"Foto: {CAPTURAS[f[0]][1]}" if ext == ".jpg" else f"Captura de {CAPTURAS[f[0]][1]}")
+        f[iv] = BASE + f"{f[0]}{ext}"
         hechas.append(f[0])
 salida = io.StringIO()
 csv.writer(salida, lineterminator="\n").writerows([cab] + cuerpo)

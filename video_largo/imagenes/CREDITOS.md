@@ -37,7 +37,22 @@ Capturas de páginas web (cita breve con fines informativos; se nombra el medio 
 | NUEVO_Absurd_Logo.png | https://www.absurdventures.com/ |
 | NUEVO_Ruffian_Captura.png | https://www.gamesradar.com/rockstar-has-officially-bought-crackdown-2-developer-ruffian-games |
 | NUEVO_Captura_Clasificacion_AU.png | https://stevivor.com/news/grand-theft-auto-v-races-to-an-r18-rating-in-australia/ (recortada sin la foto del autor) |
+| NUEVO_Schreier_Bluesky.png | https://www.gamesradar.com/games/grand-theft-auto/gta-6-delay-was-reportedly-inevitable-nobody-ive-talked-to-at-rockstar-has-believed-fall-2025-was-a-real-window-for-a-very-long-time-now |
+| NUEVO_Reediciones_Logos.png | https://www.rockstargames.com/newswire/article/4ka18ao8a4o227 |
+| NUEVO_Bully_Portada.png | https://www.rockstargames.com/bully |
+| NUEVO_Bully_Captura.png | https://www.rockstargames.com/bully |
+| NUEVO_Pantalla_Emisoras.png | https://www.rockstargames.com/VI |
 | NUEVO_Twitch_Captura.png | https://twitchtracker.com/games/32982 |
 
 Texto para la descripción del vídeo 5: Capturas: Rockstar Newswire, Take-Two, Business Wire, Game Developer, PC Gamer, Game World Observer, GamesRadar+, TechRadar, Absurd Ventures y TwitchTracker.
 Texto para la descripción del vídeo 6: Capturas: Rockstar Newswire, Steam, Game Informer, ESRB, Collective Shout y Stevivor.
+
+Fotos de Wikimedia Commons del vídeo 7 (hay que citarlas en su descripción; recortadas a 16:9, sin más cambios):
+
+| Archivo | Original | Autor | Licencia |
+|---|---|---|---|
+| NUEVO_Dial_Coche.jpg | https://commons.wikimedia.org/wiki/File:CONELRAD_car_radio.jpg | Feddacheenee | CC BY-SA 3.0 |
+| NUEVO_Chatterbox_Cabina.jpg | https://commons.wikimedia.org/wiki/File:Penwith_Radio_studio_(2).jpg | M4th5 | CC BY-SA 3.0 |
+| NUEVO_Dr_Dre_Estudio.jpg | https://commons.wikimedia.org/wiki/File:Mixing_at_Jackpot!_Recording_Studio_(Portland,_Oregon).jpg | VACANT FEVER | CC BY-SA 2.0 |
+
+Texto para la descripción del vídeo 7: Fotos: «CONELRAD car radio», Feddacheenee (CC BY-SA 3.0); «Penwith Radio studio», M4th5 (CC BY-SA 3.0); «Mixing at Jackpot! Recording Studio», VACANT FEVER (CC BY-SA 2.0); Wikimedia Commons. Capturas: Rockstar Games (web de GTA VI).
