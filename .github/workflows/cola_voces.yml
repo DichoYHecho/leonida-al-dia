@@ -1,0 +1,49 @@
+name: Cola diaria de voces
+
+# Cada mañana, cuando se renueva el cupo gratis de Gemini (medianoche en California = 8:00 UTC), pide las voces
+# que falten de los guiones de .github/cola_voces.txt, uno detrás de otro, y para cuando se acaba el cupo.
+# Coste 0 €: no cambia de plan ni de clave; solo reparte el cupo gratuito de cada día sin que haga falta el PC.
+on:
+  schedule:
+    - cron: "10 8 * * *"
+  workflow_dispatch:
+
+permissions:
+  actions: write
+  contents: read
+
+concurrency:
+  group: cola-voces
+
+jobs:
+  cola:
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      REPO: ${{ github.repository }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Pedir las voces pendientes, guion a guion
+        run: |
+          echo "### Cola diaria de voces" >> "$GITHUB_STEP_SUMMARY"
+          grep -v '^[[:space:]]*#' .github/cola_voces.txt | while read -r rama guion; do
+            [ -z "$guion" ] && continue
+            antes=$(gh run list -R "$REPO" -w voces_video.yml -L 1 --json databaseId -q '.[0].databaseId')
+            gh workflow run voces_video.yml -R "$REPO" --ref "$rama" -f guion="$guion" -f bloques=""
+            id="$antes"
+            for i in $(seq 1 30); do
+              sleep 10
+              id=$(gh run list -R "$REPO" -w voces_video.yml -L 1 --json databaseId -q '.[0].databaseId')
+              [ "$id" != "$antes" ] && break
+            done
+            gh run watch "$id" -R "$REPO" --interval 30 > /dev/null || true
+            log=$(gh run view "$id" -R "$REPO" --log || true)
+            listas=$(echo "$log" | grep -o 'Voces listas: [0-9]* de [0-9]*' | tail -1)
+            echo "- $guion ($rama): $listas" | tee -a "$GITHUB_STEP_SUMMARY"
+            if echo "$log" | grep -q 'PENDIENTE (cupo agotado'; then
+              echo "- Cupo de hoy agotado: sigue mañana" | tee -a "$GITHUB_STEP_SUMMARY"
+              break
+            fi
+          done
