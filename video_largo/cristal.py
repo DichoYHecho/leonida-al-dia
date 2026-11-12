@@ -164,35 +164,42 @@ def mascara(ruta, w, h, r):
 
 
 def filtros(paneles, idx0, tmp, fps, entrada, salida):
-    """Entradas extra y trozo de filter_complex: desenfoque real detrás de cada panel, solo durante su tiempo."""
+    """Entradas extra y trozo de filter_complex.
+    12 nov: el montaje completo pasaba de 3 horas, porque congelar y difuminar con split/freezeframes obliga a pasar
+    TODOS los fotogramas por cada cartel. Ahora el fondo de cada cartel a pantalla completa se prepara antes como
+    imagen (fotograma central del vídeo base, difuminado) y se superpone solo en su tramo: coste casi nulo fuera de él.
+    Los paneles pequeños (si los hay) siguen con desenfoque real."""
     escala = f"scale={SALIDA[0]}:{SALIDA[1]}:flags=lanczos"
-    partes, cur = [], entrada
-    for k, (t0, t1) in enumerate(CONGELAR):  # fondo quieto (fotograma del centro del cartel) en los carteles a pantalla completa
-        f0, f1 = int(round(t0 * fps)), int(round(t1 * fps))
-        partes.append(f"[{cur}]split[fz{k}a][fz{k}b];[fz{k}a][fz{k}b]freezeframes=first={f0}:last={f1}:replace={(f0 + f1) // 2}[fz{k}];")
-        cur = f"fz{k}"
-    if not paneles:
-        return [], "".join(partes) + f"[{cur}]{escala}[{salida}];"
-    args = []
-    for i, (x, y, w, h, t0, t1) in enumerate(paneles):
+    base = pathlib.Path(tmp) / "sin_audio.mp4"
+    args, partes, cur, idx = [], [], entrada, idx0
+    for k, (t0, t1) in enumerate(CONGELAR):
+        png = pathlib.Path(tmp) / f"fondo_cartel_{k:02d}.png"
+        subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-ss", f"{(t0 + t1) / 2:.2f}", "-i", str(base),
+                        "-frames:v", "1", "-vf", f"scale={W}:{H},gblur=sigma=40,eq=brightness=-0.05:saturation=1.15",
+                        str(png)], check=True)
+        d = max(0.1, t1 - t0)
+        args += ["-loop", "1", "-framerate", str(fps), "-t", f"{d:.2f}", "-i", str(png)]
+        partes.append(f"[{idx}:v]format=yuv420p,setpts=PTS+{t0:.3f}/TB[fd{k}];"
+                      f"[{cur}][fd{k}]overlay=0:0:eof_action=pass[ov{k}];")
+        cur, idx = f"ov{k}", idx + 1
+    pequenos = [p for p in paneles if (p[2], p[3]) != (W, H)]
+    for i, (x, y, w, h, t0, t1) in enumerate(pequenos):
         x, y = max(0, x - x % 2), max(0, y - y % 2)  # medidas pares: el vídeo es yuv420p
         w, h = min(W - x, w + w % 2), min(H - y, h + h % 2)
-        r = 0 if (w, h) == (W, H) else min(36 if h > 400 else 28, h // 2)
+        r = min(36 if h > 400 else 28, h // 2)
         m = pathlib.Path(tmp) / f"mascara_{i:03d}.png"
         mascara(m, w, h, r)
         d = max(0.1, t1 - t0)
         args += ["-loop", "1", "-framerate", str(fps), "-t", f"{d:.2f}", "-i", str(m)]
-        sig = 40 if (w, h) == (W, H) else 22
-        sal = "crfin" if i == len(paneles) - 1 else f"cr{i}"
         partes.append(
             f"[{cur}]split[c{i}][s{i}];"
             f"[s{i}]trim=start={t0:.3f}:end={t1:.3f},setpts=PTS-STARTPTS,crop={w}:{h}:{x}:{y},"
-            f"gblur=sigma={sig},eq=brightness=-0.05:saturation=1.15[b{i}];"
-            f"[{idx0 + i}:v]format=gray[m{i}];"
+            f"gblur=sigma=22,eq=brightness=-0.05:saturation=1.15[b{i}];"
+            f"[{idx}:v]format=gray[m{i}];"
             f"[b{i}][m{i}]alphamerge,setpts=PTS+{t0:.3f}/TB[g{i}];"
-            f"[c{i}][g{i}]overlay={x}:{y}:eof_action=pass[{sal}];")
-        cur = sal
-    partes.append(f"[crfin]{escala}[{salida}];")
+            f"[c{i}][g{i}]overlay={x}:{y}:eof_action=pass[cr{i}];")
+        cur, idx = f"cr{i}", idx + 1
+    partes.append(f"[{cur}]{escala}[{salida}];")
     return args, "".join(partes)
 
 
