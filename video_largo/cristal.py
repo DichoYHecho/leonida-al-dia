@@ -178,8 +178,10 @@ def filtros(paneles, idx0, tmp, fps, entrada, salida):
                         "-frames:v", "1", "-vf", f"scale={W}:{H},gblur=sigma=40,eq=brightness=-0.05:saturation=1.15",
                         str(png)], check=True)
         d = max(0.1, t1 - t0)
-        args += ["-loop", "1", "-framerate", str(fps), "-t", f"{d:.2f}", "-i", str(png)]
-        partes.append(f"[{idx}:v]format=yuv420p,setpts=PTS+{t0:.3f}/TB[fd{k}];"
+        # -itsoffset: la imagen empieza en su minuto; si no, ffmpeg la lee entera al principio y acumula
+        # los fotogramas de todos los carteles en memoria (el montaje completo pasaba de 4 horas, 12 nov)
+        args += ["-itsoffset", f"{t0:.3f}", "-loop", "1", "-framerate", str(fps), "-t", f"{d:.2f}", "-i", str(png)]
+        partes.append(f"[{idx}:v]format=yuv420p[fd{k}];"
                       f"[{cur}][fd{k}]overlay=0:0:eof_action=pass[ov{k}];")
         cur, idx = f"ov{k}", idx + 1
     pequenos = [p for p in paneles if (p[2], p[3]) != (W, H)]
@@ -190,7 +192,7 @@ def filtros(paneles, idx0, tmp, fps, entrada, salida):
         m = pathlib.Path(tmp) / f"mascara_{i:03d}.png"
         mascara(m, w, h, r)
         d = max(0.1, t1 - t0)
-        args += ["-loop", "1", "-framerate", str(fps), "-t", f"{d:.2f}", "-i", str(m)]
+        args += ["-itsoffset", f"{t0:.3f}", "-loop", "1", "-framerate", str(fps), "-t", f"{d:.2f}", "-i", str(m)]
         partes.append(
             f"[{cur}]split[c{i}][s{i}];"
             f"[s{i}]trim=start={t0:.3f}:end={t1:.3f},setpts=PTS-STARTPTS,crop={w}:{h}:{x}:{y},"
