@@ -9,7 +9,7 @@ TABLAS = [AQUI / f for f in ("trozos_auto.csv", "trozos_auto_sg.csv", "trozos_au
 
 # plano pendiente: (trozo libre del que se copia vídeo, inicio y duración  |  o (vídeo, inicio, duración), qué se ve)
 SUSTITUTOS = {
-    "NUEVO_Iggy_Liberty_Rock": ("G3_PS2a_10", "GTA III (tráiler oficial)"),
+    "NUEVO_Iggy_Liberty_Rock": ("IV_PC_2_06", "GTA IV, donde está Liberty Rock Radio (tráiler oficial)"),
     "NUEVO_K_DST_Menu": ("SA_PS2a_10", "San Andreas (tráiler oficial)"),
     "NUEVO_Vladivostok_Menu": ("IV_PC_1_04", "GTA IV (tráiler oficial)"),
     "NUEVO_Radio_Menu_GTA5": ("V_Juego_1_04", "GTA V (tráiler oficial)"),
