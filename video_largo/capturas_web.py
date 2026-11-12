@@ -18,6 +18,13 @@ CAPTURAS = {  # nombre: (qué se ve, fuente)
     "NUEVO_Captura_Steam_Resenas": ("Ficha de GTA V en Steam con el resumen de reseñas (sin usuarios)", "store.steampowered.com"),
     "NUEVO_Cuentas_TakeTwo": ("Resultados de Take-Two del año fiscal 2026: gasto recurrente y net bookings", "Business Wire (Take-Two)"),
     "NUEVO_Zelnick_Captura": ("Declaración de Strauss Zelnick en los resultados de mayo de 2026", "Business Wire (Take-Two)"),
+    "NUEVO_Captura_Entrevista": ("Game Informer: Rockstar responde a las críticas a las Shark Cards (23 oct 2017)", "gameinformer.com"),
+    "NUEVO_Captura_ESRB_AO": ("La ESRB retira la M a San Andreas (20 jul 2005)", "esrb.org"),
+    "NUEVO_Captura_Peticion": ("Artículo de Collective Shout sobre la petición a Target (dic 2014), sin firmantes", "collectiveshout.org"),
+    "NUEVO_Juicio_Southwark": ("Titular de la sentencia del juicio (dic 2023), sin personas", "techradar.com"),
+    "NUEVO_Absurd_Logo": ("Web de Absurd Ventures con su logo", "absurdventures.com"),
+    "NUEVO_Ruffian_Captura": ("Titular de la compra de Ruffian Games (oct 2020)", "gamesradar.com"),
+    "NUEVO_Captura_Clasificacion_AU": ("GTA V recibe la R18+ en Australia (1 ago 2013)", "stevivor.com"),
     "NUEVO_Twitch_Captura": ("Estadísticas de GTA V en Twitch", "twitchtracker.com"),
 }
 

@@ -30,6 +30,14 @@ Capturas de páginas web (cita breve con fines informativos; se nombra el medio 
 | NUEVO_Captura_Steam_Resenas.png | https://store.steampowered.com/app/271590/ |
 | NUEVO_Cuentas_TakeTwo.png | https://www.businesswire.com/news/home/20260521450562/en/ (recortada sin los contactos de prensa) |
 | NUEVO_Zelnick_Captura.png | https://www.businesswire.com/news/home/20260521450562/en/ (recortada sin los contactos de prensa) |
+| NUEVO_Captura_Entrevista.png | https://www.gameinformer.com/b/features/archive/2017/10/23/rockstar-responds-to-shark-card-criticisms.aspx |
+| NUEVO_Captura_ESRB_AO.png | https://www.esrb.org/blog/esrb-concludes-investigation-into-grand-theft-auto-san-andreas-revokes-m-mature-rating/ |
+| NUEVO_Captura_Peticion.png | https://www.collectiveshout.org/prostitution_survivors_call_on_target_to_withdraw_gta_v_for_extreme_violence_against_women |
+| NUEVO_Juicio_Southwark.png | https://techradar.com/gaming/gta-6-hacker-who-intended-to-return-to-cyber-crime-as-soon-as-possible-sentenced-to-an-indefinite-hospital-order |
+| NUEVO_Absurd_Logo.png | https://www.absurdventures.com/ |
+| NUEVO_Ruffian_Captura.png | https://www.gamesradar.com/rockstar-has-officially-bought-crackdown-2-developer-ruffian-games |
+| NUEVO_Captura_Clasificacion_AU.png | https://stevivor.com/news/grand-theft-auto-v-races-to-an-r18-rating-in-australia/ (recortada sin la foto del autor) |
 | NUEVO_Twitch_Captura.png | https://twitchtracker.com/games/32982 |
 
-Texto para la descripción (vídeos 5 y 6): Capturas: Rockstar Newswire, Take-Two, Business Wire, Game Developer, PC Gamer, Game World Observer, GamesRadar+, Steam y TwitchTracker.
+Texto para la descripción del vídeo 5: Capturas: Rockstar Newswire, Take-Two, Business Wire, Game Developer, PC Gamer, Game World Observer, GamesRadar+, TechRadar, Absurd Ventures y TwitchTracker.
+Texto para la descripción del vídeo 6: Capturas: Rockstar Newswire, Steam, Game Informer, ESRB, Collective Shout y Stevivor.
