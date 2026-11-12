@@ -7,6 +7,9 @@ Mismo formato que guion_sg.py. Datos y fuentes: investigacion.md. Edición, plan
   música de fondo bajada. El audio lo pone el usuario en la carpeta «canciones» (por ejemplo billie_jean.mp3); con
   «desde» se elige el segundo de la canción donde empieza el fragmento. Sin archivo, el bloque se monta sin hueco.
   Ningún audio está descargado ni incluido aquí.
+  12 nov 2026: solo quedan las 2 canciones de los tráileres de GTA VI (p14), recortadas de los tráileres oficiales y
+  guardadas en el repositorio privado leonida-canciones. Las otras 11 se quitaron (no hay audio legal); el texto
+  las sigue nombrando, pero ya no dice «escucha» ni «suena esto». p01, p02 y p03 cambian y se vuelven a pedir.
   Riesgo de copyright: aceptado por el usuario. Ver «Canciones y copyright» en edicion.md.
 
 Los datos marcados como SIN CONFIRMAR en investigacion.md no aparecen en el texto como hechos.
@@ -108,15 +111,14 @@ BLOQUES = [
                "canciones hechas a medida. Detrás de buena parte de esa música estaba Craig Conner, que escribió e "
                "interpretó temas para varias emisoras. Colin Anderson y Grant Middleton trabajaron en lo mismo, con "
                "otros nombres. Y el tema principal del juego, Gangster Friday, aparece acreditado a una banda que no "
-               "existe: Slumpussy. Emisoras como N-CT FM, Radio setenta y seis FM o Head Radio. Escucha Radio setenta y "
-               "seis FM. Ojo a Head Radio: años después volverá, en GTA III."),
+               "existe: Slumpussy. Emisoras como N-CT FM, Radio setenta y seis FM o Head Radio. Ojo a Head Radio: "
+               "años después volverá, en GTA III."),
      "rotulos": [{"en": "Conner", "texto": "CRAIG CONNER|MÚSICA ORIGINAL"},
                  {"en": "Slumpussy", "texto": "SLUMPUSSY|BANDA FICTICIA"},
                  {"en": "setenta", "texto": "RADIO 76 FM|1997"},
                  {"en": "Head", "texto": "HEAD RADIO|VUELVE EN GTA III"}],
      "nombres": ["Conner", "Slumpussy", "Head", "setenta", "Gangster"],
-     "canciones": [{"en": "Escucha", "titulo": "On the Move", "artista": "Ghetto Fingers",
-                    "emisora": "Radio '76 FM", "juego": "GTA 1 (1997)", "seg": 4}],
+     "canciones": [],  # 12 nov: sin audio legal de la canción; solo suenan las de los tráileres de GTA VI (p14)
      "planos": ["@GTA1_1997:6", "IMG_GTA1", "IMG_GTA1_Caja", "IMG_RaceNChase", "GTA_15_05", "@GTA1_1997:2"],
      "planos_en": [{"en": "Conner", "plano": "IMG_GTA1_Caja"},
                    {"en": "Head", "plano": "@GTA1_1997"},
@@ -124,13 +126,12 @@ BLOQUES = [
     {"id": "p02", "num": 2, "total": T, "titulo": "1999 · GTA 2", "capitulo": "1999 · GTA 2", "overlay": "",
      "anio": 1999,
      "texto": ("Dos años después llega GTA 2, en la ciudad sin nombre real que es Anywhere City. Tiene radio, claro: "
-               "en Funami FM, la emisora de la banda yakuza, suena esto. Casi toda la música de GTA 2 es original, hecha para el juego. Su historia musical merece un vídeo aparte. "
+               "Funami FM es la emisora de la banda yakuza. Casi toda la música de GTA 2 es original, hecha para el juego. Su historia musical merece un vídeo aparte. "
                "Así que aquí la marcamos en el mapa, y seguimos."),
      "rotulos": [{"en": "Anywhere", "texto": "GTA 2|ANYWHERE CITY"},
                  {"en": "Funami", "texto": "FUNAMI FM|YAKUZA"}],
      "nombres": ["Anywhere", "Funami"],
-     "canciones": [{"en": "Funami", "titulo": "Flymutha", "artista": "Toys Are Real", "emisora": "Funami FM",
-                    "juego": "GTA 2 (1999)", "seg": 5}],
+     "canciones": [],
      "planos": ["@GTA2_1999:4", "@London_1969:2", "GTA_15_07", "@GTA2_1999:2"],
      "planos_en": [{"en": "Anywhere", "plano": "@GTA2_1999"},
                    {"en": "Funami", "plano": "@GTA2_1999"}]},
@@ -139,8 +140,8 @@ BLOQUES = [
     {"id": "p03", "num": 3, "total": T, "titulo": "2001 · GTA III", "capitulo": "2001 · GTA III", "overlay": "",
      "anio": 2001, "cartela": {"anio": "2001", "acto": "ACTO II", "titulo": "LA RADIO EN 3D"},
      "texto": ("En dos mil uno, la radio cambia de piel. GTA III nos saca a la calle en tres dimensiones, y sus "
-               "emisoras tienen personalidad. Flashback noventa y cinco coma seis suena a la banda sonora de los "
-               "ochenta. Escucha. Y de la película Scarface, esta otra. Head Radio mezcla pop y soft rock. Y Chatterbox "
+               "emisoras tienen personalidad. Flashback noventa y cinco coma seis pone temas de los ochenta, varios "
+               "de la banda sonora de la película Scarface. Head Radio mezcla pop y soft rock. Y Chatterbox "
                "FM es la rareza: una emisora de charla, sin música, presentada por Lazlow. Los oyentes llaman desde "
                "Liberty City y cuentan sus cosas."),
      "rotulos": [{"en": "Flashback", "texto": "FLASHBACK 95.6|OLDIES"},
@@ -148,11 +149,7 @@ BLOQUES = [
                  {"en": "Chatterbox", "texto": "CHATTERBOX FM|SIN MÚSICA"},
                  {"en": "Lazlow", "texto": "LAZLOW|LOCUTOR"}],
      "nombres": ["Flashback", "Scarface", "Chatterbox", "Lazlow"],
-     "canciones": [{"en": "Escucha", "titulo": "Rush Rush", "artista": "Debbie Harry", "emisora": "Flashback 95.6",
-                    "juego": "GTA III (2001)", "seg": 5},
-                   {"en": "Scarface", "titulo": "Scarface (Push It to the Limit)", "artista": "Paul Engemann",
-                    "emisora": "Flashback 95.6", "juego": "GTA III (2001); confirmada en la lista de la Definitive Edition",
-                    "seg": 5}],
+     "canciones": [],
      "planos": ["@GTA3_2001:4", "@GTA3_DE:2", "NUEVO_Chatterbox_Cabina", "GTA_15_11", "@GTA3_2001:4"],
      "planos_en": [{"en": "Flashback", "plano": "@GTA3_2001"},
                    {"en": "Chatterbox", "plano": "NUEVO_Chatterbox_Cabina"},
@@ -172,10 +169,7 @@ BLOQUES = [
                  {"en": "Epic", "texto": "EPIC RECORDS|29 OCT 2002"},
                  {"en": "siete", "texto": "7 CD|UNO POR EMISORA"}],
      "nombres": ["Miami", "Flash", "Emotion", "Epic", "siete", "Wildstyle"],
-     "canciones": [{"en": "Billie", "titulo": "Billie Jean", "artista": "Michael Jackson", "emisora": "Flash FM",
-                    "juego": "GTA Vice City (2002)", "seg": 6},
-                   {"en": "Africa", "titulo": "Africa", "artista": "Toto", "emisora": "Emotion 98.3",
-                    "juego": "GTA Vice City (2002)", "seg": 6}],
+     "canciones": [],
      "planos": ["@Vice_City_2002:6", "@VC_DE:4", "NUEVO_Caja_Vice_CD", "VCA_Logo", "IMG_VC_Portada", "@Vice_City_2002:4"],
      "planos_en": [{"en": "caja", "plano": "NUEVO_Caja_Vice_CD"},
                    {"en": "Miami", "plano": "@Vice_City_2002"}]},
@@ -215,10 +209,7 @@ BLOQUES = [
                  {"en": "Axl", "texto": "AXL ROSE|DJ DE K-DST"},
                  {"en": "consecuencias", "texto": "LICENCIAS|CANCIONES FUERA"}],
      "nombres": ["estado", "Santos", "Axl"],
-     "canciones": [{"en": "Slow", "titulo": "Slow Ride", "artista": "Foghat", "emisora": "K-DST",
-                    "juego": "GTA San Andreas (2004)", "seg": 5},
-                   {"en": "Green", "titulo": "Green River", "artista": "Creedence Clearwater Revival",
-                    "emisora": "K-DST", "juego": "GTA San Andreas (2004)", "seg": 5}],
+     "canciones": [],
      "planos": ["@SA_2004:4", "@SA_DE:2", "GTA_15_25", "GTA_15_26", "NUEVO_K_DST_Menu", "@SA_2004:5"],
      "planos_en": [{"en": "estado", "plano": "@SA_DE"},
                    {"en": "Axl", "plano": "NUEVO_K_DST_Menu"},
@@ -278,8 +269,7 @@ BLOQUES = [
                  {"en": "Vladivostok", "texto": "VLADIVOSTOK FM|POP RUSO"},
                  {"en": "diez", "texto": "10 AÑOS|DESPUÉS"}],
      "nombres": ["Liberty", "Iggy", "Vladivostok", "diez"],
-     "canciones": [{"en": "Suena", "titulo": "Jailbreak", "artista": "Thin Lizzy",
-                    "emisora": "Liberty Rock Radio 97.8", "juego": "GTA IV (2008)", "seg": 5}],
+     "canciones": [],
      "planos": ["@GTA4_2008:4", "NUEVO_Iggy_Liberty_Rock", "NUEVO_Vladivostok_Menu", "@GTA4_2008:6"],
      "planos_en": [{"en": "Iggy", "plano": "NUEVO_Iggy_Liberty_Rock"},
                    {"en": "Vladivostok", "plano": "NUEVO_Vladivostok_Menu"}]},
@@ -296,8 +286,7 @@ BLOQUES = [
                  {"en": "Lab", "texto": "THE LAB|WELCOME TO LOS SANTOS"},
                  {"en": "Sleepwalking", "texto": "SLEEPWALKING|THE CHAIN GANG OF 1974"}],
      "nombres": ["Non", "Kenny", "Lab", "Sleepwalking"],
-     "canciones": [{"en": "Sleepwalking", "titulo": "Sleepwalking", "artista": "The Chain Gang of 1974",
-                    "emisora": "Radio Mirror Park", "juego": "GTA V (2013)", "seg": 6}],
+     "canciones": [],
      "planos": ["@GTA5_2013:4", "NUEVO_Radio_Menu_GTA5", "@GTA5_2013:5"],
      "planos_en": [{"en": "Kenny", "plano": "NUEVO_Radio_Menu_GTA5"},
                    {"en": "Lab", "plano": "@GTA5_2013"},
@@ -356,8 +345,7 @@ BLOQUES = [
                  {"en": "Next", "texto": "THE NEXT EPISODE|WEST COAST CLASSICS"},
                  {"en": "MOTOMAMI", "texto": "MOTOMAMI LOS SANTOS|ROSALÍA Y ARCA"}],
      "nombres": ["Contract", "Hit-Boy", "Dre", "MOTOMAMI"],
-     "canciones": [{"en": "Next", "titulo": "The Next Episode", "artista": "Dr. Dre",
-                    "emisora": "West Coast Classics", "juego": "GTA Online: The Contract (2021)", "seg": 6}],
+     "canciones": [],
      "planos": ["NUEVO_Dr_Dre_Estudio", "@GTA_Online:5", "@GTA_Online:6"],
      "planos_en": [{"en": "Dre", "plano": "NUEVO_Dr_Dre_Estudio"},
                    {"en": "MOTOMAMI", "plano": "@GTA_Online"}]},
