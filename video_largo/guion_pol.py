@@ -69,7 +69,6 @@ BLOQUES = [
                "tiempo. Hoy las repasamos todas, en orden, con las fuentes delante. Y al final te pregunto algo que "
                "quiero que me respondas."),
      "rotulos": [{"en": "publicista", "texto": "PUBLICISTA|DE ESCÁNDALOS"},
-                 {"en": "diecinueve", "texto": "19 NOV 2026|GTA VI"},
                  {"en": "hackeo", "texto": "HACKEO 2022|PARTE DEL JUEGO"}],
      "nombres": ["publicista", "diecinueve", "hackeo"],
      "planos": ["@GTA3_2001:2", "GTA_15_01", "Mirada_Logo", "@GTA5_2013:2", "Lanz_Playa", "T1_Noche_Aerea"],
