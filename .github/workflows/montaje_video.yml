@@ -12,6 +12,12 @@ on:
       solo_voces:
         description: "1 = solo el informe del final de cada voz (sin montar)"
         default: "0"
+      voz_provisional:
+        description: "1 = las voces que aún no ha hecho Gemini se ponen con una voz provisional gratis (Piper), solo para la previa"
+        default: "0"
+      forzar_finales:
+        description: "1 = no parar si Whisper duda del final de una voz (para previas)"
+        default: "0"
 
 permissions:
   contents: write
@@ -26,6 +32,7 @@ jobs:
       RAMA: ${{ inputs.guion == 'guion_vc' && 'montaje-vc' || inputs.guion == 'guion_sg' && (inputs.bloques != '' && 'montaje-sg-previa' || 'montaje-sg') || inputs.guion == 'guion_jl' && (inputs.bloques != '' && 'montaje-jl-previa' || 'montaje-jl') || inputs.guion == 'guion_13a' && (inputs.bloques != '' && 'montaje-13a-previa' || 'montaje-13a') || inputs.guion == 'guion_pol' && (inputs.bloques != '' && 'montaje-pol-previa' || 'montaje-pol') || inputs.guion == 'guion_rad' && (inputs.bloques != '' && 'montaje-rad-previa' || 'montaje-rad') || inputs.guion == 'guion_vl' && 'montaje-vl' || format('montaje-{0}', inputs.guion) }}
       # (cada guion monta en su rama y su release: un guion nuevo nunca pisa montaje-vl)
       SOLO_VOCES: ${{ inputs.solo_voces }}
+      FORZAR_FINALES: ${{ inputs.forzar_finales }}
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v4
@@ -72,6 +79,19 @@ jobs:
           path: cache/voz_vl
           key: voz-vl-montaje
           restore-keys: voz-vl-
+
+      - name: Voz provisional (Piper) para las voces que falten
+        if: inputs.voz_provisional == '1'
+        run: |
+          pip install piper-tts==1.8.0
+          mkdir -p cache/voz_previa
+          cp -r cache/voz_vl/. cache/voz_previa/ 2>/dev/null || true
+          for e in onnx onnx.json; do
+            curl -sSfL --retry 3 -o /tmp/es_ES-davefx-medium.$e \
+              https://huggingface.co/rhasspy/piper-voices/resolve/main/es/es_ES/davefx/medium/es_ES-davefx-medium.$e
+          done
+          CACHE_VOZ=cache/voz_previa python3 video_largo/voz_provisional.py /tmp/es_ES-davefx-medium.onnx
+          echo "CACHE_VOZ=cache/voz_previa" >> "$GITHUB_ENV"
 
       - name: Recuperar el modelo de Whisper
         uses: actions/cache@v4
