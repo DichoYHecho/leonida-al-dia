@@ -898,13 +898,13 @@ def archivo_cancion(c):
     if c.get("archivo"):
         r = pathlib.Path(c["archivo"])
         return r if r.exists() else None
-    base = "".join(ch if ch.isalnum() else "_" for ch in P.normalizar(c["titulo"])).strip("_")
-    while "__" in base:
-        base = base.replace("__", "_")
-    for ext in (".mp3", ".wav", ".m4a", ".flac", ".ogg"):
-        r = DIR_CANCIONES / (base + ext)
-        if r.exists():
-            return r
+    # P.normalizar quita también los espacios: se aceptan «billie_jean.mp3» y «billiejean.mp3» (y cualquier
+    # nombre que, normalizado igual, coincida con el título)
+    clave = P.normalizar(c["titulo"])
+    if DIR_CANCIONES.is_dir():
+        for r in sorted(DIR_CANCIONES.iterdir()):
+            if r.suffix.lower() in (".mp3", ".wav", ".m4a", ".flac", ".ogg") and P.normalizar(r.stem) == clave:
+                return r
     return None
 
 

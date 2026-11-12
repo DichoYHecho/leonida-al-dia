@@ -34,6 +34,9 @@ jobs:
       SOLO_VOCES: ${{ inputs.solo_voces }}
       FORZAR_FINALES: ${{ inputs.forzar_finales }}
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # Canciones (vídeo 7): viven en un repositorio PRIVADO y se bajan solo al montar; nunca entran en este repo público.
+      # Sin la clave CANCIONES_SSH_KEY el montaje sigue igual que antes, sin canciones.
+      HAY_CANCIONES: ${{ secrets.CANCIONES_SSH_KEY != '' }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -72,6 +75,14 @@ jobs:
           git show origin/trozos-vc:trozos_auto.csv > video_largo/trozos_auto.csv || true
           git show origin/trozos-sg:trozos_auto.csv > video_largo/trozos_auto_sg.csv || true
           git show origin/trozos-jl:trozos_auto.csv > video_largo/trozos_auto_jl.csv || true
+
+      - name: Canciones desde el repositorio privado
+        if: env.HAY_CANCIONES == 'true'
+        uses: actions/checkout@v4
+        with:
+          repository: DichoYHecho/leonida-canciones
+          ssh-key: ${{ secrets.CANCIONES_SSH_KEY }}
+          path: canciones
 
       - name: Recuperar las voces ya pedidas
         uses: actions/cache/restore@v4
