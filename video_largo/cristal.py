@@ -172,18 +172,15 @@ def filtros(paneles, idx0, tmp, fps, entrada, salida):
     escala = f"scale={SALIDA[0]}:{SALIDA[1]}:flags=lanczos"
     base = pathlib.Path(tmp) / "sin_audio.mp4"
     args, partes, cur, idx = [], [], entrada, idx0
-    for k, (t0, t1) in enumerate(CONGELAR):
-        png = pathlib.Path(tmp) / f"fondo_cartel_{k:02d}.png"
-        subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-ss", f"{(t0 + t1) / 2:.2f}", "-i", str(base),
-                        "-frames:v", "1", "-vf", f"scale={W}:{H},gblur=sigma=40,eq=brightness=-0.05:saturation=1.15",
-                        str(png)], check=True)
-        d = max(0.1, t1 - t0)
-        # -itsoffset: la imagen empieza en su minuto; si no, ffmpeg la lee entera al principio y acumula
-        # los fotogramas de todos los carteles en memoria (el montaje completo pasaba de 4 horas, 12 nov)
-        args += ["-itsoffset", f"{t0:.3f}", "-loop", "1", "-framerate", str(fps), "-t", f"{d:.2f}", "-i", str(png)]
-        partes.append(f"[{idx}:v]format=yuv420p[fd{k}];"
-                      f"[{cur}][fd{k}]overlay=0:0:eof_action=pass[ov{k}];")
-        cur, idx = f"ov{k}", idx + 1
+    if CONGELAR:
+        # 12 nov: con una imagen de entrada por cartel, ffmpeg se bloqueaba en el montaje completo (17 carteles).
+        # Ahora todos los fondos van en UN vídeo auxiliar de la misma duración (negro salvo en los carteles),
+        # que avanza a la par que el montaje y se superpone solo en los tramos de cartel.
+        fondos = fondos_carteles(base, pathlib.Path(tmp), fps)
+        args += ["-i", str(fondos)]
+        tramos = "+".join(f"between(t,{t0:.3f},{t1:.3f})" for t0, t1 in CONGELAR)
+        partes.append(f"[{idx}:v]format=yuv420p[fd];[{cur}][fd]overlay=0:0:eof_action=pass:enable='{tramos}'[ovf];")
+        cur, idx = "ovf", idx + 1
     pequenos = [p for p in paneles if (p[2], p[3]) != (W, H)]
     for i, (x, y, w, h, t0, t1) in enumerate(pequenos):
         x, y = max(0, x - x % 2), max(0, y - y % 2)  # medidas pares: el vídeo es yuv420p
@@ -203,6 +200,44 @@ def filtros(paneles, idx0, tmp, fps, entrada, salida):
         cur, idx = f"cr{i}", idx + 1
     partes.append(f"[{cur}]{escala}[{salida}];")
     return args, "".join(partes)
+
+
+def fondos_carteles(base, tmp, fps):
+    """Vídeo auxiliar con el fondo de cada cartel a pantalla completa (fotograma central del vídeo base, quieto y
+    difuminado) en su tramo y negro en el resto. Se arma por trozos contados en fotogramas para que no se desfase."""
+    dur = float(subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0",
+                                str(base)], capture_output=True, text=True, check=True).stdout.strip())
+    total = int(round(dur * fps))
+    enc = ["-c:v", "libx264", "-preset", "ultrafast", "-crf", "14", "-pix_fmt", "yuv420p", "-r", str(fps)]
+    trozos, pos = [], 0
+
+    def negro(n, k):
+        if n <= 0:
+            return
+        f = tmp / f"fondo_negro_{k:02d}.mp4"
+        subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-f", "lavfi", "-i", f"color=c=black:s={W}x{H}:r={fps}",
+                        "-frames:v", str(n), *enc, str(f)], check=True)
+        trozos.append(f)
+
+    for k, (t0, t1) in enumerate(CONGELAR):
+        f0, f1 = int(round(t0 * fps)), min(total, int(round(t1 * fps)))
+        negro(f0 - pos, k)
+        png = tmp / f"fondo_cartel_{k:02d}.png"
+        subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-ss", f"{(t0 + t1) / 2:.2f}", "-i", str(base),
+                        "-frames:v", "1", "-vf", f"scale={W}:{H},gblur=sigma=40,eq=brightness=-0.05:saturation=1.15",
+                        str(png)], check=True)
+        f = tmp / f"fondo_cartel_{k:02d}.mp4"
+        subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-loop", "1", "-framerate", str(fps), "-i", str(png),
+                        "-frames:v", str(max(1, f1 - f0)), *enc, str(f)], check=True)
+        trozos.append(f)
+        pos = f1
+    negro(total - pos, 99)
+    lista = tmp / "fondos_lista.txt"
+    lista.write_text("".join(f"file '{p.resolve()}'\n" for p in trozos), encoding="utf-8")
+    salida = tmp / "fondos_carteles.mp4"
+    subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-f", "concat", "-safe", "0", "-i", str(lista), "-c", "copy",
+                    str(salida)], check=True)
+    return salida
 
 
 def fotograma_cartela(origen, segundo, destino, dur, fps):
