@@ -7,7 +7,7 @@ on:
         description: "Solo estos bloques separados por comas (hook,c01,...); vacío = el vídeo entero"
         default: ""
       guion:
-        description: "Guion: guion_vl (vídeo 1), guion_vc (vídeo 2, Vice City), guion_sg (vídeo 3, la saga) o guion_jl (vídeo 4, Jason y Lucía)"
+        description: "Guion: guion_vl (vídeo 1), guion_vc (vídeo 2, Vice City), guion_sg (vídeo 3, la saga), guion_jl (vídeo 4, Jason y Lucía), guion_13a (vídeo 5), guion_pol (vídeo 6) o guion_rad (vídeo 7)"
         default: "guion_vl"
       solo_voces:
         description: "1 = solo el informe del final de cada voz (sin montar)"
@@ -23,7 +23,8 @@ jobs:
     env:
       BLOQUES_SOLO: ${{ inputs.bloques }}
       GUION: ${{ inputs.guion }}
-      RAMA: ${{ inputs.guion == 'guion_vc' && 'montaje-vc' || inputs.guion == 'guion_sg' && (inputs.bloques != '' && 'montaje-sg-previa' || 'montaje-sg') || inputs.guion == 'guion_jl' && (inputs.bloques != '' && 'montaje-jl-previa' || 'montaje-jl') || 'montaje-vl' }}
+      RAMA: ${{ inputs.guion == 'guion_vc' && 'montaje-vc' || inputs.guion == 'guion_sg' && (inputs.bloques != '' && 'montaje-sg-previa' || 'montaje-sg') || inputs.guion == 'guion_jl' && (inputs.bloques != '' && 'montaje-jl-previa' || 'montaje-jl') || inputs.guion == 'guion_13a' && (inputs.bloques != '' && 'montaje-13a-previa' || 'montaje-13a') || inputs.guion == 'guion_pol' && (inputs.bloques != '' && 'montaje-pol-previa' || 'montaje-pol') || inputs.guion == 'guion_rad' && (inputs.bloques != '' && 'montaje-rad-previa' || 'montaje-rad') || inputs.guion == 'guion_vl' && 'montaje-vl' || format('montaje-{0}', inputs.guion) }}
+      # (cada guion monta en su rama y su release: un guion nuevo nunca pisa montaje-vl)
       SOLO_VOCES: ${{ inputs.solo_voces }}
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
@@ -36,9 +37,26 @@ jobs:
           python-version: "3.12"
 
       - name: Instalar programas
+        timeout-minutes: 15
         run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y -qq ffmpeg fonts-dejavu-core fonts-montserrat fonts-bebas-neue fonts-inter
+          # apt a veces se queda colgado (11 nov 2026): 3 intentos de 3 min; si no, ffmpeg y fuentes desde GitHub
+          ok=0
+          for i in 1 2 3; do
+            timeout 180 sudo apt-get update -qq && timeout 180 sudo apt-get install -y -qq ffmpeg fonts-dejavu-core fonts-montserrat fonts-bebas-neue fonts-inter && { ok=1; break; }
+            echo "apt-get no respondió (intento $i)"; sleep 15
+          done
+          if [ "$ok" = 0 ]; then
+            echo "Sin apt: ffmpeg estático (BtbN/FFmpeg-Builds) y fuentes de sus repositorios (licencia OFL)"
+            curl -sSfL --retry 3 -o /tmp/ffmpeg.tar.xz https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-linux64-gpl.tar.xz
+            mkdir -p /tmp/ffmpeg && tar -xf /tmp/ffmpeg.tar.xz -C /tmp/ffmpeg --strip-components=1
+            echo "/tmp/ffmpeg/bin" >> "$GITHUB_PATH"
+            sudo mkdir -p /usr/share/fonts/truetype/montserrat /usr/share/fonts/truetype/bebas
+            for w in Regular Medium SemiBold Bold ExtraBold Black; do
+              sudo curl -sSfL --retry 3 -o /usr/share/fonts/truetype/montserrat/Montserrat-$w.ttf https://github.com/JulietaUla/Montserrat/raw/master/fonts/ttf/Montserrat-$w.ttf
+            done
+            sudo curl -sSfL --retry 3 -o /usr/share/fonts/truetype/bebas/BebasNeue-Regular.ttf https://github.com/google/fonts/raw/main/ofl/bebasneue/BebasNeue-Regular.ttf
+            sudo fc-cache -f >/dev/null
+          fi
           pip install numpy pillow faster-whisper==1.2.1
 
       - name: Trozos del stock nuevo
