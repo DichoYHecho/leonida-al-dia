@@ -251,8 +251,8 @@ BLOQUES = [
      "texto": ("El diecinueve de septiembre, Rockstar lo confirma: un tercero accedió sin permiso a sus sistemas y descargó "
                "información confidencial, incluido material de desarrollo del próximo GTA. Dice que está muy decepcionado, "
                "y que el trabajo sigue como estaba previsto. "
-               "Y a finales de dos mil veintitrés, en Londres, el jurado lo declara culpable de "
-               "delitos informáticos, chantaje y fraude. El juez lo condena a un internamiento hospitalario indefinido. Seguirá en un hospital de seguridad hasta que se decida que ya no es un peligro. "
+               "En agosto de dos mil veintitrés, en Londres, un jurado da por probado que cometió "
+               "delitos informáticos, chantaje y fraude. En diciembre, el juez lo condena a un internamiento hospitalario indefinido. Seguirá en un hospital de seguridad hasta que se decida que ya no es un peligro. "
                "Rockstar contó al tribunal que el ataque le costó cinco millones de dólares, y miles "
                "de horas de trabajo."),
      "rotulos": [{"en": "diecinueve", "texto": "19 SEP 2022|ROCKSTAR LO CONFIRMA"},
