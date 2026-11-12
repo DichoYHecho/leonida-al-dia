@@ -148,7 +148,7 @@ BLOQUES = [
                "Unidos, retira la M de mayores de diecisiete y pone AO, solo para adultos. Walmart, Best Buy y Target lo "
                "retiran de sus tiendas. Take-Two calcula que la historia le cuesta veinticuatro millones y medio de dólares "
                "en devoluciones. Rockstar saca una versión sin la escena. Y la FTC, la agencia federal de consumo, acusa a la "
-               "empresa de no avisar del contenido. Acaba en un acuerdo."),
+               "empresa de no avisar del contenido. Y todo acaba en un acuerdo."),
      "rotulos": [{"en": "hot", "texto": "HOT COFFEE|MINIJUEGO OCULTO"},
                  {"en": "veinte", "texto": "20 JUL 2005|M → AO"},
                  {"en": "walmart", "texto": "WALMART · BEST BUY|TARGET"},
