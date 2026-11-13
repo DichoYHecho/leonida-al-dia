@@ -112,7 +112,7 @@ def fuente(video):
 
 def tabla():
     out = {}
-    for nombre in ("trozos.csv", "trozos_vl.csv", "trozos_vc.csv", "trozos_auto.csv", "trozos_auto_sg.csv", "trozos_auto_jl.csv", "trozos_jl.csv", "trozos_57.csv"):
+    for nombre in ("trozos.csv", "trozos_vl.csv", "trozos_vc.csv", "trozos_auto.csv", "trozos_auto_sg.csv", "trozos_auto_jl.csv", "trozos_jl.csv", "trozos_57.csv", "trozos_810_evo.csv", "trozos_810_gv5.csv", "trozos_810_onl.csv"):
         if not (AQUI / nombre).exists():
             continue
         with open(AQUI / nombre, encoding="utf-8") as f:

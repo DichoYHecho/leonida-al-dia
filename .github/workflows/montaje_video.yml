@@ -7,7 +7,7 @@ on:
         description: "Solo estos bloques separados por comas (hook,c01,...); vacío = el vídeo entero"
         default: ""
       guion:
-        description: "Guion: guion_vl (vídeo 1), guion_vc (vídeo 2, Vice City), guion_sg (vídeo 3, la saga), guion_jl (vídeo 4, Jason y Lucía), guion_13a (vídeo 5), guion_pol (vídeo 6) o guion_rad (vídeo 7)"
+        description: "Guion: guion_vl (vídeo 1), guion_vc (vídeo 2, Vice City), guion_sg (vídeo 3, la saga), guion_jl (vídeo 4, Jason y Lucía), guion_13a (vídeo 5), guion_pol (vídeo 6), guion_rad (vídeo 7), guion_evo (vídeo 8), guion_gv5 (vídeo 9) o guion_onl (vídeo 10)"
         default: "guion_vl"
       solo_voces:
         description: "1 = solo el informe del final de cada voz (sin montar)"
@@ -29,7 +29,7 @@ jobs:
     env:
       BLOQUES_SOLO: ${{ inputs.bloques }}
       GUION: ${{ inputs.guion }}
-      RAMA: ${{ inputs.guion == 'guion_vc' && 'montaje-vc' || inputs.guion == 'guion_sg' && (inputs.bloques != '' && 'montaje-sg-previa' || 'montaje-sg') || inputs.guion == 'guion_jl' && (inputs.bloques != '' && 'montaje-jl-previa' || 'montaje-jl') || inputs.guion == 'guion_13a' && (inputs.bloques != '' && 'montaje-13a-previa' || 'montaje-13a') || inputs.guion == 'guion_pol' && (inputs.bloques != '' && 'montaje-pol-previa' || 'montaje-pol') || inputs.guion == 'guion_rad' && (inputs.bloques != '' && 'montaje-rad-previa' || 'montaje-rad') || inputs.guion == 'guion_vl' && 'montaje-vl' || format('montaje-{0}', inputs.guion) }}
+      RAMA: ${{ inputs.guion == 'guion_vc' && 'montaje-vc' || inputs.guion == 'guion_sg' && (inputs.bloques != '' && 'montaje-sg-previa' || 'montaje-sg') || inputs.guion == 'guion_jl' && (inputs.bloques != '' && 'montaje-jl-previa' || 'montaje-jl') || inputs.guion == 'guion_13a' && (inputs.bloques != '' && 'montaje-13a-previa' || 'montaje-13a') || inputs.guion == 'guion_pol' && (inputs.bloques != '' && 'montaje-pol-previa' || 'montaje-pol') || inputs.guion == 'guion_rad' && (inputs.bloques != '' && 'montaje-rad-previa' || 'montaje-rad') || inputs.guion == 'guion_evo' && (inputs.bloques != '' && 'montaje-evo-previa' || 'montaje-evo') || inputs.guion == 'guion_gv5' && (inputs.bloques != '' && 'montaje-gv5-previa' || 'montaje-gv5') || inputs.guion == 'guion_onl' && (inputs.bloques != '' && 'montaje-onl-previa' || 'montaje-onl') ||inputs.guion == 'guion_vl' && 'montaje-vl' || format('montaje-{0}', inputs.guion) }}
       # (cada guion monta en su rama y su release: un guion nuevo nunca pisa montaje-vl)
       SOLO_VOCES: ${{ inputs.solo_voces }}
       FORZAR_FINALES: ${{ inputs.forzar_finales }}

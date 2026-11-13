@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       guion:
-        description: "Guion: guion_vl (vídeo 1), guion_vc (vídeo 2, Vice City), guion_sg (vídeo 3, la saga), guion_jl (vídeo 4), guion_13a (vídeo 5), guion_pol (vídeo 6) o guion_rad (vídeo 7)"
+        description: "Guion: guion_vl (vídeo 1), guion_vc (vídeo 2, Vice City), guion_sg (vídeo 3, la saga), guion_jl (vídeo 4), guion_13a (vídeo 5), guion_pol (vídeo 6), guion_rad (vídeo 7), guion_evo (vídeo 8), guion_gv5 (vídeo 9) o guion_onl (vídeo 10)"
         default: "guion_vl"
       bloques:
         description: "Solo estos bloques (hook,p02,p03...); vacío = todos"
@@ -60,7 +60,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           # Cada guion tiene su rama; un guion nuevo va a «voces-<guion>» y nunca pisa la del vídeo 1
-          RAMA: ${{ inputs.guion == 'guion_vc' && 'voces-vc' || inputs.guion == 'guion_sg' && 'voces-sg' || inputs.guion == 'guion_jl' && 'voces-jl' || inputs.guion == 'guion_13a' && 'voces-13a' || inputs.guion == 'guion_pol' && 'voces-pol' || inputs.guion == 'guion_rad' && 'voces-rad' || inputs.guion == 'guion_vl' && 'voces-vl' || format('voces-{0}', inputs.guion) }}
+          RAMA: ${{ inputs.guion == 'guion_vc' && 'voces-vc' || inputs.guion == 'guion_sg' && 'voces-sg' || inputs.guion == 'guion_jl' && 'voces-jl' || inputs.guion == 'guion_13a' && 'voces-13a' || inputs.guion == 'guion_pol' && 'voces-pol' || inputs.guion == 'guion_rad' && 'voces-rad' || inputs.guion == 'guion_evo' && 'voces-evo' || inputs.guion == 'guion_gv5' && 'voces-gv5' || inputs.guion == 'guion_onl' && 'voces-onl' ||inputs.guion == 'guion_vl' && 'voces-vl' || format('voces-{0}', inputs.guion) }}
         run: |
           cd salida_voces
           git init -q
