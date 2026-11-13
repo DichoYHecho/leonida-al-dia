@@ -5,7 +5,11 @@ name: Cola diaria de voces
 # Coste 0 €: no cambia de plan ni de clave; solo reparte el cupo gratuito de cada día sin que haga falta el PC.
 on:
   schedule:
-    - cron: "10 8 * * *"
+    - cron: "10 8 * * *"    # 9:10 en Madrid, nada más renovarse el cupo gratis de Gemini
+    # De reserva: GitHub a veces retrasa horas o se salta una ejecución programada (13 nov: saltó a las 16:10).
+    # Repetir no gasta nada: las voces hechas están en caché y la cola se para sola al agotarse el cupo.
+    - cron: "40 11 * * *"
+    - cron: "40 17 * * *"
   workflow_dispatch:
 
 permissions:
