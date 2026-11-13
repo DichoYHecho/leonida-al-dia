@@ -293,7 +293,7 @@ BLOQUES = [
                "dicho que sea un guiño, pero tampoco hace falta."),
      "rotulos": [{"en": "tommy", "texto": "@TOMMY VERCETTI|VICE CITY (2002)"}],
      "nombres": ["tommy", "camisa"],
-     "planos": ["MI_40", "VCA_Tommy_Yate", "MI_75"],
+     "planos": ["VCA_Tommy_Yate", "MI_40"],
      "planos_en": [{"en": "jason", "plano": "MI_39"}, {"en": "tommy", "plano": "VCA_Tommy_Lance"}, {"en": "dos", "plano": "VCC_Tommy_Lance_Orig"}]},
 
     {"id": "e2", "num": None, "titulo": "", "overlay": "", "capitulo": "Una cara de GTA Online",
