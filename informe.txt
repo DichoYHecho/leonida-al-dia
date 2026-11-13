@@ -1,0 +1,17 @@
+Voces listas: 16 de 16 (esta vez se pidieron 6)
+hook: ya estaba
+p01: ya estaba
+p02: ya estaba
+p03: ya estaba
+p04: ya estaba
+p05: ya estaba
+p06: ya estaba
+p07: ya estaba
+p08: ya estaba
+p09: ya estaba
+p10: hecho con gemini-3.8-flash-lite-tts (30.4 s)
+p11: hecho con gemini-3.8-flash-tts (32.0 s)
+p12: hecho con gemini-3.8-flash-tts (32.5 s)
+p13: hecho con gemini-3.8-flash-tts (39.0 s)
+p14: hecho con gemini-3.8-flash-lite-tts (47.8 s)
+cierre: hecho con gemini-3.8-flash-lite-tts (16.4 s)
