@@ -71,7 +71,7 @@ BLOQUES = [
                "por ella."),
      "rotulos": [{"t": 0.0, "dur": 2.6, "negro": True, "texto": "JASON Y LUCÍA|TODO LO QUE SABEMOS"}],
      "nombres": ["jason", "lucía"],
-     "planos": ["T2_18", "LZ_04", "MI_91", "MI_46", "MI_29", "T1_02"],
+     "planos": ["T2_18", "MI_91", "MI_46", "MI_29", "T1_02"],
      "planos_en": [{"en": "jason", "plano": "LZ_02"}, {"en": "lucía", "plano": "MI_32"}]},
 
     # ---------------------------------------------------------------- ACTO I · ELLA
@@ -289,8 +289,8 @@ BLOQUES = [
                "dicho que sea un guiño, pero tampoco hace falta."),
      "rotulos": [{"en": "tommy", "texto": "@TOMMY VERCETTI|VICE CITY (2002)"}],
      "nombres": ["tommy", "camisa"],
-     "planos": ["MI_40", "MI_75", "@Vice_City_2002:1"],
-     "planos_en": [{"en": "tommy", "plano": "@Vice_City_2002"}, {"en": "camisa", "plano": "MI_39"}]},
+     "planos": ["MI_40", "VCA_Tommy_Yate", "MI_75"],
+     "planos_en": [{"en": "jason", "plano": "MI_39"}, {"en": "tommy", "plano": "VCA_Tommy_Lance"}, {"en": "dos", "plano": "VCC_Tommy_Lance_Orig"}]},
 
     {"id": "e2", "num": None, "titulo": "", "overlay": "", "capitulo": "Una cara de GTA Online",
      "texto": ("El segundo: en la mirada extendida aparece Valentina, un personaje que ya conocían los jugadores de "
