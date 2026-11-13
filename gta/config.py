@@ -43,6 +43,10 @@ MAX_NOTICIAS_MANANA = 3
 MAX_NOTICIAS_TARDE = 2
 DATOS_EN_COLA = 3            # datos pendientes (por revisar o aprobados) que tiene que haber siempre (3 publicaciones al día)
 
+# Radar de virales (fase 1, 13 nov 2026): un vídeo entra si tiene ≥ 3 veces la mediana de su canal y ≥ 10.000 vistas
+RADAR_MULT_MIN = 3
+RADAR_VISTAS_MIN = 10_000
+
 UA = "LeonidaAlDiaBot/1.0 (cuenta de fans de GTA 6; https://www.youtube.com/@leonidaaldia) GitHubActions"
 
 FUENTES_RSS = [
