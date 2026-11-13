@@ -1,0 +1,21 @@
+Duración: 494.2 s (8:14)
+Tamaño: 344 MB (alta calidad), 77 MB (previa en partes de 5 min)
+Tiempo de montaje: 1483 s
+
+hook: voz 22.2 s, 9 planos, subtítulos por Whisper
+p01: voz 30.3 s, 11 planos, subtítulos por Whisper
+p02: voz 17.4 s, 8 planos, subtítulos por Whisper
+p03: voz 22.2 s, 9 planos, subtítulos por Whisper
+p04: voz 22.8 s, 10 planos, subtítulos por Whisper
+p05: voz 35.4 s, 14 planos, subtítulos por Whisper
+p06: voz 29.0 s, 11 planos, subtítulos por Whisper
+p07: voz 30.4 s, 12 planos, subtítulos por Whisper
+p08: voz 33.9 s, 13 planos, subtítulos por Whisper
+p09: voz 21.5 s, 9 planos, subtítulos por Whisper
+p10: voz 22.4 s, 10 planos, subtítulos por Whisper
+p11: voz 51.2 s, 19 planos, subtítulos por Whisper
+p12: voz 28.2 s, 11 planos, subtítulos por Whisper
+p13: voz 28.9 s, 11 planos, subtítulos por Whisper
+p14: voz 28.1 s, 11 planos, subtítulos por Whisper, canción «Love Is a Long Road» en 7:05, canción «Hot Together» en 7:18
+p15: voz 26.7 s, 7 planos, subtítulos por Whisper
+cierre: voz 17.3 s, 5 planos, subtítulos por Whisper

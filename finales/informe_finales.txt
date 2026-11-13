@@ -1,0 +1,17 @@
+hook: bien · guion «hago una pregunta.» · oído «hago una pregunta.» · recortado 0.23 s
+p01: bien · guion «en GTA III.» · oído «en GTA 3.» · recortado 0.16 s
+p02: bien · guion «mapa, y seguimos.» · oído «mapa y seguimos.» · recortado 0.30 s
+p03: bien · guion «cuentan sus cosas.» · oído «cuentan sus cosas.» · recortado 0.20 s
+p04: bien · guion «uno por emisora.» · oído «uno por emisora.» · recortado 0.24 s
+p05: bien · guion «y tan exacta.» · oído «y tan exacta.» · recortado 0.22 s
+p06: bien · guion «de sus emisoras.» · oído «de sus emisoras.» · recortado 0.26 s
+p07: bien · guion «nunca se calle.» · oído «nunca se calle.» · recortado 0.00 s
+p08: bien · guion «voz al micrófono.» · oído «voz al micrófono.» · recortado 0.16 s
+p09: bien · guion «por las licencias.» · oído «por las licencias.» · recortado 0.14 s
+p10: bien · guion «entender la ciudad.» · oído «entender la ciudad.» · recortado 0.19 s
+p11: bien · guion «ciudad se adapta.» · oído «ciudad se adapta.» · recortado 0.23 s
+p12: bien · guion «siguen sin estar.» · oído «siguen sin estar.» · recortado 0.32 s
+p13: bien · guion «parte del juego.» · oído «parte del juego.» · recortado 0.16 s
+p14: bien · guion «después del tráiler.» · oído «después del trailer.» · recortado 0.23 s
+p15: bien · guion «en el juego.» · oído «en el juego.» · recortado 0.24 s
+cierre: bien · guion «vemos en Leónida.» · oído «vemos en Leónida.» · recortado 0.19 s
