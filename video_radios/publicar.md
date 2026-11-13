@@ -2,6 +2,8 @@
 
 **Publicación:** SUBIDO Y PROGRAMADO el 13 nov: https://youtu.be/ulVMCHXXp5M (privado hasta el lunes 16 de noviembre a las 18:00 de Madrid; lo hizo subir_youtube.yml, con la miniatura A). Calendario aprobado el 13 nov: 5 el 14, 6 el 15, 7 el 16, 8 el 17, 9 el 18 y 10 el 19 de noviembre, día de la salida de GTA VI.
 
+**Hecho en YouTube Studio (13 nov):** experimento A/B «Solo miniatura» con A, B y C (Studio dice que empieza cuando el vídeo sea público) y «Título del juego: Grand Theft Auto VI». Sin avisos de derechos al subirlo.
+
 **Miniatura:** `miniaturas/miniatura_rad.jpg`. Para «Probar y comparar» subir también `miniatura_rad_b.jpg` y `miniatura_rad_c.jpg`.
 
 **Título** (63 caracteres):
