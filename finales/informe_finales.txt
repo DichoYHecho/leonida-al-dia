@@ -1,0 +1,17 @@
+hook: bien · guion «dice por ahí.» · oído «dice por ahí.» · recortado 0.21 s
+p01: bien · guion «robar el coche.» · oído «robar el coche.» · recortado 0.20 s
+p02: bien · guion «apague la música.» · oído «apace la música.» · recortado 0.20 s
+p03: bien · guion «coche de huida.» · oído «coche de vida.» · recortado 0.20 s
+p04: bien · guion «máquina del café.» · oído «máquina del café.» · recortado 0.18 s
+p05: bien · guion «repetir desde entonces.» · oído «repetir desde entonces.» · recortado 0.19 s
+p06: bien · guion «pero con lanzacohetes.» · oído «pero con azacoetes.» · recortado 0.18 s
+p07: bien · guion «aunque no vayas.» · oído «aunque no vayas.» · recortado 0.19 s
+p08: bien · guion «con ellos, cómpralos.» · oído «con ellos comprados.» · recortado 0.20 s
+p09: bien · guion «la segunda temporada.» · oído «la segunda temporada.» · recortado 0.18 s
+p10: bien · guion «fecha. Muy Take-Two.» · oído «fecha, muy TACWW.» · recortado 0.41 s
+p11: bien · guion «el número no.» · oído «el número no.» · recortado 0.17 s
+p12: bien · guion «Esquivada de manual.» · oído «Esquivada de manual.» · recortado 0.17 s
+p13: bien · guion «es letra pequeña.» · oído «es letra pequeña.» · recortado 0.18 s
+p14: bien · guion «las tres, desconfía.» · oído «las tres, desconfía.» · recortado 0.18 s
+p_post: bien · guion «es la pregunta.» · oído «cambias la pregunta.» · recortado 0.17 s
+cierre: bien · guion «vemos en Leónida.» · oído «vemos en leónita.» · recortado 0.19 s
