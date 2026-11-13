@@ -188,6 +188,7 @@ BLOQUES = [
     # ---------------------------------------------------------------- ACTO III · EL CAMBIO Y EL SUSTO (2020-2022)
     {"id": "p08", "num": 8, "total": T, "titulo": "2020-2023 · DAN HOUSER SE VA", "capitulo": "2020-2023 · Dan Houser se va",
      "overlay": "", "anio": 2020, "etiqueta_linea": "2020 · HOUSER",
+     "final_revisado": True,  # 12 nov: Whisper oye «frente de Jarroxdar» por «Rockstar»; el final está entero
      "cartela": {"anio": "2020", "acto": "ACTO III", "titulo": "EL CAMBIO Y EL SUSTO"},
      "texto": ("En febrero de dos mil veinte, Take-Two anuncia algo que casi nadie esperaba: Dan Houser deja Rockstar. Es "
                "cofundador de la empresa y el guionista principal de GTA V y de Red Dead Redemption dos. Según la prensa, "

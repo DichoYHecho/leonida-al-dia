@@ -141,6 +141,7 @@ BLOQUES = [
     # ---------------------------------------------------------------- ACTO III · LOS TRIBUNALES (2005-2008)
     {"id": "p04", "num": 4, "total": T, "titulo": "2005 · HOT COFFEE Y LA AO", "capitulo": "2005 · Hot Coffee",
      "overlay": "", "anio": 2005, "cartela": {"anio": "2005", "acto": "ACTO III", "titulo": "LOS TRIBUNALES"},
+     "final_revisado": True,  # 13 nov: Whisper corta en «Y todo acaban»; oído entero: «Y todo acaba en un acuerdo.»
      "texto": ("2005. San Andreas está en todas las tiendas. Y un aficionado descubre algo escondido en el código: un "
                "minijuego de contenido sexual, Hot Coffee. Estaba en el disco, pero bloqueado; un mod, una modificación de "
                "terceros, lo desbloquea. El veinte de julio, la ESRB, el organismo que pone las clasificaciones en Estados "
@@ -325,6 +326,7 @@ BLOQUES = [
      "planos_en": [{"en": "septiembre", "plano": "NUEVO_Pantalla_Texto_Hack"}]},
     {"id": "p15", "num": 15, "total": T, "titulo": "2026 · EL DEBATE SOBRE GTA VI",
      "capitulo": "2026 · El debate sobre GTA VI", "overlay": "", "anio": 2026,
+     "final_revisado": True,  # 13 nov: la última frase está entera (36,2-37,9 s); el «No» que oye Whisper es una respiración
      "texto": ("Y llegamos a hoy. GTA VI sale el diecinueve de noviembre, con Vice City otra vez como telón de fondo. Y la "
                "prensa debate tres cosas. La primera: cómo se retratan las comunidades de la ciudad, algo que ya se discutió "
                "con la demanda haitiana. La segunda: hasta dónde llega la sátira. La tercera: el papel de la polémica en el "
