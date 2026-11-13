@@ -291,10 +291,10 @@ BLOQUES = [
      "texto": ("Tres extra de regalo. El primero: en una captura oficial, Jason posa delante del hotel Ocean View con "
                "una camisa que recuerda muchísimo a la de Tommy Vercetti en el Vice City de dos mil dos. Rockstar no ha "
                "dicho que sea un guiño, pero tampoco hace falta."),
-     "rotulos": [{"en": "tommy", "texto": "@TOMMY VERCETTI|VICE CITY (2002)"}],
+     "rotulos": [{"en": "camisa", "texto": "@TOMMY VERCETTI|VICE CITY (2002)"}],
      "nombres": ["tommy", "camisa"],
-     "planos": ["VCA_Tommy_Yate", "MI_40"],
-     "planos_en": [{"en": "jason", "plano": "MI_39"}, {"en": "tommy", "plano": "VCA_Tommy_Lance"}, {"en": "dos", "plano": "VCC_Tommy_Lance_Orig"}]},
+     "planos": ["VCA_Tommy_Yate", "VCA_Calle", "VCC_Moto_Orig", "VCA_Tommy_Bar", "MI_40"],
+     "planos_en": [{"en": "jason", "plano": "MI_39"}, {"en": "camisa", "plano": "VCA_Tommy_Lance"}, {"en": "dos", "plano": "VCC_Tommy_Lance_Orig"}]},
 
     {"id": "e2", "num": None, "titulo": "", "overlay": "", "capitulo": "Una cara de GTA Online",
      "texto": ("El segundo: en la mirada extendida aparece Valentina, un personaje que ya conocían los jugadores de "
