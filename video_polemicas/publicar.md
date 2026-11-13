@@ -1,6 +1,6 @@
 # Vídeo 6 · Texto para YouTube (listo para pegar)
 
-**Publicación:** domingo 15 de noviembre de 2026 (programar en YouTube Studio). Calendario aprobado el 13 nov: 5 el 14, 6 el 15, 7 el 16, 8 el 17, 9 el 18 y 10 el 19 de noviembre, día de la salida de GTA VI.
+**Publicación:** SUBIDO Y PROGRAMADO el 13 nov: https://youtu.be/cU0FaBkNkqU (privado hasta el domingo 15 de noviembre a las 18:00 de Madrid; lo hizo subir_youtube.yml, con la miniatura A). Calendario aprobado el 13 nov: 5 el 14, 6 el 15, 7 el 16, 8 el 17, 9 el 18 y 10 el 19 de noviembre, día de la salida de GTA VI.
 
 **Miniatura:** `miniaturas/miniatura_pol.jpg`. Para «Probar y comparar» subir también `miniatura_pol_b.jpg` y `miniatura_pol_c.jpg`.
 
