@@ -259,7 +259,7 @@ BLOQUES = [
      "planos_en": [{"en": "sientas", "plano": "Mirada_Terraza"}, {"en": "arthur", "plano": "RDR2@25.6+3.4"},
                    {"en": "sientas", "plano": "MI_30"}, {"en": "piso", "plano": "MI_36"}, {"en": "escaleras", "plano": "MI_129"}]},
 
-    {"id": "p13b", "num": None, "titulo": "", "overlay": "", "capitulo": "Ochenta horas con ellos",
+    {"id": "p13b", "final_revisado": True, "num": None, "titulo": "", "overlay": "", "capitulo": "Ochenta horas con ellos",
      "texto": ("¿Y cuánto tiempo vamos a pasar con esta pareja? Nelson le contó al New York Times que su última "
                "partida, en febrero, le llevó unas ochenta horas, con la historia principal y algunos objetivos "
                "opcionales que cambian cosas de la trama. Ojo: es la partida de una persona, no una duración oficial. "
