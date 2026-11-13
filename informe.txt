@@ -1,0 +1,22 @@
+Duración: 604.9 s (10:05)
+Tamaño: 404 MB (alta calidad), 90 MB (previa en partes de 5 min)
+Tiempo de montaje: 2332 s
+
+hook: voz 23.4 s, 9 planos, subtítulos por Whisper
+p01: voz 46.5 s, 15 planos, subtítulos por Whisper
+p02: voz 37.5 s, 14 planos, subtítulos por Whisper
+p03: voz 28.7 s, 13 planos, subtítulos por Whisper
+p04: voz 42.3 s, 15 planos, subtítulos por Whisper
+p05: voz 31.8 s, 10 planos, subtítulos por Whisper
+p06: voz 24.8 s, 8 planos, subtítulos por Whisper
+p07: voz 39.3 s, 15 planos, subtítulos por Whisper
+p08: voz 29.2 s, 10 planos, subtítulos por Whisper
+p09: voz 25.2 s, 10 planos, subtítulos por Whisper
+p10: voz 35.3 s, 13 planos, subtítulos por Whisper
+p11: voz 32.8 s, 12 planos, subtítulos por Whisper
+p12: voz 27.6 s, 10 planos, subtítulos por Whisper
+p13: voz 35.9 s, 10 planos, subtítulos por Whisper
+p14: voz 21.8 s, 8 planos, subtítulos por Whisper
+p15: voz 33.6 s, 12 planos, subtítulos por Whisper
+p16: voz 26.8 s, 9 planos, subtítulos por Whisper
+cierre: voz 31.9 s, 10 planos, subtítulos por Whisper
