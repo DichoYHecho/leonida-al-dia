@@ -1,0 +1,16 @@
+hook: bien · guion «ha cambiado nunca.» · oído «ha cambiado nunca.» · recortado 0.27 s
+p01: bien · guion «un camino marcado.» · oído «un camino marcado.» · recortado 0.23 s
+p02: bien · guion «soltará esa idea.» · oído «no soltaras idea.» · recortado 0.17 s
+p03: bien · guion «te veía venir.» · oído «ciudad debía venir.» · recortado 0.35 s
+p04: bien · guion «que al principio.» · oído «que al principio.» · recortado 0.17 s
+p05: bien · guion «tele para existir.» · oído «tele para existir.» · recortado 0.14 s
+p06: bien · guion «de vista, tampoco.» · oído «tuve vista tampoco.» · recortado 0.25 s
+p07: bien · guion «teniendo vida propia.» · oído «teniendo vida propia.» · recortado 0.34 s
+p08: bien · guion «a la vez.» · oído «a la vez.» · recortado 0.25 s
+p09: bien · guion «precisamente un ejemplo.» · oído «precisamente un ejemplo.» · recortado 0.22 s
+p10: bien · guion «encontrar un avión.» · oído «encontrar una avión.» · recortado 0.21 s
+p11: bien · guion «sitios donde perderse.» · oído «ítios donde perdarse.» · recortado 0.19 s
+p12: bien · guion «dice por escrito.» · oído «dice por escrito.» · recortado 0.00 s
+p13: REVISAR · guion «sabremos el diecinueve.» · oído «sabremos el 19.» · recortado 0.17 s
+p14: bien · guion «mantiene las cuatro.» · oído «mantiene las cuatro.» · recortado 0.12 s
+cierre: bien · guion «vemos en Leónida.» · oído «vemos en Leónida.» · recortado 0.15 s
