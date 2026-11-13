@@ -21,6 +21,10 @@ from fuentes_vc import FUENTES as _FUENTES_VC  # noqa: E402  (Vice City 2002, ra
 
 VIDEOS_EXTRA.update({k: v["url"] for k, v in _FUENTES_SG.items() if k not in VIDEOS_EXTRA})
 VIDEOS_EXTRA.update({k: v["url"] for k, v in _FUENTES_VC.items() if k not in VIDEOS_EXTRA})
+VIDEOS_EXTRA.update({  # planos de Tommy (VCA_..., VCC_... de trozos_vc.csv), como en guion_vc.py
+    "VC_Aniv": "https://videos-rockstargames-com.akamaized.net/v4/tror41c2/flv/en-us-720p.mp4",
+    "VC_Comp": "https://videos-rockstargames-com.akamaized.net/v4/ao1c441c/flv/en-us-1080p60.mp4",
+})
 
 RECORTES = {k: 0.075 for k in _FUENTES_SG if k.startswith(("V_Juego", "ON_Juego"))}  # marca de agua arriba
 MARCO = True       # partidas antiguas de 360p: en un marco sobre una copia borrosa
