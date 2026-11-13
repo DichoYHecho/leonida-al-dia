@@ -1,0 +1,80 @@
+name: Radar de virales (GTA 6)
+
+# Fase 1 del método viral (docs/fase1_radar.md). Los datos van a la rama «radar-datos» (radar/ultimo.md).
+# Cupo: máx. 6 búsquedas y 2.000 unidades de YouTube al día (lo cuenta gta/radar.py) y 1 llamada de texto a Gemini.
+on:
+  schedule:
+    - cron: "0 6 * * *"     # 07:00 en Madrid en invierno (08:00 en verano)
+  workflow_dispatch:
+  # Pruebas mientras el archivo no esté en main (cron y botón solo funcionan desde main): se lanza al subir a «radar»
+  push:
+    branches: [radar]
+    paths:
+      - gta/radar.py
+      - gta/config.py
+      - .github/workflows/radar.yml
+
+concurrency:
+  group: radar
+  cancel-in-progress: false
+
+permissions:
+  contents: write   # solo para guardar los datos en la rama radar-datos
+
+jobs:
+  radar:
+    if: github.event_name != 'schedule' || vars.ACTIVO == 'si'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+      GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+      GOOGLE_YT_REFRESH_TOKEN: ${{ secrets.GOOGLE_YT_REFRESH_TOKEN }}
+      YT_API_KEY: ${{ secrets.YT_API_KEY }}   # de reserva: solo se usa si el permiso del canal no sirve
+      RADAR_DIR: ${{ github.workspace }}/datos/radar
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+      - run: pip install -q requests==2.34.2
+
+      - name: Traer los datos de días anteriores (rama radar-datos)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p datos && cd datos
+          git init -q
+          git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          if git ls-remote --exit-code --heads origin radar-datos >/dev/null; then
+            git fetch -q --depth 1 origin radar-datos
+            git checkout -q -b radar-datos FETCH_HEAD
+            echo "Datos anteriores: $(ls radar 2>/dev/null | wc -l) archivos"
+          else
+            git checkout -q --orphan radar-datos
+            echo "La rama radar-datos aún no existe: se crea"
+          fi
+
+      - name: Buscar los virales del día
+        run: python gta/radar.py
+
+      - name: Guardar en la rama radar-datos
+        if: always()
+        run: |
+          cd datos
+          [ -d radar ] || { echo "Nada que guardar"; exit 0; }
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add radar
+          if git diff --cached --quiet; then echo "Sin cambios"; exit 0; fi
+          git commit -q -m "Radar $(TZ=Europe/Madrid date +%F) (run ${GITHUB_RUN_ID})"
+          git push -q origin radar-datos
+          echo "Guardado en radar-datos: https://github.com/${GITHUB_REPOSITORY}/blob/radar-datos/radar/ultimo.md"
+
+      - name: Avisar en Airtable si algo ha fallado
+        if: failure() && github.event_name == 'schedule'
+        env:
+          AIRTABLE_TOKEN: ${{ secrets.AIRTABLE_TOKEN }}
+          TAREA: ${{ github.workflow }}
+        run: python gta/aviso.py
