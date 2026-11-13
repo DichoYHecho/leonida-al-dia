@@ -288,7 +288,7 @@ BLOQUES = [
                  {"en": "Rockstar", "texto": "ROCKSTAR|REHECHO DESDE CERO"}],
      "nombres": ["Santos"],
      "canciones": [],
-     "planos": ["@GTA5_2013:7", "@SA_2004:6"],
+     "planos": ["@GTA5_2013:7", "@GTA5_Oficial_810:4", "@GTA_Online:2"],
      "planos_en": [{"en": "Game", "plano": "N8_Captura_GI_GTA5"},
                    {"en": "Santos", "plano": "@GTA5_2013"}]},
 

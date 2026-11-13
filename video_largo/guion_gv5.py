@@ -264,7 +264,7 @@ BLOQUES = [
                  {"en": "consolas", "texto": "3 CONSOLAS|= 3 UNIDADES"}],
      "nombres": [],
      "canciones": [],
-     "planos": ["@GTA5_2013:3", "@Historia_GTA:3", "@GTA4_2008:2", "@GTA6_Mirada:2"],
+     "planos": ["@GTA5_2013:3", "@GTA_Online:4", "@GTA6_Mirada:2"],
      "planos_en": [{"en": "sold-in", "plano": "@GTA5_2013"}]},
     {"id": "p13", "num": 13,"total": T, "titulo": "LA SAGA SIN TOTAL", "capitulo": "La saga, sin total oficial",
      "overlay": "", "anio": 2026,
