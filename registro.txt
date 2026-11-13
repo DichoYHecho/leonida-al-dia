@@ -1,0 +1,162 @@
+Voz de hook
+  hook: chasquido al final quitado (0.10 s)
+  Última palabra a los 22.38 s; corte en 22.54 s
+  Final de la voz recuperado: 0.22 s
+  22.3 s (final recortado 0.21 s)
+Voz de p01
+  p01: chasquido al final quitado (0.10 s)
+  Última palabra a los 22.58 s; corte en 22.88 s
+  Final de la voz recuperado: 0.23 s
+  22.8 s (final recortado 0.00 s)
+Voz de p02
+  p02: chasquido al final quitado (0.10 s)
+  Última palabra a los 28.90 s; corte en 29.01 s
+  Final de la voz recuperado: 0.24 s
+  28.8 s (final recortado 0.19 s)
+Voz de p03
+  p03: chasquido al final quitado (0.10 s)
+  Última palabra a los 16.78 s; corte en 16.98 s
+  Final de la voz recuperado: 0.10 s
+  16.7 s (final recortado 0.22 s)
+Voz de p04
+  p04: chasquido al final quitado (0.15 s)
+  Última palabra a los 24.78 s; corte en 24.95 s
+  24.7 s (final recortado 0.30 s)
+Voz de p05
+  p05: chasquido al final quitado (0.15 s)
+  Última palabra a los 24.14 s; corte en 24.48 s
+  24.1 s (final recortado 0.17 s)
+Voz de p06
+  p06: chasquido al final quitado (0.10 s)
+  Última palabra a los 16.04 s; corte en 16.22 s
+  15.8 s (final recortado 0.13 s)
+Voz de p07
+  p07: chasquido al final quitado (0.10 s)
+  Última palabra a los 18.86 s; corte en 19.17 s
+  Final de la voz recuperado: 0.27 s
+  18.7 s (final recortado 0.13 s)
+Voz de p07b
+  p07b: chasquido al final quitado (0.15 s)
+  Última palabra a los 27.78 s; corte en 27.90 s
+  Final de la voz recuperado: 0.17 s
+  27.7 s (final recortado 0.30 s)
+Voz de p08
+  p08: chasquido al final quitado (0.10 s)
+  Última palabra a los 34.82 s; corte en 34.97 s
+  Final marcado como revisado en el guion: no se para el montaje
+  34.6 s (final recortado 0.13 s)
+Voz de p09
+  p09: chasquido al final quitado (0.10 s)
+  Última palabra a los 22.24 s; corte en 22.43 s
+  21.9 s (final recortado 0.17 s)
+Voz de p10
+  p10: chasquido al final quitado (0.10 s)
+  Última palabra a los 38.70 s; corte en 38.87 s
+  Final de la voz recuperado: 0.36 s
+  38.7 s (final recortado 0.00 s)
+Voz de p11
+  p11: chasquido al final quitado (0.10 s)
+  Última palabra a los 33.80 s; corte en 33.94 s
+  33.5 s (final recortado 0.31 s)
+Voz de p11b
+  p11b: chasquido al final quitado (0.10 s)
+  Última palabra a los 18.38 s; corte en 18.51 s
+  18.2 s (final recortado 0.14 s)
+Voz de p12
+  p12: chasquido al final quitado (0.15 s)
+  Última palabra a los 30.56 s; corte en 30.78 s
+  30.6 s (final recortado 0.00 s)
+Voz de p13
+  p13: chasquido al final quitado (0.15 s)
+  Última palabra a los 25.48 s; corte en 25.66 s
+  25.4 s (final recortado 0.14 s)
+Voz de p13b
+  p13b: chasquido al final quitado (0.10 s)
+  Final marcado como revisado en el guion: no se para el montaje
+  18.2 s (final recortado 0.00 s)
+Voz de p14
+  p14: chasquido al final quitado (0.15 s)
+  Última palabra a los 20.72 s; corte en 20.83 s
+  Final de la voz recuperado: 0.53 s
+  20.8 s (final recortado 0.00 s)
+Voz de e1
+  e1: chasquido al final quitado (0.15 s)
+  Última palabra a los 12.36 s; corte en 12.54 s
+  12.1 s (final recortado 0.46 s)
+Voz de e2
+  e2: chasquido al final quitado (0.10 s)
+  Última palabra a los 16.54 s; corte en 17.04 s
+  16.9 s (final recortado 0.21 s)
+Voz de e3
+  e3: chasquido al final quitado (0.15 s)
+  Última palabra a los 17.74 s; corte en 17.85 s
+  17.7 s (final recortado 0.15 s)
+Voz de cierre
+  cierre: chasquido al final quitado (0.10 s)
+  Última palabra a los 15.00 s; corte en 15.15 s
+  14.9 s (final recortado 0.20 s)
+hook: bien · guion «empezamos por ella.» · oído «empezamos por ella.» · recortado 0.21 s
+p01: bien · guion «Ya quisieran muchos.» · oído «aquí serán muchos.» · recortado 0.00 s
+p02: bien · guion «de todo esto.» · oído «de todo esto.» · recortado 0.19 s
+p03: bien · guion «va a pesar.» · oído «va a pesar.» · recortado 0.22 s
+p04: bien · guion «la puerta grande.» · oído «la puerta grande.» · recortado 0.30 s
+p05: bien · guion «Nosotros, todavía no.» · oído «Nosotros, todavía no.» · recortado 0.17 s
+p06: bien · guion «De ellos dos.» · oído «De ellos dos.» · recortado 0.13 s
+p07: bien · guion «vigila a todos.» · oído «vigila a todos.» · recortado 0.13 s
+p07b: bien · guion «Jason y Lucía.» · oído «de Jason Ylucía.» · recortado 0.30 s
+p08: bien · guion «sesenta y cinco.» · oído «quedó en 365.» · recortado 0.13 s
+p09: bien · guion «siete años esperándonos.» · oído «siete años esperándonos.» · recortado 0.17 s
+p10: bien · guion «Nada de ChatGPT.» · oído «de chagy pity.» · recortado 0.00 s
+p11: bien · guion «GTA, la verdad.» · oído «GTA, la verdad.» · recortado 0.31 s
+p11b: bien · guion «por ahí liándola.» · oído «por ahí liándala.» · recortado 0.14 s
+p12: bien · guion «cara. Ojeras incluidas.» · oído «cara. Ojeras incluidas.» · recortado 0.00 s
+p13: bien · guion «la de Arthur.» · oído «la de Arthur.» · recortado 0.14 s
+p13b: bien · guion «te caigan bien.» · oído «te cae cambié.» · recortado 0.00 s
+p14: bien · guion «quién quieres ver.» · oído «quien quieres ver.» · recortado 0.00 s
+e1: bien · guion «tampoco hace falta.» · oído «tampoco hace falta.» · recortado 0.46 s
+e2: bien · guion «a GTA VI.» · oído «a GTA 6.» · recortado 0.21 s
+e3: bien · guion «también en Leónida.» · oído «también en Leónida.» · recortado 0.15 s
+cierre: bien · guion «vemos en Leónida.» · oído «vemos en Leónida.» · recortado 0.20 s
+Duración total prevista: 534.6 s (8:55)
+Bajando T1
+Bajando MI
+Bajando G1_Demo2
+Bajando G1_PS
+Bajando LZ
+Bajando Mirada
+Bajando RDR2
+Bajando T2
+Bajando VC_Aniv
+Bajando VC_Comp
+Bajando V_Juego_1
+Bajando V_Juego_2
+Bajando V_Juego_4
+138 planos cortados (940 s)
+Música: 0:00 synthwave, 0:23 hiphop, 2:02 breakbeat, 3:34 synthwave, 5:48 breakbeat, 7:24 hiphop
+Vídeo final listo (2402 s)
+Duración: 534.6 s (8:55)
+Tamaño: 872 MB (alta calidad), 106 MB (previa en partes de 5 min)
+Tiempo de montaje: 2757 s
+
+hook: voz 22.3 s, 5 planos, subtítulos por Whisper
+p01: voz 22.8 s, 7 planos, subtítulos por Whisper
+p02: voz 28.8 s, 7 planos, subtítulos por Whisper
+p03: voz 16.7 s, 4 planos, subtítulos por Whisper
+p04: voz 24.7 s, 6 planos, subtítulos por Whisper
+p05: voz 24.1 s, 7 planos, subtítulos por Whisper
+p06: voz 15.8 s, 5 planos, subtítulos por Whisper
+p07: voz 18.7 s, 7 planos, subtítulos por Whisper
+p07b: voz 27.7 s, 9 planos, subtítulos por Whisper
+p08: voz 34.6 s, 8 planos, subtítulos por Whisper
+p09: voz 21.9 s, 7 planos, subtítulos por Whisper
+p10: voz 38.7 s, 9 planos, subtítulos por Whisper
+p11: voz 33.5 s, 6 planos, subtítulos por Whisper
+p11b: voz 18.2 s, 4 planos, subtítulos por Whisper
+p12: voz 30.6 s, 7 planos, subtítulos por Whisper
+p13: voz 25.4 s, 7 planos, subtítulos por Whisper
+p13b: voz 18.2 s, 5 planos, subtítulos por Whisper
+p14: voz 20.8 s, 7 planos, subtítulos por Whisper
+e1: voz 12.1 s, 8 planos, subtítulos por Whisper
+e2: voz 16.9 s, 4 planos, subtítulos por Whisper
+e3: voz 17.7 s, 4 planos, subtítulos por Whisper
+cierre: voz 14.9 s, 5 planos, subtítulos por Whisper
