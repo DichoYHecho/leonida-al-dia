@@ -19,7 +19,7 @@ RECORTES = {}
 MARCO = True
 
 PLANOS_FIJOS = {"N9_Captura_GameInformer_Records", "N9_Captura_MCV_45M", "N9_Captura_Transcripcion_Sold_In",
-                "N9_Captura_Webull_230_Agosto", "N9_Portada_GTA5_Commons", "NUEVO_Reediciones_Logos",
+                "N9_Captura_Webull_230_Agosto", "N9_Logo_GTA5", "NUEVO_Reediciones_Logos",
                 "NUEVO_Cuentas_TakeTwo", "NUEVO_Zelnick_Captura", "NUEVO_Estanteria_Tienda", "VL_Fecha"}
 
 # Música: sin pistas con licencia; solo música de fondo generada en el montaje
@@ -68,8 +68,8 @@ BLOQUES = [
                  {"en": "diecinueve", "texto": "19 NOV 2026|LLEGA GTA VI"}],
      "nombres": ["Ochocientos"],
      "canciones": [],
-     "planos": ["N9_Portada_GTA5_Commons", "@GTA5_2013:4", "@Historia_GTA:2", "@GTA6_Mirada:2"],
-     "planos_en": [{"en": "Ochocientos", "plano": "N9_Portada_GTA5_Commons"},
+     "planos": ["N9_Logo_GTA5", "@GTA5_2013:4", "@Historia_GTA:2", "@GTA6_Mirada:2"],
+     "planos_en": [{"en": "Ochocientos", "plano": "N9_Logo_GTA5"},
                    {"en": "diecinueve", "plano": "@GTA6_Mirada"}]},
 
     # ---------------------------------------------------------------- ACTO I · EL LANZAMIENTO (2013)
@@ -107,7 +107,7 @@ BLOQUES = [
                "millones en tres días, algo que Take-Two ya había anunciado el veinte de septiembre con un titular que "
                "no necesitaba adjetivos. Tres días. El juego salió un martes: no le dio tiempo ni a llegar al primer fin "
                "de semana. Eso sí, esto son dólares, no jugadores. Guinness publicó también una cifra de copias del "
-               "primer día, pero Take-Two nunca la confirmó, así que aquí no la vamos a repetir. Una cifra sin nadie que "
+               "primer día, pero, según la prensa de entonces, Take-Two no la confirmó, así que aquí no la vamos a repetir. Una cifra sin nadie que "
                "la firme se queda fuera, por bonita que sea."),
      "rotulos": [{"en": "ochocientos", "texto": "815,7 M $|PRIMER DÍA"},
                  {"en": "tres", "texto": "1.000 M $|EN TRES DÍAS"},

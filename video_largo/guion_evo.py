@@ -181,7 +181,7 @@ BLOQUES = [
      "canciones": [],
      "planos": ["@GTA2_1999:13", "@GTA1_1997:6"],
      "planos_en": [{"en": "Anywhere", "plano": "@GTA2_1999"},
-                   {"en": "respeto", "plano": "N8_Captura_GTA2_Respeto"}]},
+                   {"en": "respeto", "plano": "@GTA2_1999"}]},
 
     # ---------------------------------------------------------------- ACTO II · LA CALLE EN 3D (2001-2004)
     {"id": "p03", "num": 3, "total": T, "titulo": "2001 · GTA III", "capitulo": "2001 · GTA III", "overlay": "",

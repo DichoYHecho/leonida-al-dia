@@ -56,3 +56,14 @@ Fotos de Wikimedia Commons del vídeo 7 (hay que citarlas en su descripción; re
 | NUEVO_Dr_Dre_Estudio.jpg | https://commons.wikimedia.org/wiki/File:Mixing_at_Jackpot!_Recording_Studio_(Portland,_Oregon).jpg | VACANT FEVER | CC BY-SA 2.0 |
 
 Texto para la descripción del vídeo 7: Fotos: «CONELRAD car radio», Feddacheenee (CC BY-SA 3.0); «Penwith Radio studio», M4th5 (CC BY-SA 3.0); «Mixing at Jackpot! Recording Studio», VACANT FEVER (CC BY-SA 2.0); Wikimedia Commons. Capturas: Rockstar Games (web de GTA VI).
+## Vídeos 8-10 (13 nov 2026)
+
+Fotos de Wikimedia Commons:
+
+| Archivo | Original | Autor | Licencia |
+|---|---|---|---|
+| N8_Foto_Monitor_CRT.jpg | https://commons.wikimedia.org/wiki/File:SGI_Indigo_Workstation_Computer_(1990s)_with_large_CRT_monitor_displaying_a_window_of_IRIX_operating_system.jpg | Wolfgang Stief | CC0 (no exige cita) |
+
+Imágenes oficiales de Rockstar Games (Newswire), solo como cita breve: N9_GTA5_Oficial_01…20.jpg (entrada «Out Now: The Cayo Perico Heist», 15 dic 2020) y N10_GTAO_Oficial_01…08.jpg (entrada «The Kortz Center Heist Now Available in GTA Online», 14 jul 2026). La URL original de cada una está en la columna «Notas» de trozos_810_gv5.csv y trozos_810_onl.csv.
+N9_Logo_GTA5.png: logo oficial de GTA V (SVG de rockstargames.com) sobre negro.
+Capturas web N8_/N9_/N10_Captura_*: hechas con capturar_810.py el 13 nov 2026; la URL de cada una está en su fila del CSV.
