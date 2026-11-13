@@ -1,4 +1,4 @@
-# Vídeo 7 · Texto para YouTube (BORRADOR: faltan los tiempos del montaje final)
+# Vídeo 7 · Texto para YouTube (listo para pegar)
 
 **Publicación:** lunes 16 de noviembre de 2026 (programar en YouTube Studio). Calendario aprobado el 13 nov: 5 el 14, 6 el 15, 7 el 16, 8 el 17, 9 el 18 y 10 el 19 de noviembre, día de la salida de GTA VI.
 
@@ -13,24 +13,24 @@ Repasamos todas las radios de GTA, de 1997 a GTA VI: la música original de GTA 
 
 ¿Cuál es tu radio favorita de GTA? Déjala en los comentarios, que quiero ver cuál gana.
 
-Capítulos (PROVISIONALES: copiar los de `capitulos.txt` del montaje final):
+Capítulos:
 0:00 Introducción
-0:28 1997 · GTA 1
-1:02 1999 · GTA 2
-1:25 2001 · GTA III
-2:00 2002 · Vice City
-2:38 2001-2004 · Los anuncios
-3:18 2004 · San Andreas
-3:57 2005-2006 · Las portátiles
-4:28 2004-2008 · Las radios de charla
-5:08 2008 · GTA IV
-5:35 2013 · GTA V
-6:04 2013-2021 · La radio que eliges
-6:52 2018 · Las licencias
-7:19 2021-2022 · The Contract
-7:50 2023-2026 · Los tráileres
-8:21 2026 · Las radios de GTA VI
-8:43 De 1997 a 2026
+0:23 1997 · GTA 1
+0:56 1999 · GTA 2
+1:14 2001 · GTA III
+1:39 2002 · Vice City
+2:03 2001-2004 · Los anuncios
+2:40 2004 · San Andreas
+3:10 2005-2006 · Las portátiles
+3:42 2004-2008 · Las radios de charla
+4:17 2008 · GTA IV
+4:40 2013 · GTA V
+5:03 2013-2021 · La radio que eliges
+5:56 2018 · Las licencias
+6:27 2021-2022 · The Contract
+6:56 2023-2026 · Los tráileres
+7:27 2026 · Las radios de GTA VI
+7:55 De 1997 a 2026
 
 Música que suena (fragmentos breves de los tráileres oficiales de GTA VI, con comentario):
 - Love Is a Long Road, Tom Petty (tráiler 1 de GTA VI)
@@ -69,5 +69,5 @@ Imagen: `miniatura_rad.jpg`
 La comunidad ha votado: la mejor radio de GTA es [EMISORA], con [N] likes. ¿Te esperabas este resultado?
 
 **Antes de publicar:**
-1. Montaje final con todas las voces de Gemini (las 2 canciones ya están en `leonida-canciones`); copiar los capítulos de `capitulos.txt`. Los de arriba son la estimación con 13 canciones: con 2 el vídeo queda en unos 8 minutos y los tiempos se adelantan.
+1. HECHO el 13 nov: montaje final con todas las voces de Gemini, 8:14 (release `montaje-rad-alta-calidad` → `video_largo.mp4`); capítulos copiados de `capitulos.txt` de la rama `montaje-rad`. Falta verlo entero, sobre todo las dos canciones (7:05 y 7:18) y la voz de p15 (7:27), hecha con otro modelo de Gemini.
 2. Si salta Content ID, seguir la sección 9.4 de `edicion.md`: silenciar o recortar el tramo en YouTube Studio, no borrar el vídeo.
