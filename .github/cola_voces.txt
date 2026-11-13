@@ -7,4 +7,4 @@ videos-5-7 guion_13a
 videos-5-7 guion_rad
 videos-8-10 guion_evo
 videos-8-10 guion_gv5
-videos-8-10 guion_onl
+# videos-8-10 guion_onl  (fuera hasta adaptarlo a después del lanzamiento: se publica tras el 19 nov)
