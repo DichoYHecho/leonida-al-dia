@@ -51,6 +51,11 @@ DRY = P.DRY
 FPS, SR = P.FPS, P.SR
 # 14 nov: todos los planos con la misma cadencia, base de tiempo y rango de color, para que el concat no deje huecos
 SEG = ["-r", str(FPS), "-video_track_timescale", "15360", "-color_range", "tv"]
+# 14 nov (3): todo en BT.709 (estándar HD/4K); antes cada plano llevaba una marca de color distinta y el vídeo final
+# heredaba la del primero (bt470bg), con lo que YouTube convertía mal los colores del material 4K
+COLOR = ["-colorspace", "bt709", "-color_primaries", "bt709", "-color_trc", "bt709"]
+SEG += COLOR
+A709 = "scale=out_color_matrix=bt709:out_range=tv"  # RGB (imágenes, png) a YUV con la matriz BT.709
 # 14 nov 2026: el vídeo sale SIEMPRE a 2K (2560x1440) y a pantalla completa, sin marcos ni bandas (pedido del usuario).
 # El grafismo (ASS, degradado, línea de tiempo) sigue diseñado a 1920x1080 (P.W x P.H) y se escala x4/3: libass escala
 # solo desde PlayRes y las capas PNG/MOV se escalan en el grafo final. RESOLUCION=1080 vuelve a 1920x1080.
@@ -154,7 +159,7 @@ def cortar(nombre, t, dur_out, destino, sentido):
         P.run(["ffmpeg", "-y", "-loglevel", "error", "-loop", "1", "-framerate", str(FPS), "-t", f"{dur_out:.2f}",
                "-i", str(fuente(t["video"])), "-vf",
                f"scale={W * 2}:{H * 2}:force_original_aspect_ratio=increase:flags=lanczos,crop={W * 2}:{H * 2},"
-               f"zoompan=z='{zoom}':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=1:s={W}x{H}:fps={FPS},scale=out_range=tv,format=yuv420p,tpad=stop_mode=clone:stop_duration=1",
+               f"zoompan=z='{zoom}':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=1:s={W}x{H}:fps={FPS},{A709},format=yuv420p,tpad=stop_mode=clone:stop_duration=1",
                "-frames:v", str(round(dur_out * FPS)), "-c:v", "libx264", "-crf", "12", "-preset", "veryfast", *SEG, destino])
         return
     lento = t["lento"]
@@ -1383,7 +1388,7 @@ def main():
                            f"{pre_c}scale={W}:{H}:force_original_aspect_ratio=increase,crop={W}:{H},"
                            "gblur=sigma=40,eq=brightness=-0.22:saturation=1.05", png])
                     P.run(["ffmpeg", "-y", "-loglevel", "error", "-loop", "1", "-framerate", str(FPS), "-i", png,
-                           "-frames:v", str(round(DUR_CARTELA * FPS)), "-c:v", "libx264", "-crf", "12", "-preset", "veryfast", *SEG,
+                           "-vf", A709, "-frames:v", str(round(DUR_CARTELA * FPS)), "-c:v", "libx264", "-crf", "12", "-preset", "veryfast", *SEG,
                            "-pix_fmt", "yuv420p", destino])
                     hecho = True
                 except Exception as e:  # noqa: BLE001
@@ -1441,7 +1446,7 @@ def main():
         except Exception as e:  # noqa: BLE001
             print("  pantalla final en azul oscuro:", e, flush=True)
             fuente_final = ["-f", "lavfi", "-i", f"color=c=0x0E1020:s={W}x{H}:r={FPS}"]
-        P.run(["ffmpeg", "-y", "-loglevel", "error", *fuente_final, "-frames:v", str(round((total - fin_bloques + 1) * FPS)),
+        P.run(["ffmpeg", "-y", "-loglevel", "error", *fuente_final, "-vf", A709, "-frames:v", str(round((total - fin_bloques + 1) * FPS)),
                "-c:v", "libx264", "-crf", "14", "-preset", "veryfast", "-pix_fmt", "yuv420p", *SEG, destino])
         lista_concat.append(destino)
     repetidos = comprobar_repetidos(bloques, tb)
@@ -1574,7 +1579,7 @@ def main():
            "-loop", "1", "-framerate", FPS, "-i", TMP / "degradado.png", *(["-i", linea_mov] if linea_mov else []), *ent_cristal,
            "-filter_complex", grafo, "-map", "[v]",
            "-map", "1:a", "-af", "loudnorm=I=-14:TP=-1.5:LRA=11", "-c:v", "libx264", "-crf", "17", "-preset", "medium", "-x264-params", "aq-mode=3",
-           "-pix_fmt", "yuv420p", "-c:a", "aac", "-b:a", "192k", "-ar", SR, "-t", f"{total:.2f}", "-movflags", "+faststart",
+           "-pix_fmt", "yuv420p", *COLOR, "-color_range", "tv", "-c:a", "aac", "-b:a", "192k", "-ar", SR, "-t", f"{total:.2f}", "-movflags", "+faststart",
            final])
     print(f"Vídeo final listo ({time.time() - t0:.0f} s)", flush=True)
     n_final, n_esperado = fotogramas(final), round(total * FPS)
