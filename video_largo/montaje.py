@@ -286,7 +286,10 @@ def alargar_ultimo(b, lista, extra, tb):
     """Sin planos nuevos: el último solo se alarga hasta lo que dura de verdad su trozo (14 nov: alargarlo más
     enseñaba lo que venía después en la fuente). Lo que no se cubre se apunta en b["falta"] y el montaje para."""
     n, d = lista[-1]
-    cabe = max(0.0, tb[n]["dur"] * tb[n]["lento"] - d)
+    if tb[n]["video"].startswith("Imagen:"):  # una imagen fija puede durar más (con el acercamiento lento), hasta 8 s
+        cabe = max(0.0, 8.0 - d)
+    else:
+        cabe = max(0.0, tb[n]["dur"] * tb[n]["lento"] - d)
     lista[-1][1] += min(cabe, extra)
     if extra - cabe > 0.05:
         b["falta"] = b.get("falta", 0) + extra - cabe
