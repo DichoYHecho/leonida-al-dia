@@ -25,6 +25,8 @@ PLANOS_FIJOS = {"GTA_15_01", "Mirada_Logo", "VL_Fecha", "VCA_Logo", "Portada_Ani
                 "IMG_RaceNChase", "IMG_VC_Portada"}
 
 # Música por época (hecha con código en el propio montaje: sin pistas con licencia)
+# 14 nov: estas voces se hicieron con gemini-3.8-flash-tts (suena distinto); se rehacen con flash-lite
+VOZ_REHACER = ["p04", "p15", "cierre"]
 MUSICA = {"hook": "synthwave", "p01": "chiptune", "p03": "breakbeat", "p07": "chiptune", "p09": "hiphop",
           "p12": "synthwave", "p14": "synthwave"}
 

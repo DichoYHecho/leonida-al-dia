@@ -14,6 +14,8 @@ RECORTES = {}
 MARCO = True
 
 # Música por época: cambia con cada cartela (ninguna pista más de 3,5 min)
+# 14 nov: estas voces se hicieron con gemini-3.8-flash-tts (suena distinto); se rehacen con flash-lite
+VOZ_REHACER = ["p05", "p06", "p07", "p08", "p10", "p11"]
 MUSICA = {"hook": "synthwave", "p01": "chiptune", "p06": "breakbeat", "p13": "hiphop", "p17": "synthwave"}
 
 # Línea de tiempo de abajo (años de los bloques; etiqueta_linea por bloque)

@@ -21,6 +21,8 @@ PLANOS_FIJOS = {"GTA_15_01", "GTA_15_02", "GTA_15_03", "IMG_GTA1", "IMG_GTA1_Caj
                 "NUEVO_Captura_Entrevista", "NUEVO_Captura_Disculpa_Rockstar"}
 
 # Música por acto: cambia con cada cartela
+# 14 nov: estas voces se hicieron con gemini-3.8-flash-tts (suena distinto); se rehacen con flash-lite
+VOZ_REHACER = ["p06", "p07", "p08", "p09", "p10", "p11", "p12", "p16", "cierre"]
 MUSICA = {"hook": "synthwave", "p01": "chiptune", "p02": "breakbeat", "p04": "hiphop", "p08": "synthwave",
           "p13": "breakbeat"}
 

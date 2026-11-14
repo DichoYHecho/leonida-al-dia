@@ -21,7 +21,9 @@ import importlib  # noqa: E402
 guion_vl = importlib.import_module(os.environ.get("GUION", "guion_vl"))  # guion_vc = vídeo 2 (Vice City)
 
 CLAVE = os.environ.get("GEMINI_API_KEY", "").strip()
-MODELOS = ["gemini-3.8-flash-lite-tts", "gemini-3.8-flash-tts"]
+# 14 nov 2026: SOLO flash-lite. El otro modelo (flash) suena distinto y el usuario lo oyó saltar entre bloques;
+# si flash-lite agota el cupo, el bloque espera al día siguiente. Las voces nuevas se guardan como «<id>_<hash>_lite.wav».
+MODELOS = ["gemini-3.8-flash-lite-tts"]
 VOZ = "Orus"
 ESTILO = (
     "Relaxed, friendly Spanish gaming YouTuber telling a funny story to a friend. "
@@ -54,9 +56,15 @@ def pedir(modelo, texto):
 
 
 def ruta_wav(b):
+    """Voz del bloque. Las nuevas llevan «_lite»; la antigua (sin sufijo) solo vale si el guion no la manda rehacer
+    (VOZ_REHACER: bloques que se hicieron con el otro modelo)."""
     texto = b.get("voz") or b["texto"]
     h = hashlib.sha1((VOZ + ESTILO + texto).encode("utf-8")).hexdigest()[:10]
-    return VOCES / f"{b['id']}_{h}.wav"
+    nueva = VOCES / f"{b['id']}_{h}_lite.wav"
+    vieja = VOCES / f"{b['id']}_{h}.wav"
+    if nueva.exists() or b["id"] in getattr(guion_vl, "VOZ_REHACER", []) or not vieja.exists():
+        return nueva
+    return vieja
 
 
 def main():
@@ -101,7 +109,7 @@ def main():
         if not hecho:
             if not any(x.startswith(b["id"] + ": ERROR") for x in informe):
                 agotado = True
-                informe.append(f"{b['id']}: PENDIENTE (cupo agotado en los dos modelos)")
+                informe.append(f"{b['id']}: PENDIENTE (cupo agotado)")
             else:
                 informe.append(f"{b['id']}: PENDIENTE (falló; se reintenta la próxima vez)")
     # MP3 para escucharlos
