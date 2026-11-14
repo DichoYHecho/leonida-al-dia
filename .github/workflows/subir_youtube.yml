@@ -4,19 +4,22 @@ name: Subir vídeo largo a YouTube (privado y programado)
 # fecha de publicación (publishAt): YouTube lo hace público solo a esa hora. Título, descripción y etiquetas salen del
 # publicar.md del vídeo (rama videos-5-7); la miniatura, la A. No sube dos veces el mismo título.
 # Calendario aprobado: vídeo 5 el 14 nov, 6 el 15, 7 el 16, a las 18:00 de Madrid (17:00 UTC).
-# Vídeos 8 (guion_evo) el 17 nov y 9 (guion_gv5) el 18 nov, misma hora; sus archivos están en la rama videos-8-10.
-# El vídeo 10 (guion_onl) sale después del lanzamiento: se añadirá cuando tenga fecha.
 on:
   workflow_dispatch:
     inputs:
       video:
         description: "Vídeo"
         type: choice
-        options: [guion_13a, guion_pol, guion_rad, guion_evo, guion_gv5]
+        options: [guion_13a, guion_pol, guion_rad]
       prueba:
         description: "Prueba: solo enseñar lo que subiría"
         type: boolean
         default: true
+      accion:
+        description: "subir, o desprogramar (lo deja en privado sin fecha; no borra)"
+        type: choice
+        options: [subir, desprogramar]
+        default: subir
 
 permissions:
   contents: read
@@ -34,10 +37,11 @@ jobs:
       GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
       GOOGLE_YT_REFRESH_TOKEN: ${{ secrets.GOOGLE_YT_REFRESH_TOKEN }}
       PRUEBA: ${{ inputs.prueba && '1' || '0' }}
+      ACCION: ${{ inputs.accion }}
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ (inputs.video == 'guion_evo' || inputs.video == 'guion_gv5') && 'videos-8-10' || 'videos-5-7' }}
+          ref: videos-5-7
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
@@ -48,16 +52,15 @@ jobs:
             guion_13a) echo "carpeta=video_trece_anos" >> "$GITHUB_OUTPUT"; echo "corto=13a" >> "$GITHUB_OUTPUT"; echo "cuando=2026-11-14T17:00:00Z" >> "$GITHUB_OUTPUT" ;;
             guion_pol) echo "carpeta=video_polemicas" >> "$GITHUB_OUTPUT"; echo "corto=pol" >> "$GITHUB_OUTPUT"; echo "cuando=2026-11-15T17:00:00Z" >> "$GITHUB_OUTPUT" ;;
             guion_rad) echo "carpeta=video_radios" >> "$GITHUB_OUTPUT"; echo "corto=rad" >> "$GITHUB_OUTPUT"; echo "cuando=2026-11-16T17:00:00Z" >> "$GITHUB_OUTPUT" ;;
-            guion_evo) echo "carpeta=video_evolucion" >> "$GITHUB_OUTPUT"; echo "corto=evo" >> "$GITHUB_OUTPUT"; echo "cuando=2026-11-17T17:00:00Z" >> "$GITHUB_OUTPUT" ;;
-            guion_gv5) echo "carpeta=video_gtav" >> "$GITHUB_OUTPUT"; echo "corto=gv5" >> "$GITHUB_OUTPUT"; echo "cuando=2026-11-18T17:00:00Z" >> "$GITHUB_OUTPUT" ;;
           esac
       - name: Bajar el vídeo del montaje final
-        if: env.PRUEBA != '1'
+        if: env.PRUEBA != '1' && env.ACCION != 'desprogramar'
         run: |
           pip install requests
           gh release download "montaje-${{ steps.d.outputs.corto }}-alta-calidad" -R "${{ github.repository }}" -p video_largo.mp4 -D /tmp
           ls -l /tmp/video_largo.mp4
       - name: Subir y programar
         run: |
+          pip install -q requests
           python video_largo/subir_youtube.py "${{ steps.d.outputs.carpeta }}/publicar.md" /tmp/video_largo.mp4 \
             "video_largo/miniaturas/miniatura_${{ steps.d.outputs.corto }}.jpg" "${{ steps.d.outputs.cuando }}"
