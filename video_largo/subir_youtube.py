@@ -95,6 +95,18 @@ def main():
         return
     tok = token()
     vid = ya_subido(tok, titulo)
+    if os.environ.get("ACCION") == "desprogramar":  # 14 nov: deja el vídeo en privado y sin fecha (no borra nada)
+        if not vid:
+            sys.exit(f"No encuentro en el canal «{titulo}»")
+        st = api("GET", "videos", tok, params={"part": "status", "id": vid})["items"][0]["status"]
+        nuevo = {k: st[k] for k in ("embeddable", "license", "publicStatsViewable", "selfDeclaredMadeForKids") if k in st}
+        nuevo["privacyStatus"] = "private"
+        api("PUT", "videos", tok, params={"part": "status"}, json={"id": vid, "status": nuevo})
+        st = api("GET", "videos", tok, params={"part": "status", "id": vid})["items"][0]["status"]
+        print(f"Desprogramado https://youtu.be/{vid}: {json.dumps(st, ensure_ascii=False)}")
+        if st.get("publishAt") or st.get("privacyStatus") != "private":
+            sys.exit("⚠️ sigue programado")
+        return
     if vid:
         print(f"Ya estaba subido: https://youtu.be/{vid} (no se sube otro)")
     else:
