@@ -45,7 +45,13 @@ import prototipo as P  # noqa: E402
 import voces as V  # noqa: E402
 
 DRY = P.DRY
-W, H, FPS, SR = P.W, P.H, P.FPS, P.SR
+FPS, SR = P.FPS, P.SR
+# 14 nov 2026: el vídeo sale SIEMPRE a 2K (2560x1440) y a pantalla completa, sin marcos ni bandas (pedido del usuario).
+# El grafismo (ASS, degradado, línea de tiempo) sigue diseñado a 1920x1080 (P.W x P.H) y se escala x4/3: libass escala
+# solo desde PlayRes y las capas PNG/MOV se escalan en el grafo final. RESOLUCION=1080 vuelve a 1920x1080.
+_A_1080 = os.environ.get("RESOLUCION") == "1080" or getattr(guion_vl, "CRISTAL", False)  # cristal.py va a 1080
+W, H = (1920, 1080) if _A_1080 else (2560, 1440)
+ESC = W / P.W  # factor del diseño a la salida
 TMP, OUT, HQ = P.TMP, pathlib.Path("salida_montaje"), pathlib.Path("salida_hq")
 FUENTES = pathlib.Path(os.environ.get("DIR_FUENTES", "fuentes"))
 SOLO = [x.strip() for x in os.environ.get("BLOQUES_SOLO", "").split(",") if x.strip()]
@@ -124,12 +130,16 @@ def tabla():
 
 
 def cortar(nombre, t, dur_out, destino, sentido):
-    """Corta un trozo a 1080p con un ligero movimiento de cámara; los clips lentos se estiran a su duración final."""
-    if t["video"].startswith("Imagen:") and not DRY:  # imagen: quieta, centrada y sobre fondo negro
+    """Corta un trozo a W x H (2K) a pantalla completa con un ligero movimiento de cámara; los clips lentos se estiran
+    a su duración final. Nunca hay bandas ni marcos: todo cubre el cuadro entero (14 nov 2026)."""
+    if t["video"].startswith("Imagen:") and not DRY:
+        # imagen: cubre el cuadro entero (recorte centrado) con un acercamiento lento; las capturas web son 16:9 y
+        # no pierden nada. Los logos y carteles (es_fijo) van quietos.
+        zoom = "1" if es_fijo(nombre) else f"1+0.04*on/{max(1, int(dur_out * FPS))}"
         P.run(["ffmpeg", "-y", "-loglevel", "error", "-loop", "1", "-framerate", str(FPS), "-t", f"{dur_out:.2f}",
                "-i", str(fuente(t["video"])), "-vf",
-               "scale=1600:880:force_original_aspect_ratio=decrease:flags=lanczos,"
-               "pad=1920:1080:(ow-iw)/2:(oh-ih)/2:color=black,format=yuv420p",
+               f"scale={W * 2}:{H * 2}:force_original_aspect_ratio=increase:flags=lanczos,crop={W * 2}:{H * 2},"
+               f"zoompan=z='{zoom}':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=1:s={W}x{H}:fps={FPS},format=yuv420p",
                "-t", f"{dur_out:.2f}", "-c:v", "libx264", "-crf", "12", "-preset", "veryfast", destino])
         return
     lento = t["lento"]
@@ -145,9 +155,12 @@ def cortar(nombre, t, dur_out, destino, sentido):
         x = "(in_w-out_w)/2"
     rec = RECORTES.get(t["video"], 0)
     quitar = f"crop=iw:ih*{1 - rec:.3f}:0:ih*{rec:.3f}," if rec else ""  # franja de arriba con marca de agua
-    vf = (f"setpts={lento}*PTS,{quitar}fps={FPS},scale=2112:1188:flags=lanczos:force_original_aspect_ratio=increase,"
+    vf = (f"setpts={lento}*PTS,{quitar}fps={FPS},"
+          f"scale={int(W * 1.1) // 2 * 2}:{int(H * 1.1) // 2 * 2}:flags=lanczos:force_original_aspect_ratio=increase,"
           f"crop={W}:{H}:x='{x}':y='(in_h-out_h)/2',format=yuv420p")
-    if MARCO and not DRY and alto(fuente(t["video"])) < 600:
+    if not DRY and alto(fuente(t["video"])) < 720:  # poca resolución: se escala igual a pantalla completa, con nitidez
+        vf = vf.replace("format=yuv420p", "unsharp=5:5:0.6:5:5:0.0,format=yuv420p")
+    if False and MARCO:  # 14 nov: el marco cambiaba el tamaño del cuadro durante el vídeo; ya no se usa
         # vídeo antiguo de poca resolución: se ve entero y nítido en un marco, sobre una copia borrosa y oscura
         z = "1+0.03*t/%.3f" % dur_out if not es_fijo(nombre) else "1"
         vf = (f"setpts={lento}*PTS,{quitar}fps={FPS},split[a][b];"
@@ -1302,11 +1315,13 @@ def main():
     # 6) montaje final
     P.crear_degradado(TMP / "degradado.png")
     linea_mov = esperar_linea(hilo_linea)
-    capa_linea = (f"[3:v]format=rgba[lt];[v1][lt]overlay=0:{LT.Y0}:eof_action=pass[v1b];" if linea_mov else "")
+    capa_linea = (f"[3:v]format=rgba,scale={W}:-2:flags=lanczos[lt];[v1][lt]overlay=0:{round(LT.Y0 * ESC)}:eof_action=pass[v1b];"
+                  if linea_mov else "")
     ent_cristal, cad_cristal = (cristal.filtros(PANELES, 4 if linea_mov else 3, TMP, FPS, "v1b" if linea_mov else "v1", "vc")
                                 if CRISTAL else ([], ""))
     grafo = (f"[0:v]tpad=stop_mode=clone:stop_duration=3,eq=contrast=1.04:saturation=1.08,unsharp=5:5:0.4:5:5:0.0[v0];"
-             f"[2:v]format=rgba[g];[v0][g]overlay=0:{H - P.ALTO_DEGRADADO}:shortest=1[v1];"
+             f"[2:v]format=rgba,scale={W}:{round(P.ALTO_DEGRADADO * ESC)}[g];"
+             f"[v0][g]overlay=0:{H - round(P.ALTO_DEGRADADO * ESC)}:shortest=1[v1];"
              + capa_linea + cad_cristal + f"[{'vc' if CRISTAL else ('v1b' if linea_mov else 'v1')}]ass={TMP / 'rotulos.ass'}[v]")
     final = HQ / "video_largo.mp4"
     P.run(["ffmpeg", "-y", "-loglevel", "error", "-i", TMP / "sin_audio.mp4", "-i", TMP / "mezcla.wav",
