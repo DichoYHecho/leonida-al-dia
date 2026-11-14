@@ -7,18 +7,30 @@ Los planos NUEVO_ se describen en edicion.md.
 """
 import re
 
-VIDEOS_EXTRA = {}  # sin URLs oficiales verificadas
+VIDEOS_EXTRA = {'Bully_Aniv': 'https://videos-rockstargames-com.akamaized.net/v4/totcka8o/flv/en-us-1080p.mp4',
+ 'GTAO_Bounties_4K': 'https://videos-rockstargames-com.akamaized.net/v4/oa46rs8r/flv/en-us-2160p.mp4',
+ 'GTAO_CE_4K': 'https://videos-rockstargames-com.akamaized.net/v4/8rakra67/flv/en-us-2160p.mp4',
+ 'GTAO_Cluckin_4K': 'https://videos-rockstargames-com.akamaized.net/v4/r3175t5r/flv/en-us-2160p.mp4',
+ 'GTAO_Drift_4K': 'https://videos-rockstargames-com.akamaized.net/v4/arrkr814/flv/en-us-2160p.mp4',
+ 'GTAO_Kanjo_4K': 'https://videos-rockstargames-com.akamaized.net/v4/3ra4t562/flv/en-us-2160p.mp4',
+ 'GTAO_Kortz_4K': 'https://videos-rockstargames-com.akamaized.net/v4/a0a0rre4/flv/en-us-2160p.mp4',
+ 'GTAO_Luiva_4K': 'https://videos-rockstargames-com.akamaized.net/v4/203as2rs/flv/en-us-2160p.mp4',
+ 'GTAO_MoneyFronts_4K': 'https://videos-rockstargames-com.akamaized.net/v4/334ek667/flv/en-us-2160p.mp4',
+ 'GTAO_PS5_4K': 'https://videos-rockstargames-com.akamaized.net/v4/1s626s55/flv/en-us-2160p.mp4',
+ 'GTAO_Pizza_4K': 'https://videos-rockstargames-com.akamaized.net/v4/aro34sg4/flv/en-us-2160p.mp4',
+ 'GTAO_Sabotage_4K': 'https://videos-rockstargames-com.akamaized.net/v4/r50k6mmg/flv/en-us-2160p.mp4',
+ 'GTAO_Safehouse_4K': 'https://videos-rockstargames-com.akamaized.net/v4/to78rk1o/flv/en-us-2160p.mp4',
+ 'GTAO_Vigero_4K': 'https://videos-rockstargames-com.akamaized.net/v4/k1t75kk6/flv/en-us-2160p.mp4',
+ 'GTAV_PS5_4K': 'https://videos-rockstargames-com.akamaized.net/v4/r3too449/flv/en-us-2160p.mp4',
+ 'Trilogy_4K': 'https://videos-rockstargames-com.akamaized.net/v4/8ta2r546/flv/en-us-2160p.mp4'}  # 15 nov: solo fuentes oficiales de Rockstar (planos_v6.md)
+SIN_BANDAS = {'Bully_Aniv', 'GTAO_CE_4K', 'GTAO_Kanjo_4K', 'GTAO_Pizza_4K', 'GTAO_PS5_4K', 'GTAO_Vigero_4K'}  # sin letterbox: sin cropdetect
+LENTO_MAX = {}  # cámara lenta máx. 1,25 (todas las fuentes a 30 fps)
+FUENTES_REMOTAS = True  # cada tramo se lee de la URL 4K (no se baja el vídeo entero)
 
 RECORTES = {}
 MARCO = False
 
-PLANOS_FIJOS = {"GTA_15_01", "GTA_15_02", "GTA_15_03", "IMG_GTA1", "IMG_GTA1_Caja", "IMG_RaceNChase", "IMG_VC_Portada",
-                "VCA_Logo", "Mirada_Logo", "VL_Fecha", "Portada_Animada",
-                "NUEVO_Recorte_Prensa_1997", "NUEVO_Captura_ESRB_AO", "NUEVO_Captura_Clasificacion_AU",
-                "NUEVO_Mazo_Juez", "NUEVO_Tribunal_Florida", "NUEVO_Tribunal_NY", "NUEVO_Bully_Portada", "NUEVO_Bully_Captura",
-                "NUEVO_Titular_Prensa_2013", "NUEVO_Pantalla_Texto_Hack",
-                "NUEVO_Estanteria_Tienda", "NUEVO_Captura_Peticion", "NUEVO_Captura_Steam_Resenas",
-                "NUEVO_Captura_Entrevista", "NUEVO_Captura_Disculpa_Rockstar"}
+PLANOS_FIJOS = {'K6_Tarjeta_Despidos', 'K6_Tarjeta_HotCoffee', 'K6_Tarjeta_Target', 'K6_Tarjeta_Trilogy', 'K6_Panel_GTA1', 'K6_Tarjeta_11S', 'K6_Tarjeta_Australia', 'K6_Tarjeta_Miami', 'K6_Tarjeta_OpenIV', 'K6_Tarjeta_Clifford', 'K6_Tarjeta_Thompson', 'K6_Tarjeta_Bully_Juez', 'K6_Tarjeta_Brasil', 'K6_Tarjeta_Formula'}
 
 # Música por acto: cambia con cada cartela
 # 14 nov: estas voces se hicieron con gemini-3.8-flash-tts (suena distinto); se rehacen con flash-lite
@@ -82,7 +94,7 @@ BLOQUES = [
     # ---------------------------------------------------------------- ACTO I · EL PUBLICISTA (1997)
     {"id": "p01", "num": 1, "total": T, "titulo": "1997 · LA CAMPAÑA DE GTA 1",
      "capitulo": "1997 · La campaña de GTA 1", "overlay": "", "anio": 1997,
-     "cartela": {"anio": "1997", "acto": "ACTO I", "titulo": "EL PUBLICISTA"}, "intro_original": "G1_Demo1_01",
+     "cartela": {"anio": "1997", "acto": "ACTO I", "titulo": "EL PUBLICISTA"},
      "texto": ("Empecemos en 1997. GTA nace como un juego raro, visto desde arriba. Y la polémica llega con ayuda. "
                "La distribuidora BMG contrató a Max Clifford, un "
                "publicista británico famoso por campañas construidas sobre escándalos. Los creadores, David Jones y Mike "
@@ -105,7 +117,6 @@ BLOQUES = [
     # ---------------------------------------------------------------- ACTO II · EL SALTO AL 3D (2001-2002)
     {"id": "p02", "num": 2, "total": T, "titulo": "2001 · GTA III Y EL 11-S", "capitulo": "2001 · GTA III y el 11-S",
      "overlay": "", "anio": 2001, "cartela": {"anio": "2001", "acto": "ACTO II", "titulo": "EL SALTO AL 3D"},
-     "intro_original": "G3_DE_01",
      "texto": ("Llega 2001 y la saga da el salto al 3D: por primera vez, en GTA III, bajas a la calle. Pero el 11 de "
                "septiembre cambia los planes. "
                "Rockstar retrasa el juego unas semanas, y el equipo lo revisa a toda prisa. Los coches de policía, azules "
@@ -310,7 +321,7 @@ BLOQUES = [
                "versiones clásicas de PC de los tres juegos. Una semana después de su lanzamiento, la empresa pide disculpas "
                "y promete arreglos. Y vuelve a poner las versiones antiguas a la venta, en su propia tienda para PC. Quien comprara la trilogía antes del 30 de junio de 2022 recibiría los clásicos para PC gratis. Una "
                "remasterización también puede ser una polémica."),
-     "rotulos": [{"en": "noviembre", "texto": "11 NOV 2021|THE TRILOGY"},
+     "rotulos": [{"en": "noviembre", "texto": "NOV 2021|THE TRILOGY"},
                  {"en": "problemas", "texto": "PROBLEMAS TÉCNICOS|AL SALIR"},
                  {"en": "disculpas", "texto": "ROCKSTAR|PIDE DISCULPAS"},
                  {"en": "tienda", "texto": "VERSIONES CLÁSICAS|DE NUEVO A LA VENTA"}],
@@ -396,21 +407,179 @@ BLOQUES = [
                    {"en": "grave", "plano": "@GTA6_Mirada"}]},
 ]
 
+# ---------------------------------------------------------------- planos K6 (15 nov 2026)
+# Generado por planos_pol_k6.py: material oficial 4K de Rockstar, capturas propias, tarjetas y fotos de Commons.
+PLANOS_K6 = {'hook': {'planos': ['K6_GTAO_Aereo_LS',
+                     'K6_Bully_Logo',
+                     'K6_Panel_GTA1',
+                     'K6_Img_VI_Hidrodeslizador',
+                     'K6_Img_VI_Descapotable',
+                     'K6_GTAO_Desierto',
+                     'K6_Img_VI_Buzo_Cayos'],
+          'planos_en': [{'en': 'publicista', 'plano': 'K6_Panel_GTA1'},
+                        {'en': 'despidos', 'plano': 'K6_Img_VI_Descapotable'}]},
+ 'p01': {'planos': ['K6_GTAO_Skyline_Atardecer',
+                    'K6_Tarjeta_Clifford',
+                    'K6_Cap_Clifford_Killscreen',
+                    'K6_Cap_Hansard_Lores',
+                    'K6_Tarjeta_Brasil',
+                    'K6_GTAO_Coche_Atardecer',
+                    'K6_GTAO_Calle_Palmeras'],
+         'planos_en': [{'en': 'clifford', 'plano': 'K6_Tarjeta_Clifford'},
+                       {'en': 'creadores', 'plano': 'K6_Cap_Clifford_Killscreen'},
+                       {'en': 'lores', 'plano': 'K6_Cap_Hansard_Lores'},
+                       {'en': 'brasil', 'plano': 'K6_Tarjeta_Brasil'}]},
+ 'p02': {'planos': ['K6_Tril_Coche_Lluvia',
+                    'K6_Img_Tril_GTA3_Lanzallamas',
+                    'K6_Tarjeta_11S',
+                    'K6_Img_Tril_GTA3_Policia',
+                    'K6_Img_Tril_GTA3_Persecucion_Lluvia'],
+         'planos_en': [{'en': 'septiembre', 'plano': 'K6_Tarjeta_11S'},
+                       {'en': 'policía', 'plano': 'K6_Img_Tril_GTA3_Policia'},
+                       {'en': 'finales', 'plano': 'K6_Img_Tril_GTA3_Persecucion_Lluvia'}]},
+ 'p03': {'planos': ['K6_Img_Tril_VC_Tommy_OceanView',
+                    'K6_Img_Tril_VC_Hotel_Lluvia',
+                    'K6_Cap_VC_Demanda',
+                    'K6_Img_Tril_VC_Tommy_Lance',
+                    'K6_Img_Tril_VC_Tommy_Moto'],
+         'planos_en': [{'en': 'vice', 'plano': 'K6_Img_Tril_VC_Tommy_OceanView'},
+                       {'en': 'haitiana', 'plano': 'K6_Img_Tril_VC_Hotel_Lluvia'},
+                       {'en': 'federal', 'plano': 'K6_Cap_VC_Demanda'}]},
+ 'p04': {'planos': ['K6_Img_Tril_SA_Grove',
+                    'K6_Cap_ESRB_AO',
+                    'K6_Tril_CJ_Coche',
+                    'K6_Tarjeta_HotCoffee',
+                    'K6_Cap_FTC_Acuerdo',
+                    'K6_Img_Tril_SA_Coche_Noche'],
+         'planos_en': [{'en': 'hot', 'plano': 'K6_Img_Tril_SA_Grove'},
+                       {'en': 'veinte', 'plano': 'K6_Cap_ESRB_AO'},
+                       {'en': 'veinticuatro', 'plano': 'K6_Tarjeta_HotCoffee'},
+                       {'en': 'federal', 'plano': 'K6_Cap_FTC_Acuerdo'}]},
+ 'p05': {'planos': ['K6_Img_Tril_SA_CJ_Lancha',
+                    'K6_Tarjeta_Australia',
+                    'K6_Tril_Vinewood',
+                    'K6_GTAO_Faro',
+                    'K6_GTAO_Aereo_LS_2',
+                    'K6_GTAO_Moto_Callejon',
+                    'K6_Img_Tril_SA_CJ_Moto'],
+         'planos_en': [{'en': 'australia', 'plano': 'K6_Img_Tril_SA_CJ_Lancha'},
+                       {'en': 'revocó', 'plano': 'K6_Tarjeta_Australia'},
+                       {'en': 'julio', 'plano': 'K6_GTAO_Aereo_LS_2'}]},
+ 'p06': {'planos': ['K6_Bully_Logo_2',
+                    'K6_Foto_Juzgado_MiamiDade',
+                    'K6_Tarjeta_Bully_Juez',
+                    'K6_Cap_Bully_Juez',
+                    'K6_Cap_Bully_Profesores'],
+         'planos_en': [{'en': 'molestia', 'plano': 'K6_Foto_Juzgado_MiamiDade'},
+                       {'en': 'juez', 'plano': 'K6_Tarjeta_Bully_Juez'},
+                       {'en': 'coalición', 'plano': 'K6_Cap_Bully_Profesores'}]},
+ 'p07': {'planos': ['K6_Foto_Supremo_Florida',
+                    'K6_GTAO_Autopista',
+                    'K6_GTAO_Coche_Luces',
+                    'K6_GTAO_Cluckin_Noche',
+                    'K6_Img_GTAV_Helicoptero',
+                    'K6_GTAO_Puente_Ciudad',
+                    'K6_Tarjeta_Thompson',
+                    'K6_Cap_Thompson_Cargos'],
+         'planos_en': [{'en': 'thompson', 'plano': 'K6_Foto_Supremo_Florida'},
+                       {'en': 'veintisiete', 'plano': 'K6_Tarjeta_Thompson'},
+                       {'en': 'inhabilitó', 'plano': 'K6_Cap_Thompson_Cargos'}]},
+ 'p08': {'planos': ['K6_GTAV_Logo_Ciudad',
+                    'K6_GTAV_Trevor_Casa',
+                    'K6_Cap_Tortura_CNBC',
+                    'K6_GTAO_Torre_Palmera',
+                    'K6_GTAV_Avion_Montes',
+                    'K6_GTAO_Barcos_Puente',
+                    'K6_GTAO_Coches_Salida',
+                    'K6_GTAO_Calle_Drift',
+                    'K6_Img_GTAV_Ciudad_Palmeras'],
+         'planos_en': [{'en': 'diecisiete', 'plano': 'K6_GTAV_Logo_Ciudad'},
+                       {'en': 'tortura', 'plano': 'K6_Cap_Tortura_CNBC'}]},
+ 'p09': {'planos': ['K6_Cap_Lohan_Fortune',
+                    'K6_GTAO_Helicoptero_Carga',
+                    'K6_GTAO_Lowriders',
+                    'K6_GTAO_Villa',
+                    'K6_GTAO_Casa_Colinas',
+                    'K6_GTAO_Michael',
+                    'K6_GTAO_Patio_Coches',
+                    'K6_GTAO_Garaje_Drift',
+                    'K6_Img_GTAO_Coche_Garaje'],
+         'planos_en': [{'en': 'lindsay', 'plano': 'K6_Cap_Lohan_Fortune'}, {'en': '2016', 'plano': 'K6_GTAO_Villa'}]},
+ 'p10': {'planos': ['K6_GTAO_Calle_Noche',
+                    'K6_Cap_Target_AFP',
+                    'K6_Tarjeta_Target',
+                    'K6_GTAO_Taxis',
+                    'K6_GTAO_Calle_Coche',
+                    'K6_Img_GTAO_Personajes'],
+         'planos_en': [{'en': 'australia', 'plano': 'K6_Cap_Target_AFP'},
+                       {'en': 'cuarenta', 'plano': 'K6_Tarjeta_Target'}]},
+ 'p11': {'planos': ['K6_GTAO_Derrape',
+                    'K6_Cap_OpenIV',
+                    'K6_GTAO_Tunel',
+                    'K6_GTAO_Derrape_Noche',
+                    'K6_GTAO_Garaje_Noche',
+                    'K6_GTAO_Drift_Humo',
+                    'K6_GTAO_Ladron_Atardecer',
+                    'K6_GTAO_Humo',
+                    'K6_GTAO_Drift_Rampa',
+                    'K6_Tarjeta_OpenIV'],
+         'planos_en': [{'en': 'openiv', 'plano': 'K6_Cap_OpenIV'}, {'en': 'reseñas', 'plano': 'K6_Tarjeta_OpenIV'}]},
+ 'p12': {'planos': ['K6_GTAO_Negocio_Tapadera',
+                    'K6_Cap_SharkCards_GI',
+                    'K6_GTAO_Hangar',
+                    'K6_GTAO_Coche_Calavera',
+                    'K6_GTAO_Persecucion',
+                    'K6_GTAO_Barco_Atardecer',
+                    'K6_GTAO_Plan_Maqueta',
+                    'K6_Img_GTAO_Coche_Rayas'],
+         'planos_en': [{'en': 'shark', 'plano': 'K6_GTAO_Negocio_Tapadera'},
+                       {'en': 'sarwar', 'plano': 'K6_Cap_SharkCards_GI'}]},
+ 'p13': {'planos': ['K6_Tril_Logo',
+                    'K6_Tril_Coche_Vuela',
+                    'K6_Cap_Trilogy_NME',
+                    'K6_Img_Tril_GTA3_Coche_Puente',
+                    'K6_GTAO_Moto_Agua',
+                    'K6_GTAO_Todoterreno',
+                    'K6_Tarjeta_Trilogy'],
+         'planos_en': [{'en': 'noviembre', 'plano': 'K6_Tril_Logo'},
+                       {'en': 'disculpas', 'plano': 'K6_Cap_Trilogy_NME'},
+                       {'en': 'tienda', 'plano': 'K6_Tarjeta_Trilogy'}]},
+ 'p14': {'planos': ['K6_Cap_Hackeo_Guardian', 'K6_GTAO_Laseres', 'K6_Img_VI_Jason_Coche', 'K6_Img_VI_Estudio'],
+         'planos_en': [{'en': 'septiembre', 'plano': 'K6_Cap_Hackeo_Guardian'}]},
+ 'p14b': {'planos': ['K6_Img_VI_Raul',
+                     'K6_Cap_Despidos_Register',
+                     'K6_Tarjeta_Despidos',
+                     'K6_Cap_Juicio_Aftermath',
+                     'K6_Img_VI_Conversacion'],
+          'planos_en': [{'en': 'octubre', 'plano': 'K6_Cap_Despidos_Register'},
+                        {'en': 'confidencial', 'plano': 'K6_Tarjeta_Despidos'},
+                        {'en': 'glasgow', 'plano': 'K6_Cap_Juicio_Aftermath'}]},
+ 'p15': {'planos': ['K6_Img_VI_Playa',
+                    'K6_Foto_MiamiBeach_Noche',
+                    'K6_Cap_MiamiBeach_WLRN',
+                    'K6_Tarjeta_Miami',
+                    'K6_Img_VI_Fiesta_Piscina'],
+         'planos_en': [{'en': 'miami', 'plano': 'K6_Foto_MiamiBeach_Noche'},
+                       {'en': 'emisora', 'plano': 'K6_Cap_MiamiBeach_WLRN'},
+                       {'en': 'contrato', 'plano': 'K6_Tarjeta_Miami'}]},
+ 'p16': {'planos': ['K6_Img_VI_Lucia_Coche',
+                    'K6_Tarjeta_Formula',
+                    'K6_Img_VI_Bar',
+                    'K6_Img_VI_Jason_Moto',
+                    'K6_Img_VI_Lucia_Bar',
+                    'K6_GTAO_Conversacion'],
+         'planos_en': [{'en': 'publicidad', 'plano': 'K6_Tarjeta_Formula'}]},
+ 'cierre': {'planos': ['K6_GTAO_Policia_Charla',
+                       'K6_GTAO_Fila_Policias',
+                       'K6_GTAO_Policia_Camion',
+                       'K6_Img_VI_Minigolf',
+                       'K6_Img_VI_Jason_Conduce',
+                       'K6_Img_VI_Caminan',
+                       'K6_Img_VI_Bosque'],
+            'planos_en': []}}
+for _b in BLOQUES:
+    _b.update(PLANOS_K6[_b["id"]])
+    _b.pop("intro_original", None)
+
 for _b in BLOQUES:
     _b["voz"] = _voz(_b["texto"])
-
-# ---------------------------------------------------------------- vídeos oficiales de los vídeos 2 a 4
-# Los trozos de las tablas salen de esos vídeos: se toman sus direcciones, recortes de marca de agua y planos fijos.
-import guion_jl as _jl  # noqa: E402
-import guion_sg as _sg  # noqa: E402
-import guion_vc as _vc  # noqa: E402
-
-VIDEOS_EXTRA = dict(globals().get("VIDEOS_EXTRA", {}))
-RECORTES = dict(globals().get("RECORTES", {}))
-for _m in (_vc, _sg, _jl):
-    for _k, _v in getattr(_m, "VIDEOS_EXTRA", {}).items():
-        VIDEOS_EXTRA.setdefault(_k, _v)
-    for _k, _v in getattr(_m, "RECORTES", {}).items():
-        RECORTES.setdefault(_k, _v)
-PLANOS_FIJOS = set(globals().get("PLANOS_FIJOS", ())) | set(_vc.PLANOS_FIJOS) | set(_sg.PLANOS_FIJOS) | set(_jl.PLANOS_FIJOS)
-MARCO = True

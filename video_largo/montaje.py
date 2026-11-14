@@ -135,7 +135,7 @@ def fuente(video):
 def tabla():
     out = {}
     for nombre in ("trozos.csv", "trozos_vl.csv", "trozos_vc.csv", "trozos_auto.csv", "trozos_auto_sg.csv", "trozos_auto_jl.csv", "trozos_jl.csv", "trozos_57.csv",
-                   "trozos_13a_4k.csv"):
+                   "trozos_13a_4k.csv", "trozos_pol_4k.csv"):
         if not (AQUI / nombre).exists():
             continue
         with open(AQUI / nombre, encoding="utf-8") as f:
@@ -1547,6 +1547,16 @@ def main():
         if not tiempos:
             tiempos, b["metodo"] = P.tiempos_por_voz(b["audio"], b["texto"]), "la voz (pausas)"
         b["subs"] = P.frases_de_subtitulo(pal, tiempos, b["voz_ini"])
+    for b in bloques:  # 15 nov: el título grande no pisa el titular de una captura de prensa (vídeo 5: 4:47 y 7:15)
+        t0 = 0.0
+        for n, d in b.get("plan") or []:
+            v = tb[n]["video"] if n in tb else ""
+            if t0 >= 3.8:
+                break
+            if "/imagenes_2k/" in v and not any(k in n for k in ("Tarjeta", "Panel", "Foto", "Texto_Hechos")):
+                b["titulo_seg"] = 0 if t0 < 1.2 else round(t0 - 0.15, 2)
+                break
+            t0 += d
     P.escribir_ass(TMP / "rotulos.ass", [dict(b, ini=b["plan_ini"]) for b in bloques], total)
     anadir_cta(TMP / "rotulos.ass", bloques)
     anadir_rotulos(TMP / "rotulos.ass", bloques)

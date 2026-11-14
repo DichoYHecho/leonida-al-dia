@@ -446,13 +446,16 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
         if b["num"] and TITULO_CORTO:
             # 14 nov: el título grande sale 3,8 s y luego queda una etiqueta pequeña arriba a la izquierda (antes pisaba
             # las capturas durante todo el bloque)
-            zg = ass_t(min(b["fin"], b["ini"] + 3.8))
+            # 15 nov: si entra una captura de prensa antes de los 3,8 s, el título grande se acorta para no pisar su
+            # titular; si el bloque empieza con una captura, solo sale la etiqueta pequeña (titulo_seg lo pone montaje.py)
+            seg = b.get("titulo_seg", 3.8)
+            zg = ass_t(min(b["fin"], b["ini"] + seg))
             z = zg
             num = b['num'] if isinstance(b['num'], str) else format(b['num'], '02d')
-            if b["fin"] - b["ini"] > 4.4:
+            if b["fin"] - b["ini"] > seg + 0.6:
                 ev.append(f"Dialogue: 1,{zg},{ass_t(b['fin'])},Etiqueta,,0,0,0,,{{\\pos(64,46)\\fad(300,250)}}"
                           f"{{\\c{ACENTO}}}{num}{{\\c&HFFFFFF&}}  {limpiar(b['titulo'])}")
-        if b["num"]:
+        if b["num"] and b.get("titulo_seg", 3.8) > 0:
             ev.append(f"Dialogue: 1,{a},{z},Num,,0,0,0,,{{\\move(30,26,70,26,0,350)\\fad(250,250)}}{b['num'] if isinstance(b['num'], str) else format(b['num'], '02d')}")
             ev.append(f"Dialogue: 1,{a},{z},Total,,0,0,0,,{{\\pos(196,100)\\fad(400,250)}}/{b.get('total', TOTAL_CURIOSIDADES)}")
             ev.append(f"Dialogue: 1,{a},{z},Dibujo,,0,0,0,,{{\\pos(76,170)\\c{ACENTO}\\p1\\fad(350,250)"
