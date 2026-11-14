@@ -49,6 +49,8 @@ import voces as V  # noqa: E402
 
 DRY = P.DRY
 FPS, SR = P.FPS, P.SR
+# 14 nov: todos los planos con la misma cadencia, base de tiempo y rango de color, para que el concat no deje huecos
+SEG = ["-r", str(FPS), "-video_track_timescale", "15360", "-color_range", "tv"]
 # 14 nov 2026: el vídeo sale SIEMPRE a 2K (2560x1440) y a pantalla completa, sin marcos ni bandas (pedido del usuario).
 # El grafismo (ASS, degradado, línea de tiempo) sigue diseñado a 1920x1080 (P.W x P.H) y se escala x4/3: libass escala
 # solo desde PlayRes y las capas PNG/MOV se escalan en el grafo final. RESOLUCION=1080 vuelve a 1920x1080.
@@ -152,8 +154,8 @@ def cortar(nombre, t, dur_out, destino, sentido):
         P.run(["ffmpeg", "-y", "-loglevel", "error", "-loop", "1", "-framerate", str(FPS), "-t", f"{dur_out:.2f}",
                "-i", str(fuente(t["video"])), "-vf",
                f"scale={W * 2}:{H * 2}:force_original_aspect_ratio=increase:flags=lanczos,crop={W * 2}:{H * 2},"
-               f"zoompan=z='{zoom}':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=1:s={W}x{H}:fps={FPS},format=yuv420p",
-               "-frames:v", str(round(dur_out * FPS)), "-c:v", "libx264", "-crf", "12", "-preset", "veryfast", destino])
+               f"zoompan=z='{zoom}':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=1:s={W}x{H}:fps={FPS},scale=out_range=tv,format=yuv420p",
+               "-frames:v", str(round(dur_out * FPS)), "-c:v", "libx264", "-crf", "12", "-preset", "veryfast", *SEG, destino])
         return
     lento = t["lento"]
     dur_in = dur_out / lento
@@ -193,7 +195,7 @@ def cortar(nombre, t, dur_out, destino, sentido):
         try:
             P.run(["ffmpeg", "-y", "-loglevel", "error", *pre, *entrada, "-an", "-vf", vf,
                    "-frames:v", str(round(dur_out * FPS)),
-                   "-c:v", "libx264", "-crf", "12", "-preset", "veryfast", destino])
+                   "-c:v", "libx264", "-crf", "12", "-preset", "veryfast", *SEG, destino])
             return
         except RuntimeError as e:
             print("  reintento", nombre, str(e)[-200:], flush=True)
@@ -1365,14 +1367,14 @@ def main():
                            f"{pre_c}scale={W}:{H}:force_original_aspect_ratio=increase,crop={W}:{H},"
                            "gblur=sigma=40,eq=brightness=-0.22:saturation=1.05", png])
                     P.run(["ffmpeg", "-y", "-loglevel", "error", "-loop", "1", "-framerate", str(FPS), "-i", png,
-                           "-frames:v", str(round(DUR_CARTELA * FPS)), "-c:v", "libx264", "-crf", "12", "-preset", "veryfast",
+                           "-frames:v", str(round(DUR_CARTELA * FPS)), "-c:v", "libx264", "-crf", "12", "-preset", "veryfast", *SEG,
                            "-pix_fmt", "yuv420p", destino])
                     hecho = True
                 except Exception as e:  # noqa: BLE001
                     print("  cartela sin fotograma, va en negro:", e, flush=True)
             if not hecho:
                 P.run(["ffmpeg", "-y", "-loglevel", "error", "-f", "lavfi", "-i", f"color=c=black:s={W}x{H}:r={FPS}:d={DUR_CARTELA + 1}",
-                       "-frames:v", str(round(DUR_CARTELA * FPS)), "-c:v", "libx264", "-crf", "12", "-preset", "veryfast", "-pix_fmt", "yuv420p", destino])
+                       "-frames:v", str(round(DUR_CARTELA * FPS)), "-c:v", "libx264", "-crf", "12", "-preset", "veryfast", "-pix_fmt", "yuv420p", *SEG, destino])
             lista_concat.append(destino)
         if b.get("intro_original"):
             k += 1
@@ -1424,7 +1426,7 @@ def main():
             print("  pantalla final en azul oscuro:", e, flush=True)
             fuente_final = ["-f", "lavfi", "-i", f"color=c=0x0E1020:s={W}x{H}:r={FPS}"]
         P.run(["ffmpeg", "-y", "-loglevel", "error", *fuente_final, "-frames:v", str(round((total - fin_bloques + 1) * FPS)),
-               "-c:v", "libx264", "-crf", "14", "-preset", "veryfast", "-pix_fmt", "yuv420p", destino])
+               "-c:v", "libx264", "-crf", "14", "-preset", "veryfast", "-pix_fmt", "yuv420p", *SEG, destino])
         lista_concat.append(destino)
     repetidos = comprobar_repetidos(bloques, tb)
     if repetidos:
