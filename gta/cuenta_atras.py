@@ -13,7 +13,7 @@
 import csv, os, random, re, shutil, tempfile
 from datetime import date, datetime, timezone
 import airtable, gemini, guion, medios, publicar, video
-from config import AQUI, MADRID, T_PUB, HASHTAGS_FIJOS, PIE_POST
+from config import AQUI, MADRID, T_PUB, HASHTAGS_FIJOS, PIE_POST, CTA_SEGUIR, puntuar_dato
 
 SALIDA = datetime(2026, 11, 19, 0, 0, tzinfo=MADRID)
 PRECARGA = datetime(2026, 11, 10, 1, 0, tzinfo=MADRID)
@@ -57,8 +57,9 @@ def foto_del_dia(dia):
 
 
 def elegir_dato(usados, hoy):
-    """El dato sin usar con el número más alto que siga siendo válido hoy."""
-    for d in sorted(banco(), key=lambda x: -int(x["Orden"])):
+    """El dato sin usar que siga siendo válido hoy, primero los temas que más se ven (15 nov: puntuar_dato) y,
+    a igualdad, el de número más alto."""
+    for d in sorted(banco(), key=lambda x: (-puntuar_dato(x), -int(x["Orden"]))):
         if int(d["Orden"]) in usados:
             continue
         if d.get("Válido hasta") and date.fromisoformat(d["Válido hasta"]) < hoy:
@@ -142,7 +143,8 @@ def textos(hoy, ahora, d):
         inicio, resto_dato = gancho_dato(d["Dato"])
         cuerpo = partir(resto_dato) if resto_dato else []
     final = "¡GTA 6 sale mañana!" if n == 1 else f"Faltan {n} días para GTA 6."
-    trozos = [inicio] + cuerpo + [final, PREGUNTAS[hoy.toordinal() % len(PREGUNTAS)]]
+    # 15 nov: la promesa para seguir, justo antes de la pregunta (que sigue siendo la última línea)
+    trozos = [inicio] + cuerpo + [final, CTA_SEGUIR, PREGUNTAS[hoy.toordinal() % len(PREGUNTAS)]]
     # 27 oct: sin la frase de la precarga en la voz (sigue en pantalla), para ir antes al dato
     return n, trozos, precarga, corta
 

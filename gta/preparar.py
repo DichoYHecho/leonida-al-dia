@@ -10,7 +10,7 @@ import csv, json, os, sys, tempfile, time
 from datetime import datetime, timedelta, timezone, date
 import airtable, clips, fuentes, guion, imagenes, medios, prensa, video
 from config import (AQUI, MADRID, T_PUB, CADUCA_HORAS, MAX_NOTICIAS_MANANA, MAX_NOTICIAS_TARDE, DATOS_EN_COLA,
-                    OFICIALES, ARRANQUE, LANZAMIENTO, CACHE)
+                    OFICIALES, ARRANQUE, LANZAMIENTO, CACHE, puntuar_dato)
 import gemini
 
 AHORA = datetime.now(MADRID)
@@ -106,6 +106,10 @@ Ya hemos propuesto estas (no repitas el mismo tema):
 Elige como mucho {maximo} que merezcan un vídeo hoy: novedades reales sobre GTA 6 (anuncios, fechas, precios,
 tráileres, cifras, análisis, declaraciones oficiales, polémicas reales). Si varias cuentan lo mismo, elige solo una,
 preferiblemente la oficial (Rockstar Games o Take-Two) o la más completa.
+Prioriza (es lo que más ve nuestro público): cifras concretas del juego (vehículos, animales, tamaño del mapa, fps),
+lugares del mapa, cómo se juega, récords (reservas, ventas, visualizaciones), comparaciones con GTA 5 o Red Dead
+Redemption 2 y cruces con la cultura popular (series, famosos). Deja para el final las frases o el carácter de
+personajes y los avisos repetidos de un tema que ya hemos contado (precarga, fechas).
 Descarta: filtraciones o material filtrado, rumores sin confirmar, especulación, listas de opinión, ofertas para
 comprar o reservar, noticias que solo mencionan GTA 6 de pasada, y destripes de la historia.
 Devuelve SOLO un JSON: {{"elegidas": [{{"n": número, "motivo": "frase corta"}}]}} (lista vacía si no hay ninguna)."""
@@ -243,7 +247,8 @@ def datos(regs_todas, carpeta):
         return []
     dia = max(HOY + timedelta(days=1), ARRANQUE)
     out, fallos = [], 0
-    for d in banco():
+    # 15 nov: primero los temas que más se ven (config.puntuar_dato); a igualdad, por orden del banco
+    for d in sorted(banco(), key=lambda x: (-puntuar_dato(x), int(x["Orden"]))):
         if falta <= 0 or fallos >= 6:
             break
         orden = int(d["Orden"])

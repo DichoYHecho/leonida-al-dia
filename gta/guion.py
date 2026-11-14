@@ -4,7 +4,7 @@ Reglas (apartado 5 del plan): nada que no diga la fuente; «Rockstar confirma» 
 nada de filtraciones, rumores como hechos ni destripes; sin enlaces para comprar; parafrasear."""
 import csv, datetime, os, re, unicodedata
 import gemini
-from config import HASHTAGS_FIJOS, PIE_POST, OFICIALES
+from config import HASHTAGS_FIJOS, PIE_POST, OFICIALES, CTA_SEGUIR
 from medios import GRUPOS, CAPTURAS, validas
 
 REGLAS = """Eres el guionista de «Leónida al Día», una cuenta de fans de GTA 6 en español de España.
@@ -29,6 +29,8 @@ Reglas que no se pueden saltar:
   Una estimación se cuenta como estimación («calcula», «estima»), nunca como un hecho.
 - Da el dato concreto (cifras, nombres, fechas de la fuente) en vez de frases vagas como «millones» o «muchos».
 - La pregunta final pide la opinión del público; no puede ser una apuesta ni una predicción («¿Llegará a…?»).
+- Vocabulario neutro que entienda cualquier hispanohablante (la mayoría del público es de México y Latinoamérica):
+  evita expresiones solo de España («mola», «flipar», «tío», «vale», «guay», «currar», «pasada»).
 """
 
 FORMATO = """Devuelve SOLO un JSON con estos campos:
@@ -128,7 +130,9 @@ def validar(j):
         "etiqueta": _limpiar(j.get("etiqueta"), 18).upper().rstrip("…") or "GTA 6",
         "personaje": bool(j.get("es_personaje")),
         "grupo": grupo,
-        "trozos": [_limpiar(j["gancho"], 95)] + cuerpo + [pregunta(_limpiar(j["cierre"], 75))],
+        # 15 nov: antes de la pregunta final, la promesa para seguir la cuenta (la pregunta sigue siendo la última
+        # línea: render, publicar.py y youtube.py la buscan ahí)
+        "trozos": [_limpiar(j["gancho"], 95)] + cuerpo + [CTA_SEGUIR, pregunta(_limpiar(j["cierre"], 75))],
         "capturas": validas(", ".join(str(c) for c in (j.get("capturas") or []))),
         "texto_post": en_cifras(_limpiar(j.get("texto_post"), 600)),
         "hashtags": hashtags(j.get("hashtags")),

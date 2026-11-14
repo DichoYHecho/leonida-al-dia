@@ -43,6 +43,25 @@ MAX_NOTICIAS_MANANA = 3
 MAX_NOTICIAS_TARDE = 2
 DATOS_EN_COLA = 3            # datos pendientes (por revisar o aprobados) que tiene que haber siempre (3 publicaciones al día)
 
+# 15 nov 2026 (estadísticas de YouTube, TikTok e Instagram del 21 oct al 14 nov): lo que más se ve son las cifras y
+# curiosidades del juego, los lugares del mapa, la jugabilidad y los récords; lo que menos, las frases de personajes.
+# El banco de datos y la cuenta atrás eligen primero los temas con más prioridad (3 = más; 0 = solo si no queda otro).
+PRIORIDAD_TEMAS = {"Curiosidades": 3, "Lugares": 3, "Jugabilidad": 3, "Lanzamiento": 2, "Tráileres": 2, "Música": 2,
+                   "Desarrollo": 1, "Creadores": 0, "Personajes": 0}
+# Casi nadie de los que ven los vídeos sigue la cuenta (menos de 100 seguidores en las 3 redes con ~110.000 vistas
+# al mes): todos los vídeos acaban con una promesa para seguir. La pregunta para comentar pasa al texto del post.
+CTA_SEGUIR = "Síguenos: cada día, un secreto de GTA 6."
+
+
+def puntuar_dato(d):
+    """Prioridad de un dato del banco: su tema y, dentro del tema, que tenga una cifra o compare con GTA 5 o RDR2."""
+    import re
+    texto = (d.get("Dato") or "").lower()
+    p = PRIORIDAD_TEMAS.get((d.get("Tema") or "").strip(), 1) * 10
+    p += 3 if re.search(r"\d", texto) else 0
+    p += 2 if any(k in texto for k in ("gta 5", "gta v", "red dead", "rdr")) else 0
+    return p
+
 # Radar de virales (fase 1, 13 nov 2026): un vídeo entra si tiene ≥ 3 veces la mediana de su canal y ≥ 10.000 vistas
 RADAR_MULT_MIN = 3
 RADAR_VISTAS_MIN = 10_000
