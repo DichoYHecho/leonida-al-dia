@@ -101,6 +101,7 @@ def main():
         st = api("GET", "videos", tok, params={"part": "status", "id": vid})["items"][0]["status"]
         nuevo = {k: st[k] for k in ("embeddable", "license", "publicStatsViewable", "selfDeclaredMadeForKids") if k in st}
         nuevo["privacyStatus"] = "private"
+        nuevo["publishAt"] = None  # sin esto YouTube conserva la fecha programada
         api("PUT", "videos", tok, params={"part": "status"}, json={"id": vid, "status": nuevo})
         st = api("GET", "videos", tok, params={"part": "status", "id": vid})["items"][0]["status"]
         print(f"Desprogramado https://youtu.be/{vid}: {json.dumps(st, ensure_ascii=False)}")
