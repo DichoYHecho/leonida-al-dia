@@ -26,12 +26,14 @@ import csv
 import hashlib
 import os
 import pathlib
+import re
 import subprocess
 import sys
 import time
 import urllib.request
 import wave
 import zipfile
+import zlib
 from concurrent.futures import ThreadPoolExecutor
 
 import numpy as np
@@ -41,6 +43,7 @@ sys.path.insert(0, str(AQUI))
 import importlib  # noqa: E402
 
 guion_vl = importlib.import_module(os.environ.get("GUION", "guion_vl"))  # guion_vc = vídeo 2 (Vice City)
+os.environ.setdefault("ESTILO_2026", "1")  # 14 nov: grafismo nuevo en todo lo que se monte desde ahora
 import prototipo as P  # noqa: E402
 import voces as V  # noqa: E402
 
@@ -140,7 +143,7 @@ def cortar(nombre, t, dur_out, destino, sentido):
                "-i", str(fuente(t["video"])), "-vf",
                f"scale={W * 2}:{H * 2}:force_original_aspect_ratio=increase:flags=lanczos,crop={W * 2}:{H * 2},"
                f"zoompan=z='{zoom}':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=1:s={W}x{H}:fps={FPS},format=yuv420p",
-               "-t", f"{dur_out:.2f}", "-c:v", "libx264", "-crf", "12", "-preset", "veryfast", destino])
+               "-frames:v", str(round(dur_out * FPS)), "-c:v", "libx264", "-crf", "12", "-preset", "veryfast", destino])
         return
     lento = t["lento"]
     dur_in = dur_out / lento
@@ -148,18 +151,26 @@ def cortar(nombre, t, dur_out, destino, sentido):
         pre = []
         entrada = ["-f", "lavfi", "-i", f"testsrc2=size={W}x{H}:rate=30:duration={dur_in + 0.3}"]
     else:
-        pre = ["-ss", f"{t['ini']:.2f}", "-t", f"{dur_in:.2f}"]
+        pre = ["-ss", f"{t['ini']:.2f}", "-t", f"{dur_in + 0.5:.2f}"]  # 0,5 s de margen: se corta por fotogramas
         entrada = ["-i", str(fuente(t["video"]))]
-    x = f"(in_w-out_w)*t/{dur_out:.3f}" if sentido == 0 else f"(in_w-out_w)*(1-t/{dur_out:.3f})"
+    # movimiento de cámara suave (arranca y frena: coseno) sobre un sobrante del 6 %, alternando sentido y eje
+    e = f"(0.5-0.5*cos(PI*t/{dur_out:.3f}))"
+    e = e if sentido == 0 else f"(1-{e})"
+    x, y = f"(in_w-out_w)*{e}", "(in_h-out_h)/2"
+    if zlib.crc32(nombre.encode()) % 3 == 0:  # uno de cada tres, en diagonal suave
+        y = f"(in_h-out_h)*{e}"
     if es_fijo(nombre):
-        x = "(in_w-out_w)/2"
+        x, y = "(in_w-out_w)/2", "(in_h-out_h)/2"
     rec = RECORTES.get(t["video"], 0)
     quitar = f"crop=iw:ih*{1 - rec:.3f}:0:ih*{rec:.3f}," if rec else ""  # franja de arriba con marca de agua
+    if not DRY:  # primero las bandas negras de la propia fuente (letterbox de los tráileres), luego la franja
+        quitar = bandas(fuente(t["video"])) + quitar
+        if alto(fuente(t["video"])) < 1080 and os.environ.get("PERMITIR_BAJA") != "1":
+            raise RuntimeError(f"{nombre}: la fuente {t['video']} tiene {alto(fuente(t['video']))} px de alto; "
+                               "en 2K solo entran fuentes de 1080p o más (14 nov 2026)")
     vf = (f"setpts={lento}*PTS,{quitar}fps={FPS},"
-          f"scale={int(W * 1.1) // 2 * 2}:{int(H * 1.1) // 2 * 2}:flags=lanczos:force_original_aspect_ratio=increase,"
-          f"crop={W}:{H}:x='{x}':y='(in_h-out_h)/2',format=yuv420p")
-    if not DRY and alto(fuente(t["video"])) < 720:  # poca resolución: se escala igual a pantalla completa, con nitidez
-        vf = vf.replace("format=yuv420p", "unsharp=5:5:0.6:5:5:0.0,format=yuv420p")
+          f"scale={int(W * 1.06) // 2 * 2}:{int(H * 1.06) // 2 * 2}:flags=lanczos:force_original_aspect_ratio=increase,"
+          f"crop={W}:{H}:x='{x}':y='{y}',format=yuv420p")
     if False and MARCO:  # 14 nov: el marco cambiaba el tamaño del cuadro durante el vídeo; ya no se usa
         # vídeo antiguo de poca resolución: se ve entero y nítido en un marco, sobre una copia borrosa y oscura
         z = "1+0.03*t/%.3f" % dur_out if not es_fijo(nombre) else "1"
@@ -170,13 +181,50 @@ def cortar(nombre, t, dur_out, destino, sentido):
               f"[f][c]overlay=(W-w)/2:(H-h)/2-24,format=yuv420p")
     for _ in range(3):
         try:
-            P.run(["ffmpeg", "-y", "-loglevel", "error", *pre, *entrada, "-an", "-vf", vf, "-t", f"{dur_out:.2f}",
+            P.run(["ffmpeg", "-y", "-loglevel", "error", *pre, *entrada, "-an", "-vf", vf,
+                   "-frames:v", str(round(dur_out * FPS)),
                    "-c:v", "libx264", "-crf", "12", "-preset", "veryfast", destino])
             return
         except RuntimeError as e:
             print("  reintento", nombre, str(e)[-200:], flush=True)
             time.sleep(3)
     raise RuntimeError("No se pudo cortar " + nombre)
+
+
+_BANDAS = {}
+
+
+def bandas(ruta):
+    """Filtro crop que quita las bandas negras de una fuente (letterbox o pillarbox), medido con cropdetect en
+    varios puntos del vídeo (se queda con el rectángulo más grande). "" si no tiene bandas."""
+    ruta = str(ruta)
+    if ruta in _BANDAS:
+        return _BANDAS[ruta]
+    r = subprocess.run(["ffprobe", "-v", "error", "-select_streams", "v:0", "-show_entries", "stream=width,height:format=duration",
+                        "-of", "default=nw=1", ruta], capture_output=True, text=True)
+    info = dict(l.split("=", 1) for l in r.stdout.split() if "=" in l)
+    try:
+        ancho, altura, dur = int(info["width"]), int(info["height"]), float(info.get("duration", 0) or 0)
+    except (KeyError, ValueError):
+        _BANDAS[ruta] = ""
+        return ""
+    mejor = None
+    for frac in (0.2, 0.4, 0.6, 0.8):
+        r = subprocess.run(["ffmpeg", "-v", "info", "-ss", f"{dur * frac:.1f}", "-i", ruta, "-t", "2",
+                            "-vf", "cropdetect=limit=24:round=2:reset=0", "-an", "-f", "null", "-"],
+                           capture_output=True, text=True)
+        m = re.findall(r"crop=(\d+):(\d+):(\d+):(\d+)", r.stderr)
+        if m:
+            w, h, x, yy = map(int, m[-1])
+            if mejor is None or w * h > mejor[0] * mejor[1]:
+                mejor = (w, h, x, yy)
+    f = ""
+    if mejor and (mejor[1] < altura * 0.97 or mejor[0] < ancho * 0.97) and mejor[1] > altura * 0.6:
+        w, h, x, yy = mejor
+        f = f"crop={w}:{h}:{x}:{yy},"
+        print(f"  bandas negras en {pathlib.Path(ruta).name}: se recorta a {w}x{h}", flush=True)
+    _BANDAS[ruta] = f
+    return f
 
 
 RECORTES = getattr(guion_vl, "RECORTES", {})
@@ -202,14 +250,45 @@ def es_fijo(nombre):
     return nombre in FIJOS or "logo" in n or n.startswith("img_") or "cartel" in n or "letras" in n
 
 
+def q(x):
+    """Redondea un tiempo al fotograma entero más cercano."""
+    return round(x * FPS) / FPS
+
+
+def a_fotogramas(lista, dur_visual):
+    """Pasa la lista [trozo, s] a duraciones en fotogramas enteros que suman exactamente dur_visual (redondeo
+    acumulado: cada corte cae en el fotograma del plan y el error no se arrastra)."""
+    total_f, acum, prev, out = round(dur_visual * FPS), 0.0, 0, []
+    for n, d in lista:
+        acum += d
+        fin = min(total_f, round(acum * FPS))
+        if fin > prev:
+            out.append([n, (fin - prev) / FPS])
+            prev = fin
+    if out and prev < total_f:
+        out[-1][1] += (total_f - prev) / FPS
+    return out
+
+
+def alargar_ultimo(b, lista, extra, tb):
+    """Sin planos nuevos: el último solo se alarga hasta lo que dura de verdad su trozo (14 nov: alargarlo más
+    enseñaba lo que venía después en la fuente). Lo que no se cubre se apunta en b["falta"] y el montaje para."""
+    n, d = lista[-1]
+    cabe = max(0.0, tb[n]["dur"] * tb[n]["lento"] - d)
+    lista[-1][1] += min(cabe, extra)
+    if extra - cabe > 0.05:
+        b["falta"] = b.get("falta", 0) + extra - cabe
+        lista[-1][1] += extra - cabe  # se mantiene la duración para poder seguir, pero el montaje avisa
+    b["alargado"] = b.get("alargado", 0) + extra
+
+
 def planificar(b, dur_visual, tb):
     """Lista [trozo, segundos] que cubre dur_visual. El trozo con sonido original no se repite en silencio."""
     nombres = [n for n in b["planos"] if n != b.get("original")]
     lista, resto, i = [], dur_visual, 0
     while resto > 0.05 and i < 60:
         if i >= len(nombres) and lista:  # sin planos nuevos: se alarga el último en vez de repetir uno
-            lista[-1][1] += resto
-            b["alargado"] = b.get("alargado", 0) + resto
+            alargar_ultimo(b, lista, resto, tb)
             break
         n = nombres[i % len(nombres)]
         d = min(tb[n]["dur"] * tb[n]["lento"], resto)
@@ -248,8 +327,7 @@ def planificar_anclado(b, dur_visual, tb):
         while hasta - estado["cursor"] > 0.05:
             if estado["i"] >= len(relleno) and lista:  # sin planos nuevos: se alarga el último en vez de repetir
                 extra = hasta - estado["cursor"]
-                lista[-1][1] += extra
-                b["alargado"] = b.get("alargado", 0) + extra
+                alargar_ultimo(b, lista, extra, tb)
                 estado["cursor"] = hasta
                 break
             n = relleno[estado["i"] % len(relleno)]
@@ -364,19 +442,32 @@ def anadir_rotulos(ruta, bloques):
                 continue
             l1, l2 = (r["texto"].split("|") + [""])[:2]
             negro = r.get("negro")
-            g1, g2 = (124, 72) if negro else (84, 52)
+            g1, g2 = 124, 72
             a, z = P.ass_t(t0), P.ass_t(t1)
             if negro:
                 ev.append(f"Dialogue: 0,{a},{z},Dibujo,,0,0,0,,{{\\pos(0,0)\\c&H000000&\\fad(0,250)\\p1}}"
                           "m 0 0 l 1920 0 1920 1080 0 1080")
-            else:
-                w = min(1840, int(max(len(l1) * g1, len(l2) * g2) * 0.66) + 110)
-                h = g1 + (g2 + 24 if l2 else 0) + 64
-                ev.append(f"Dialogue: 2,{a},{z},Dibujo,,0,0,0,,{{\\pos({960 - w // 2},{440 - h // 2})\\c&H000000&"
-                          f"\\alpha&H28&\\fad(150,200)\\p1}}m 0 0 l {w} 0 {w} {h} 0 {h}")
-            linea2 = f"\\N{{\\fs{g2}\\c{P.ACENTO}}}{P.limpiar(l2)}" if l2 else ""
-            ev.append(f"Dialogue: 3,{a},{z},Dato,,0,0,0,,{{\\an5\\pos(960,440)\\fad(150,200)\\fs{g1}\\c&H0000D7FF&}}"
-                      f"{P.limpiar(l1)}{linea2}")
+            if negro:
+                linea2 = f"\\N{{\\fs{g2}\\c{P.ACENTO}}}{P.limpiar(l2)}" if l2 else ""
+                ev.append(f"Dialogue: 3,{a},{z},Dato,,0,0,0,,{{\\an5\\pos(960,440)\\fad(150,200)\\fs{g1}\\c&H0000D7FF&}}"
+                          f"{P.limpiar(l1)}{linea2}")
+                continue
+            # 14 nov: tercio inferior a la izquierda (antes, caja negra en el centro que tapaba titulares y logos):
+            # panel oscuro translúcido, barra rosa a la izquierda, línea 1 blanca grande y línea 2 rosa; entra
+            # deslizándose 40 px y sale con fundido
+            g1, g2 = 62, 34
+            x0, y1 = 150, 760  # esquina inferior izquierda del texto (coordenadas de diseño 1920x1080)
+            w = min(1100, int(max(len(l1) * g1 * 0.62, len(l2) * g2 * 0.6)) + 80)
+            h = g1 + (g2 + 14 if l2 else 0) + 44
+            top = y1 - h + 22
+            mov = f"\\move({x0 - 40 - 30},{top},{x0 - 30},{top},0,220)"
+            ev.append(f"Dialogue: 2,{a},{z},Dibujo,,0,0,0,,{{{mov}\\c&H20100E&\\alpha&H38&\\fad(160,180)\\p1}}"
+                      f"m 0 0 l {w} 0 {w} {h} 0 {h}")
+            ev.append(f"Dialogue: 3,{a},{z},Dibujo,,0,0,0,,{{\\move({x0 - 40 - 30},{top},{x0 - 30},{top},0,220)"
+                      f"\\c{P.ACENTO}\\fad(160,180)\\p1}}m 0 0 l 8 0 8 {h} 0 {h}")
+            linea2 = f"\\N{{\\fnMontserrat ExtraBold\\fs{g2}\\c{P.ACENTO}}}{P.limpiar(l2)}" if l2 else ""
+            ev.append(f"Dialogue: 4,{a},{z},Dato,,0,0,0,,{{\\an1\\move({x0 - 40},{y1},{x0},{y1},0,220)\\fad(160,180)"
+                      f"\\fs{g1}\\c&HFFFFFF&}}{P.limpiar(l1)}{linea2}")
     if not ev:
         return
     txt = pathlib.Path(ruta).read_text(encoding="utf-8")
@@ -740,8 +831,9 @@ def expandir_grupos(bloques, tb):
     grupos = {}
     for n in sorted(tb):
         grupos.setdefault("@" + tb[n].get("grupo", ""), []).append(n)
+    semilla = zlib.crc32(os.environ.get("GUION", "guion_vl").encode())  # 14 nov: semilla propia de cada guion
     for lista in grupos.values():
-        random.Random(7).shuffle(lista)
+        random.Random(semilla).shuffle(lista)
     usados = {}
     explicitos = {p for b in bloques for p in list(b["planos"]) + [r["plano"] for r in b.get("planos_en", [])]
                   + [b[k] for k in ("original", "intro_original") if b.get(k)] if not p.startswith("@")}  # los planos que el guion pide por su nombre no salen también por grupo
@@ -778,7 +870,22 @@ def expandir_grupos(bloques, tb):
 
 
 # ---------------------------------------------------------------- cartelas, línea de tiempo y controles (vídeo 3)
-DUR_CARTELA = 1.6
+DUR_CARTELA = 2.0  # 14 nov: 1,6 -> 2,0 s, sobre fotograma difuminado
+DUR_FINAL = float(os.environ.get("DUR_FINAL", "15"))  # pantalla final (tarjetas de YouTube); 0 = sin ella
+
+
+def anadir_final(ruta, ini, fin):
+    """Texto de la pantalla final: arriba en el centro; el resto queda libre para las tarjetas de YouTube."""
+    if not DUR_FINAL:
+        return
+    a, z = P.ass_t(ini), P.ass_t(fin)
+    ev = [f"Dialogue: 6,{a},{z},Dato,,0,0,0,,{{\\an8\\pos(960,120)\\fad(400,500)\\fs76\\c&HFFFFFF&}}GRACIAS POR VERLO"
+          f"\\N{{\\fnMontserrat ExtraBold\\fs34\\c{P.ACENTO}}}NOS VEMOS EN LEÓNIDA"]
+    txt = pathlib.Path(ruta).read_text(encoding="utf-8")
+    if "Style: Dato," not in txt:
+        txt = txt.replace("Style: Dibujo,", "Style: Dato,Montserrat Black,84,&H00FFFFFF,&H000000FF,&H00000000,"
+                          "&H00000000,0,0,0,0,100,100,1,0,1,0,0,5,0,0,0,1\nStyle: Dibujo,", 1)
+    pathlib.Path(ruta).write_text(txt.rstrip("\n") + "\n" + "\n".join(ev) + "\n", encoding="utf-8")
 LINEA = getattr(guion_vl, "LINEA", None)  # [(año, "nombre corto"), ...] para la línea de tiempo de abajo
 Y_LINEA, X0_LINEA, X1_LINEA = 1046, 420, 1700
 Y_SUBS_ARRIBA = 840  # por encima de aquí no llegan nunca los subtítulos (2 líneas de 60 px con MarginV 92)
@@ -991,16 +1098,42 @@ def audio_cancion(c):
     return P.fundir(P.leer_wav(destino), 0.15, 0.6)
 
 
-def comprobar_repetidos(bloques):
-    """Ningún trozo puede salir dos veces en el vídeo (se prepara material de sobra para eso)."""
-    vistos, rep = {}, []
+ALIAS_FUENTE = {"MI": "Mirada", "Mirada4K": "Mirada", "T2": "Trailer_2", "LZ": "Lanzamiento", "Lanz": "Lanzamiento",
+                "T1": "Trailer_1"}
+
+
+def comprobar_repetidos(bloques, tb=None):
+    """Ningún trozo puede salir dos veces en el vídeo: ni por nombre ni por tramo de la misma fuente (14 nov: MI y
+    Mirada son el mismo vídeo; también cuentan los originales con sonido)."""
+    vistos, rep, tramos = {}, [], []
     for b in bloques:
-        for nombre, _ in b["plan"]:
+        usados = [n for n, _ in b["plan"]] + [b[k] for k in ("intro_original", "original") if b.get(k)]
+        for nombre in usados:
             vistos.setdefault(nombre, []).append(b["id"])
+            if tb and nombre in tb and not tb[nombre]["video"].startswith(("Imagen:", "Clips:")):
+                t = tb[nombre]
+                tramos.append((ALIAS_FUENTE.get(t["video"], t["video"]), t["ini"], t["ini"] + t["dur"], nombre, b["id"]))
     for nombre, donde in vistos.items():
         if len(donde) > 1:
             rep.append(f"{nombre}: {', '.join(donde)}")
+    tramos.sort()
+    for (f1, a1, z1, n1, b1), (f2, a2, z2, n2, b2) in zip(tramos, tramos[1:]):
+        if f1 == f2 and n1 != n2 and a2 < z1 - 0.5:
+            rep.append(f"{n1} ({b1}) y {n2} ({b2}): mismo tramo de {f1} ({a2:.1f}-{min(z1, z2):.1f} s)")
     return rep
+
+
+def igualar_voz(x, objetivo=0.1):
+    """Lleva la voz a un RMS de -20 dBFS medido solo en las tramas con voz (50 ms por encima del 10 % de la más fuerte)
+    y frena los picos con un limitador suave, para que todos los bloques suenen igual de fuertes."""
+    mono = x if x.ndim == 1 else x.mean(axis=1)
+    v = int(0.05 * SR)
+    n = max(1, len(mono) // v)
+    rms = np.sqrt(np.mean(mono[: n * v].reshape(n, v) ** 2, axis=1)) if len(mono) >= v else np.array([np.sqrt(np.mean(mono ** 2))])
+    hablado = rms[rms > 0.1 * rms.max()] if rms.max() > 0 else rms
+    nivel = float(np.sqrt(np.mean(hablado ** 2))) + 1e-9
+    y = x * (objetivo / nivel)
+    return (np.tanh(y / 0.95) * 0.95).astype(np.float32)  # limitador suave: por debajo de 0,5 apenas cambia
 
 
 def quitar_chasquido(x, nombre=""):
@@ -1161,24 +1294,27 @@ def main():
     for i, b in enumerate(bloques):
         b["ini"] = t
         c = 0.0
+        # 14 nov: todos los límites de la imagen caen en fotogramas enteros (q), para que rótulos y cartelas
+        # vayan clavados con la imagen (antes se desfasaban ~0,5 s al redondear cada plano)
         if b.get("cartela"):
             b["cartela_ini"] = t
-            c += DUR_CARTELA
+            c += q(DUR_CARTELA)
         if b.get("intro_original"):
             o = tb[b["intro_original"]]
-            b["intro_ini"], b["intro_fin"] = t + c, t + c + o["dur"]
-            c += o["dur"]
+            b["intro_ini"], b["intro_fin"] = t + c, t + c + q(o["dur"])
+            c += q(o["dur"])
         b["plan_ini"] = t + c
         b["voz_ini"] = t + c + ((0.15 if i == 0 else 0.5) if not c else 0.3)
         b["voz_fin"] = b["voz_ini"] + b["dur_voz"]
-        b["vis_fin"] = b["voz_fin"] + 0.4 + min(b["cola_cortada"], 0.5)
+        b["vis_fin"] = q(b["voz_fin"] + 0.4 + min(b["cola_cortada"], 0.5))
         b["fin"] = b["vis_fin"]
         if b.get("original"):
             o = tb[b["original"]]
-            b["orig_ini"], b["orig_fin"] = b["vis_fin"], b["vis_fin"] + o["dur"]
+            b["orig_ini"], b["orig_fin"] = b["vis_fin"], b["vis_fin"] + q(o["dur"])
             b["fin"] = b["orig_fin"]
         t = b["fin"]
-    total = t + 0.8
+    fin_bloques = t
+    total = t + 0.8 + DUR_FINAL  # 14 nov: pantalla final para las tarjetas de YouTube (antes, 2 s de imagen congelada)
     print(f"Duración total prevista: {total:.1f} s ({hms(total)})", flush=True)
     hilo_linea = empezar_linea(bloques, total)
     # 3) planos: se cortan en paralelo
@@ -1186,7 +1322,8 @@ def main():
     carpeta.mkdir(exist_ok=True)
     tareas, lista_concat, k = [], [], 0
     for b in bloques:
-        b["plan"] = (planificar_anclado if b.get("planos_en") else planificar)(b, b["vis_fin"] - b["plan_ini"], tb)
+        b["plan"] = a_fotogramas((planificar_anclado if b.get("planos_en") else planificar)(b, b["vis_fin"] - b["plan_ini"], tb),
+                                 b["vis_fin"] - b["plan_ini"])
         if b.get("cartela"):
             k += 1
             destino = str(carpeta / f"{k:03d}_cartela.mp4")
@@ -1198,15 +1335,35 @@ def main():
                     hecho = True
                 except Exception as e:  # noqa: BLE001
                     print("  cartela sin fotograma, va en negro:", e, flush=True)
+            if not hecho and not DRY and b["plan"]:
+                # 14 nov: cartela sobre un fotograma difuminado y oscurecido del primer plano del acto (antes, negro)
+                try:
+                    o = tb[b.get("intro_original") or b["plan"][0][0]]
+                    src = fuente(o["video"])
+                    if o["video"].startswith("Imagen:"):
+                        ent = ["-loop", "1", "-i", str(src)]
+                    else:
+                        ent = ["-ss", f"{o['ini'] + o['dur'] / 2:.2f}", "-i", str(src)]
+                    pre_c = "" if o["video"].startswith("Imagen:") else bandas(src)
+                    png = carpeta / f"{k:03d}_cartela.png"
+                    P.run(["ffmpeg", "-y", "-loglevel", "error", *ent, "-frames:v", "1", "-vf",
+                           f"{pre_c}scale={W}:{H}:force_original_aspect_ratio=increase,crop={W}:{H},"
+                           "gblur=sigma=40,eq=brightness=-0.22:saturation=1.05", png])
+                    P.run(["ffmpeg", "-y", "-loglevel", "error", "-loop", "1", "-framerate", str(FPS), "-i", png,
+                           "-frames:v", str(round(DUR_CARTELA * FPS)), "-c:v", "libx264", "-crf", "12", "-preset", "veryfast",
+                           "-pix_fmt", "yuv420p", destino])
+                    hecho = True
+                except Exception as e:  # noqa: BLE001
+                    print("  cartela sin fotograma, va en negro:", e, flush=True)
             if not hecho:
-                P.run(["ffmpeg", "-y", "-loglevel", "error", "-f", "lavfi", "-i", f"color=c=black:s={W}x{H}:r={FPS}:d={DUR_CARTELA}",
-                       "-c:v", "libx264", "-crf", "12", "-preset", "veryfast", "-pix_fmt", "yuv420p", destino])
+                P.run(["ffmpeg", "-y", "-loglevel", "error", "-f", "lavfi", "-i", f"color=c=black:s={W}x{H}:r={FPS}:d={DUR_CARTELA + 1}",
+                       "-frames:v", str(round(DUR_CARTELA * FPS)), "-c:v", "libx264", "-crf", "12", "-preset", "veryfast", "-pix_fmt", "yuv420p", destino])
             lista_concat.append(destino)
         if b.get("intro_original"):
             k += 1
             o = tb[b["intro_original"]]
             destino = str(carpeta / f"{k:03d}_{b['intro_original'].replace('@', '_').replace('+', '_')}.mp4")
-            tareas.append((b["intro_original"], o, o["dur"], destino, 0))
+            tareas.append((b["intro_original"], o, q(o["dur"]), destino, 0))
             lista_concat.append(destino)
             if not DRY:
                 b["intro_wav"] = TMP / f"intro_{b['id']}.wav"
@@ -1221,13 +1378,40 @@ def main():
             k += 1
             o = tb[b["original"]]
             destino = str(carpeta / f"{k:03d}_{b['original']}.mp4")
-            tareas.append((b["original"], o, o["dur"], destino, 0))
+            tareas.append((b["original"], o, q(o["dur"]), destino, 0))
             lista_concat.append(destino)
             if not DRY:
                 b["orig_wav"] = TMP / f"orig_{b['id']}.wav"
                 P.run(["ffmpeg", "-y", "-loglevel", "error", "-ss", f"{o['ini']:.2f}", "-t", f"{o['dur']:.2f}",
                        "-i", str(fuente(o["video"])), "-vn", "-ar", SR, "-ac", 2, "-c:a", "pcm_s16le", b["orig_wav"]])
-    repetidos = comprobar_repetidos(bloques)
+    cortos = [f"{b['id']}: faltan {b['falta']:.1f} s de planos" for b in bloques if b.get("falta", 0) > 0.05]
+    if cortos:
+        print("Bloques sin planos suficientes:\n  " + "\n  ".join(cortos), flush=True)
+        if os.environ.get("PERMITIR_ALARGAR") != "1":
+            print("PARADO: añade planos a esos bloques (un plano no se alarga más de lo que dura su trozo).")
+            sys.exit(5)
+    if DUR_FINAL and not DRY:
+        k += 1
+        destino = str(carpeta / f"{k:03d}_pantalla_final.mp4")
+        try:
+            n, _ = bloques[-1]["plan"][-1]
+            o = tb[n]
+            src = fuente(o["video"])
+            ent = ["-loop", "1", "-i", str(src)] if o["video"].startswith("Imagen:") else \
+                ["-ss", f"{o['ini'] + o['dur'] / 2:.2f}", "-i", str(src)]
+            pre_c = "" if o["video"].startswith("Imagen:") else bandas(src)
+            png = carpeta / f"{k:03d}_final.png"
+            P.run(["ffmpeg", "-y", "-loglevel", "error", *ent, "-frames:v", "1", "-vf",
+                   f"{pre_c}scale={W}:{H}:force_original_aspect_ratio=increase,crop={W}:{H},"
+                   "gblur=sigma=46,eq=brightness=-0.28:saturation=1.0", png])
+            fuente_final = ["-loop", "1", "-framerate", str(FPS), "-i", png]
+        except Exception as e:  # noqa: BLE001
+            print("  pantalla final en azul oscuro:", e, flush=True)
+            fuente_final = ["-f", "lavfi", "-i", f"color=c=0x0E1020:s={W}x{H}:r={FPS}"]
+        P.run(["ffmpeg", "-y", "-loglevel", "error", *fuente_final, "-frames:v", str(round((total - fin_bloques + 1) * FPS)),
+               "-c:v", "libx264", "-crf", "14", "-preset", "veryfast", "-pix_fmt", "yuv420p", destino])
+        lista_concat.append(destino)
+    repetidos = comprobar_repetidos(bloques, tb)
     if repetidos:
         print("Trozos repetidos:\n  " + "\n  ".join(repetidos), flush=True)
         if os.environ.get("PERMITIR_REPETIDOS") != "1":
@@ -1263,19 +1447,27 @@ def main():
     anadir_cartelas(TMP / "rotulos.ass", bloques)
     if not LINEA_ANIMADA:
         anadir_linea(TMP / "rotulos.ass", bloques, total)
+    anadir_final(TMP / "rotulos.ass", fin_bloques + 0.6, total)
     PANELES = cristal.retocar(TMP / "rotulos.ass", total) if CRISTAL else []
     # 5) audio: voz + música que baja con la voz + sonidos originales
     n = int(total * SR)
     voz = np.zeros((n, 2), np.float32)
     for b in bloques:
-        a = b["audio"] / (np.max(np.abs(b["audio"])) + 1e-9) * 0.9
+        a = igualar_voz(b["audio"])  # 14 nov: por sonoridad, no por pico (había 5 dB de diferencia entre bloques)
         i0 = int(b["voz_ini"] * SR)
         voz[i0:i0 + len(a)] += a[: n - i0]
     mus = musica_del_guion(bloques, total)[:n]
     rms = rms_50hz(voz.mean(axis=1))
-    habla = P.suavizar((rms > 0.02).astype(float), 50, 0.06, 0.5)
+    # 14 nov: la música se oía casi nada bajo la voz y «bombeaba» en cada pausa: ahora va más presente (0,14) y
+    # solo sube en pausas de más de 1,2 s (se mantiene la voz «encendida» 1,2 s), con subidas y bajadas lentas
+    hay = (rms > 0.02).astype(float)
+    hold = int(1.2 * 50)
+    hay = np.array([hay[max(0, i - hold):i + 1].max() for i in range(len(hay))]) if len(hay) else hay
+    habla = P.suavizar(hay, 50, 0.25, 0.9)
+    if len(habla) > 15:  # se adelanta 0,3 s: la música ya ha bajado cuando entra la voz
+        habla = np.concatenate([habla[15:], np.full(15, habla[-1])])
     tt = np.arange(n) / SR
-    ganancia = 0.30 - (0.30 - 0.085) * np.interp(tt, np.arange(len(habla)) / 50, habla)
+    ganancia = 0.26 - (0.26 - 0.14) * np.interp(tt, np.arange(len(habla)) / 50, habla)
     ganancia *= np.minimum(1, tt / 1.0) * np.minimum(1, (total - tt) / 1.5)
     orig = np.zeros((n, 2), np.float32)
     mudo = np.ones(int(total * 100) + 2)
@@ -1319,7 +1511,7 @@ def main():
                   if linea_mov else "")
     ent_cristal, cad_cristal = (cristal.filtros(PANELES, 4 if linea_mov else 3, TMP, FPS, "v1b" if linea_mov else "v1", "vc")
                                 if CRISTAL else ([], ""))
-    grafo = (f"[0:v]tpad=stop_mode=clone:stop_duration=3,eq=contrast=1.04:saturation=1.08,unsharp=5:5:0.4:5:5:0.0[v0];"
+    grafo = (f"[0:v]tpad=stop_mode=clone:stop_duration=3,eq=contrast=1.03:saturation=1.05[v0];"  # 14 nov: sin unsharp (fuentes 4K)
              f"[2:v]format=rgba,scale={W}:{round(P.ALTO_DEGRADADO * ESC)}[g];"
              f"[v0][g]overlay=0:{H - round(P.ALTO_DEGRADADO * ESC)}:shortest=1[v1];"
              + capa_linea + cad_cristal + f"[{'vc' if CRISTAL else ('v1b' if linea_mov else 'v1')}]ass={TMP / 'rotulos.ass'}[v]")
@@ -1327,7 +1519,7 @@ def main():
     P.run(["ffmpeg", "-y", "-loglevel", "error", "-i", TMP / "sin_audio.mp4", "-i", TMP / "mezcla.wav",
            "-loop", "1", "-framerate", FPS, "-i", TMP / "degradado.png", *(["-i", linea_mov] if linea_mov else []), *ent_cristal,
            "-filter_complex", grafo, "-map", "[v]",
-           "-map", "1:a", "-af", "loudnorm=I=-14:TP=-1.5:LRA=11", "-c:v", "libx264", "-crf", "19", "-preset", "medium",
+           "-map", "1:a", "-af", "loudnorm=I=-14:TP=-1.5:LRA=11", "-c:v", "libx264", "-crf", "17", "-preset", "medium", "-x264-params", "aq-mode=3",
            "-pix_fmt", "yuv420p", "-c:a", "aac", "-b:a", "192k", "-ar", SR, "-t", f"{total:.2f}", "-movflags", "+faststart",
            final])
     print(f"Vídeo final listo ({time.time() - t0:.0f} s)", flush=True)

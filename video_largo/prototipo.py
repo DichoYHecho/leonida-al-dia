@@ -91,7 +91,10 @@ BLOQUES = [
 TOTAL_CURIOSIDADES = 20
 TEMPO_VOZ = float(os.environ.get("TEMPO_VOZ", "1.12"))  # más ritmo sin cambiar el tono
 ACENTO = "&HA34FFF&"  # rosa de la marca (ASS usa el orden azul-verde-rojo)
-ALTO_DEGRADADO = 380  # franja oscura suave abajo, para que se lean bien los subtítulos
+# 14 nov: estilo nuevo (título que se reduce, degradado más suave, subtítulos sin palabras sueltas). Lo activa el
+# montaje de los vídeos rehechos con ESTILO_2026=1; los vídeos ya publicados no cambian.
+TITULO_CORTO = os.environ.get("ESTILO_2026") == "1"
+ALTO_DEGRADADO = 260 if TITULO_CORTO else 380  # franja oscura suave abajo, para que se lean bien los subtítulos
 CARPETA_FUENTES = "/usr/share/fonts/truetype/montserrat/"
 
 
@@ -432,6 +435,7 @@ Style: Titulo,Bebas Neue Bold,74,&H00FFFFFF,&H000000FF,&H00000000,&H90000000,0,0
 Style: Gancho,Montserrat Black,112,&H00FFFFFF,&H000000FF,&H00000000,&H90000000,0,0,0,0,100,100,0,0,1,9,4,5,0,0,0,1
 Style: Marca,Montserrat Black,40,&H00FFFFFF,&H000000FF,&H00000000,&H96000000,0,0,0,0,100,100,3,0,1,0,3,9,0,56,44,1
 Style: Dibujo,Montserrat Black,20,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,0,0,7,0,0,0,1
+Style: Etiqueta,Bebas Neue Bold,40,&H30FFFFFF,&H000000FF,&H00000000,&H90000000,0,0,0,0,100,100,3,0,1,0,2,7,0,0,0,1
 
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
@@ -439,6 +443,15 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
     ev = [f"Dialogue: 1,{ass_t(0)},{ass_t(total)},Marca,,0,0,0,,{{\\fad(600,600)}}LEÓNIDA {{\\c{ACENTO}}}AL DÍA"]
     for b in bloques:
         a, z = ass_t(b["ini"]), ass_t(b["fin"])
+        if b["num"] and TITULO_CORTO:
+            # 14 nov: el título grande sale 3,8 s y luego queda una etiqueta pequeña arriba a la izquierda (antes pisaba
+            # las capturas durante todo el bloque)
+            zg = ass_t(min(b["fin"], b["ini"] + 3.8))
+            z = zg
+            num = b['num'] if isinstance(b['num'], str) else format(b['num'], '02d')
+            if b["fin"] - b["ini"] > 4.4:
+                ev.append(f"Dialogue: 1,{zg},{ass_t(b['fin'])},Etiqueta,,0,0,0,,{{\\pos(64,46)\\fad(300,250)}}"
+                          f"{{\\c{ACENTO}}}{num}{{\\c&HFFFFFF&}}  {limpiar(b['titulo'])}")
         if b["num"]:
             ev.append(f"Dialogue: 1,{a},{z},Num,,0,0,0,,{{\\move(30,26,70,26,0,350)\\fad(250,250)}}{b['num'] if isinstance(b['num'], str) else format(b['num'], '02d')}")
             ev.append(f"Dialogue: 1,{a},{z},Total,,0,0,0,,{{\\pos(196,100)\\fad(400,250)}}/{b.get('total', TOTAL_CURIOSIDADES)}")
@@ -462,10 +475,12 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
                     if acum >= largo / 2:
                         corte = i + 1
                         break
+                if corte is not None and TITULO_CORTO:  # 14 nov: nunca una palabra sola en una línea
+                    corte = max(2, min(corte, len(palabras) - 2))
             for k, (w, ini, fin) in enumerate(frase):
                 sig = frase[k + 1][1] if k + 1 < len(frase) else fin + 0.12
                 fin_k = min(sig, fin + 0.45) if k + 1 < len(frase) else sig
-                entra, sale = (90 if k == 0 else 0), (130 if k + 1 == len(frase) else 0)
+                entra, sale = (90 if k == 0 else 0), (130 if k + 1 == len(frase) and not TITULO_CORTO else 0)
                 fund = f"\\fad({entra},{sale})" if entra or sale else ""
                 ev.append(f"Dialogue: 0,{ass_t(ini)},{ass_t(fin_k)},SubSombra,,0,0,0,,"
                           f"{{\\blur16\\alpha&H70&{fund}}}{armar(palabras, corte)}")
@@ -477,8 +492,10 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
 def crear_degradado(ruta):
     """Franja oscura suave en la parte de abajo (transparente arriba): da profesionalidad y ayuda a leer."""
     from PIL import Image
-    alfa = (np.linspace(0, 1, ALTO_DEGRADADO) ** 1.7 * 165).astype(np.uint8)
+    alfa = (np.linspace(0, 1, ALTO_DEGRADADO) ** 1.7 * (120 if TITULO_CORTO else 165)).astype(np.uint8)
     arr = np.zeros((ALTO_DEGRADADO, W, 4), np.uint8)
+    if TITULO_CORTO:  # 14 nov: azul muy oscuro de la marca en vez de negro puro, y más suave
+        arr[..., :3] = (14, 16, 32)
     arr[..., 3] = alfa[:, None]
     Image.fromarray(arr, "RGBA").save(ruta)
 
