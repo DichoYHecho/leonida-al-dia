@@ -3,7 +3,8 @@ name: Subir vídeo largo a YouTube (privado y programado)
 # Pedido por el usuario el 13 nov 2026. Sube el MP4 del montaje final (release montaje-XXX-alta-calidad) EN PRIVADO con
 # fecha de publicación (publishAt): YouTube lo hace público solo a esa hora. Título, descripción y etiquetas salen del
 # publicar.md del vídeo (rama videos-5-7); la miniatura, la A. No sube dos veces el mismo título.
-# Calendario aprobado: vídeo 5 el 14 nov, 6 el 15, 7 el 16, a las 18:00 de Madrid (17:00 UTC).
+# Calendario: vídeo 5 (rehecho) el 15 nov a las 18:00 de Madrid (17:00 UTC), aprobado el 14 nov. Los 6 y 7 se están
+# rehaciendo: sus fechas son provisionales hasta que el usuario las confirme (entrada «fecha»).
 on:
   workflow_dispatch:
     inputs:
@@ -20,6 +21,14 @@ on:
         type: choice
         options: [subir, desprogramar]
         default: subir
+      fecha:
+        description: "Fecha de publicación en UTC (p. ej. 2026-11-15T17:00:00Z); vacío = la del calendario"
+        type: string
+        default: ""
+      nuevo:
+        description: "Subir aunque ya haya un vídeo con el mismo título (vídeo rehecho; el viejo no se toca)"
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -38,6 +47,7 @@ jobs:
       GOOGLE_YT_REFRESH_TOKEN: ${{ secrets.GOOGLE_YT_REFRESH_TOKEN }}
       PRUEBA: ${{ inputs.prueba && '1' || '0' }}
       ACCION: ${{ inputs.accion }}
+      NUEVO: ${{ inputs.nuevo && '1' || '0' }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -49,10 +59,13 @@ jobs:
         id: d
         run: |
           case "${{ inputs.video }}" in
-            guion_13a) echo "carpeta=video_trece_anos" >> "$GITHUB_OUTPUT"; echo "corto=13a" >> "$GITHUB_OUTPUT"; echo "cuando=2026-11-14T17:00:00Z" >> "$GITHUB_OUTPUT" ;;
-            guion_pol) echo "carpeta=video_polemicas" >> "$GITHUB_OUTPUT"; echo "corto=pol" >> "$GITHUB_OUTPUT"; echo "cuando=2026-11-15T17:00:00Z" >> "$GITHUB_OUTPUT" ;;
-            guion_rad) echo "carpeta=video_radios" >> "$GITHUB_OUTPUT"; echo "corto=rad" >> "$GITHUB_OUTPUT"; echo "cuando=2026-11-16T17:00:00Z" >> "$GITHUB_OUTPUT" ;;
+            guion_13a) echo "carpeta=video_trece_anos" >> "$GITHUB_OUTPUT"; echo "corto=13a" >> "$GITHUB_OUTPUT"; cuando=2026-11-15T17:00:00Z ;;
+            guion_pol) echo "carpeta=video_polemicas" >> "$GITHUB_OUTPUT"; echo "corto=pol" >> "$GITHUB_OUTPUT"; cuando=2026-11-16T17:00:00Z ;;
+            guion_rad) echo "carpeta=video_radios" >> "$GITHUB_OUTPUT"; echo "corto=rad" >> "$GITHUB_OUTPUT"; cuando=2026-11-17T17:00:00Z ;;
           esac
+          # 14 nov: vídeo 5 rehecho, sale el 15; la fecha se puede cambiar con la entrada «fecha»
+          if [ -n "${{ inputs.fecha }}" ]; then cuando="${{ inputs.fecha }}"; fi
+          echo "cuando=$cuando" >> "$GITHUB_OUTPUT"
       - name: Bajar el vídeo del montaje final
         if: env.PRUEBA != '1' && env.ACCION != 'desprogramar'
         run: |
