@@ -209,6 +209,7 @@ BLOQUES = [
     {"id": "p06", "num": 6, "total": T, "titulo": "2010-2018 · RED DEAD REDEMPTION 2",
      "capitulo": "2010-2018 · Red Dead Redemption 2", "overlay": "", "anio": 2010, "etiqueta_linea": "2010 · RDR 2",
      "cartela": {"anio": "2010", "acto": "ACTO II", "titulo": "EL OTRO GRAN PROYECTO"},
+     "final_revisado": True,  # 14 nov: voz nueva (lite); Whisper small oye entero «antes de tocar otro GTA.»
      "texto": ("Rockstar tiene a la vez otro proyecto enorme: Red Dead Redemption dos. Según Rob Nelson, de Rockstar North, "
                "el desarrollo empieza en dos mil diez, unos ocho años antes de salir. Él mismo lo cuenta a IGN: el estudio "
                "junta a todos sus equipos en uno solo, y el juego se retrasa dos veces para pulirlo. Sale el veintiséis de "
