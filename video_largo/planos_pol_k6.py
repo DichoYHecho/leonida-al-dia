@@ -74,17 +74,17 @@ for n in ["Tril_GTA3_Policia", "Tril_GTA3_Lanzallamas", "Tril_GTA3_Persecucion_L
           "VI_Descapotable", "VI_Buzo_Cayos", "VI_Hidrodeslizador", "VI_Playa", "VI_Fiesta_Piscina", "VI_Minigolf",
           "VI_Jason_Moto", "VI_Jason_Coche", "VI_Bar", "VI_Lucia_Coche", "VI_Raul", "VI_Conversacion", "VI_Estudio",
           "VI_Jason_Conduce", "VI_Bosque"]:
-    IMG["K6_Img_" + n] = (I4, f"K6_{n}.jpg", 7, "Imagen oficial 4K de Rockstar: " + n.replace("_", " "))
+    IMG["K6_Img_" + n] = (I4, f"K6_{n}.jpg", 8, "Imagen oficial 4K de Rockstar: " + n.replace("_", " "))
 for n in ["Clifford_Killscreen", "Hansard_Lores", "VC_Demanda", "ESRB_AO", "FTC_Acuerdo", "Bully_Juez", "Bully_Profesores",
           "Thompson_Cargos", "Lohan_Fortune", "Target_AFP", "OpenIV", "SharkCards_GI", "Trilogy_NME", "Hackeo_Guardian",
           "Despidos_Register", "Juicio_Aftermath", "MiamiBeach_WLRN", "Tortura_CNBC"]:
-    IMG["K6_Cap_" + n] = (I2, f"K6_{n}.png", 7, "Captura propia de prensa (titular y fecha): " + n.replace("_", " "))
+    IMG["K6_Cap_" + n] = (I2, f"K6_{n}.png", 8, "Captura propia de prensa (titular y fecha): " + n.replace("_", " "))
 for n in ["Clifford", "Brasil", "11S", "HotCoffee", "Australia", "Bully_Juez", "Thompson", "Target", "OpenIV", "Despidos",
           "Miami", "Formula"]:
     IMG["K6_Tarjeta_" + n] = (I2, f"K6_Tarjeta_{n}.png", 8, "Tarjeta propia con los datos y su fuente: " + n)
-IMG["K6_Panel_GTA1"] = (I2, "K6_Panel_GTA1.jpg", 7, "Carátula oficial de GTA (1997) en un panel")
+IMG["K6_Panel_GTA1"] = (I2, "K6_Panel_GTA1.jpg", 8, "Carátula oficial de GTA (1997) en un panel")
 for n in ["Supremo_Florida", "Juzgado_MiamiDade", "MiamiBeach_Noche"]:
-    IMG["K6_Foto_" + n] = (I2, f"K6_Foto_{n}.jpg", 7, "Foto de Wikimedia Commons: " + n.replace("_", " "))
+    IMG["K6_Foto_" + n] = (I2, f"K6_Foto_{n}.jpg", 8, "Foto de Wikimedia Commons: " + n.replace("_", " "))
 
 # planos por bloque: (lista en orden, anclas {palabra: plano})
 PLAN = {
@@ -184,7 +184,7 @@ VID.update({
     "K6_GTAO_Patio_Coches": ("GTAO_Drift_4K", 16.90, 18.10, "Dos coches en un patio"),
 })
 for n in ["VI_Caminan", "VI_Lucia_Bar"]:
-    IMG["K6_Img_" + n] = (I4, f"K6_{n}.jpg", 7, "Imagen oficial 4K de Rockstar: " + n.replace("_", " "))
+    IMG["K6_Img_" + n] = (I4, f"K6_{n}.jpg", 8, "Imagen oficial 4K de Rockstar: " + n.replace("_", " "))
 IMG["K6_Tarjeta_Trilogy"] = (I2, "K6_Tarjeta_Trilogy.png", 8, "Tarjeta propia con los datos y su fuente: Trilogy")
 PLAN["p05"] = (["K6_Img_Tril_SA_CJ_Lancha", "K6_Tarjeta_Australia", "K6_Tril_Vinewood", "K6_GTAO_Faro",
                 "K6_GTAO_Aereo_LS_2", "K6_GTAO_Moto_Callejon", "K6_Img_Tril_SA_CJ_Moto"],
