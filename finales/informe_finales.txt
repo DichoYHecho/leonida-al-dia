@@ -1,0 +1,3 @@
+hook: bien · guion «año a año.» · oído «año a año.» · recortado 0.22 s
+p01: bien · guion «seguir ganando dinero.» · oído «seguir ganando dinero.» · recortado 0.00 s
+p02: bien · guion «qué salir pronto.» · oído «porque salir pronto.» · recortado 0.22 s
