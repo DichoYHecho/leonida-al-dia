@@ -195,7 +195,8 @@ def cortar(nombre, t, dur_out, destino, sentido):
     for intento in range(4):
         # 14 nov: la lectura remota a veces acaba antes sin error y el plano salía corto (saltos al unirlos):
         # se comprueba el número de fotogramas y se repite; al último intento, se completa congelando el final
-        vf_i = vf + (",tpad=stop_mode=clone:stop_duration=2" if intento == 3 else "")
+        # 14 nov (2): tiempos renumerados por fotograma; algunos planos empezaban desplazados y al unirlos dejaban huecos
+        vf_i = vf + (",tpad=stop_mode=clone:stop_duration=2" if intento == 3 else "") + f",setpts=N/{FPS}/TB"
         try:
             P.run(["ffmpeg", "-y", "-loglevel", "error", *pre, *entrada, "-an", "-vf", vf_i, "-frames:v", str(n_f),
                    "-c:v", "libx264", "-crf", "12", "-preset", "veryfast", *SEG, destino])
@@ -1465,7 +1466,15 @@ def main():
     (TMP / "lista.txt").write_text("".join(f"file '{pathlib.Path(p).resolve()}'\n" for p in lista_concat))
     P.run(["ffmpeg", "-y", "-loglevel", "error", "-f", "concat", "-safe", "0", "-i", TMP / "lista.txt", "-c", "copy",
            TMP / "sin_audio.mp4"])
-    # 4) subtítulos y rótulos
+    if not DRY:  # 14 nov (2): comprobación de huecos tras unir los planos
+        esperados = sum(fotogramas(p) for p in lista_concat)
+        r = subprocess.run(["ffprobe", "-v", "error", "-select_streams", "v:0", "-show_entries", "packet=pts",
+                            "-of", "csv=p=0", str(TMP / "sin_audio.mp4")], capture_output=True, text=True)
+        pts = sorted(int(x) for x in r.stdout.split() if x.strip().lstrip("-").isdigit())
+        paso = 15360 // FPS
+        saltos = sum(1 for a, b in zip(pts, pts[1:]) if b - a > 1.5 * paso)
+        print(f"Unión de planos: {len(pts)} fotogramas (suma de planos {esperados}), {saltos} saltos de tiempo "
+              "(se corrigen al renumerar)", flush=True)
     for b in bloques:
         pal = b["texto"].split()
         tiempos = P.alinear(pal, b["ws"], b["dur_voz"]) if b["ws"] else None
@@ -1543,7 +1552,8 @@ def main():
                   if linea_mov else "")
     ent_cristal, cad_cristal = (cristal.filtros(PANELES, 4 if linea_mov else 3, TMP, FPS, "v1b" if linea_mov else "v1", "vc")
                                 if CRISTAL else ([], ""))
-    grafo = (f"[0:v]tpad=stop_mode=clone:stop_duration=3,eq=contrast=1.03:saturation=1.05[v0];"  # 14 nov: sin unsharp (fuentes 4K)
+    # 14 nov (2): setpts por número de fotograma: el vídeo unido no puede tener huecos ni desfasarse de la voz
+    grafo = (f"[0:v]setpts=N/{FPS}/TB,tpad=stop_mode=clone:stop_duration=3,eq=contrast=1.03:saturation=1.05[v0];"  # 14 nov: sin unsharp (fuentes 4K)
              f"[2:v]format=rgba,scale={W}:{round(P.ALTO_DEGRADADO * ESC)}[g];"
              f"[v0][g]overlay=0:{H - round(P.ALTO_DEGRADADO * ESC)}:shortest=1[v1];"
              + capa_linea + cad_cristal + f"[{'vc' if CRISTAL else ('v1b' if linea_mov else 'v1')}]ass={TMP / 'rotulos.ass'}[v]")
