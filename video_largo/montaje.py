@@ -1473,6 +1473,14 @@ def main():
         pts = sorted(int(x) for x in r.stdout.split() if x.strip().lstrip("-").isdigit())
         paso = 15360 // FPS
         saltos = sum(1 for a, b in zip(pts, pts[1:]) if b - a > 1.5 * paso)
+        props = {}
+        for p in lista_concat:  # diagnóstico: propiedades distintas entre planos provocan reinicios del grafo final
+            r = subprocess.run(["ffprobe", "-v", "error", "-select_streams", "v:0", "-show_entries",
+                                "stream=width,height,pix_fmt,color_range,color_space,color_transfer,color_primaries,profile",
+                                "-of", "csv=p=0", str(p)], capture_output=True, text=True)
+            props.setdefault(r.stdout.strip(), []).append(pathlib.Path(p).name)
+        for k_p, v_p in props.items():
+            print(f"  planos con [{k_p}]: {len(v_p)} (p. ej. {', '.join(v_p[:3])})", flush=True)
         print(f"Unión de planos: {len(pts)} fotogramas (suma de planos {esperados}), {saltos} saltos de tiempo"
               + (" — AVISO: habrá microcongelaciones y desfase con la voz" if saltos or len(pts) != esperados else ""),
               flush=True)
@@ -1560,7 +1568,9 @@ def main():
              f"[v0][g]overlay=0:{H - round(P.ALTO_DEGRADADO * ESC)}:shortest=1[v1];"
              + capa_linea + cad_cristal + f"[{'vc' if CRISTAL else ('v1b' if linea_mov else 'v1')}]ass={TMP / 'rotulos.ass'}[v]")
     final = HQ / "video_largo.mp4"
-    P.run(["ffmpeg", "-y", "-loglevel", "error", "-i", TMP / "sin_audio.mp4", "-i", TMP / "mezcla.wav",
+    # 14 nov (3): -reinit_filter 0: en ffmpeg 8 el grafo se reiniciaba en los cambios de plano (propiedades de color
+    # distintas) y perdía fotogramas en cada corte; todos los planos tienen el mismo tamaño y formato, no hace falta
+    P.run(["ffmpeg", "-y", "-loglevel", "error", "-reinit_filter", "0", "-i", TMP / "sin_audio.mp4", "-i", TMP / "mezcla.wav",
            "-loop", "1", "-framerate", FPS, "-i", TMP / "degradado.png", *(["-i", linea_mov] if linea_mov else []), *ent_cristal,
            "-filter_complex", grafo, "-map", "[v]",
            "-map", "1:a", "-af", "loudnorm=I=-14:TP=-1.5:LRA=11", "-c:v", "libx264", "-crf", "17", "-preset", "medium", "-x264-params", "aq-mode=3",
