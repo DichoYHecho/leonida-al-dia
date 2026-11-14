@@ -1473,8 +1473,9 @@ def main():
         pts = sorted(int(x) for x in r.stdout.split() if x.strip().lstrip("-").isdigit())
         paso = 15360 // FPS
         saltos = sum(1 for a, b in zip(pts, pts[1:]) if b - a > 1.5 * paso)
-        print(f"Unión de planos: {len(pts)} fotogramas (suma de planos {esperados}), {saltos} saltos de tiempo "
-              "(se corrigen al renumerar)", flush=True)
+        print(f"Unión de planos: {len(pts)} fotogramas (suma de planos {esperados}), {saltos} saltos de tiempo"
+              + (" — AVISO: habrá microcongelaciones y desfase con la voz" if saltos or len(pts) != esperados else ""),
+              flush=True)
     for b in bloques:
         pal = b["texto"].split()
         tiempos = P.alinear(pal, b["ws"], b["dur_voz"]) if b["ws"] else None
@@ -1552,8 +1553,9 @@ def main():
                   if linea_mov else "")
     ent_cristal, cad_cristal = (cristal.filtros(PANELES, 4 if linea_mov else 3, TMP, FPS, "v1b" if linea_mov else "v1", "vc")
                                 if CRISTAL else ([], ""))
-    # 14 nov (2): setpts por número de fotograma: el vídeo unido no puede tener huecos ni desfasarse de la voz
-    grafo = (f"[0:v]setpts=N/{FPS}/TB,tpad=stop_mode=clone:stop_duration=3,eq=contrast=1.03:saturation=1.05[v0];"  # 14 nov: sin unsharp (fuentes 4K)
+    # 14 nov (2): aquí NO va setpts=N: si el grafo se reinicia en un cambio de plano, N vuelve a 0 y el vídeo se corta
+    # (pasó a los 162 s). Los planos ya salen renumerados y la unión se comprueba arriba.
+    grafo = (f"[0:v]tpad=stop_mode=clone:stop_duration=3,eq=contrast=1.03:saturation=1.05[v0];"  # 14 nov: sin unsharp (fuentes 4K)
              f"[2:v]format=rgba,scale={W}:{round(P.ALTO_DEGRADADO * ESC)}[g];"
              f"[v0][g]overlay=0:{H - round(P.ALTO_DEGRADADO * ESC)}:shortest=1[v1];"
              + capa_linea + cad_cristal + f"[{'vc' if CRISTAL else ('v1b' if linea_mov else 'v1')}]ass={TMP / 'rotulos.ass'}[v]")
@@ -1565,6 +1567,11 @@ def main():
            "-pix_fmt", "yuv420p", "-c:a", "aac", "-b:a", "192k", "-ar", SR, "-t", f"{total:.2f}", "-movflags", "+faststart",
            final])
     print(f"Vídeo final listo ({time.time() - t0:.0f} s)", flush=True)
+    n_final, n_esperado = fotogramas(final), round(total * FPS)
+    print(f"Fotogramas del vídeo final: {n_final} de {n_esperado}", flush=True)
+    if abs(n_final - n_esperado) > FPS:  # 14 nov (2): el vídeo no puede acabar antes que el audio
+        print("PARADO: el vídeo final tiene menos imagen que audio.")
+        sys.exit(7)
     P.run(["ffmpeg", "-y", "-loglevel", "error", "-i", final, "-vf", "scale=1280:720", "-c:v", "libx264", "-crf", "27",
            "-maxrate", "2000k", "-bufsize", "4000k", "-preset", "fast", "-force_key_frames", "expr:gte(t,n_forced*300)",
            "-c:a", "aac", "-b:a", "112k", "-f", "segment", "-segment_time", "300", "-reset_timestamps", "1",
