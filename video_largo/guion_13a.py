@@ -101,7 +101,7 @@ BLOQUES = [
                  {"en": "cincuenta", "texto": "50 MINUTOS|DE GTA VI"},
                  {"en": "trece", "texto": "13 AÑOS|DESPUÉS DE GTA V"}],
      "nombres": ["noventa", "trece"],
-     "planos": ["NUEVO_Filtracion_Foro", "K5_Mir_Llegada_Noche", "NUEVO_Comunicado_Rockstar", "K5_GTAV_Coche_Atardecer", "K5_Img_VC_Skyline_Helicoptero", "K5_T2_Atardecer_Aereo", "K5_Img_Leonida_Keys_Avioneta", "K5_Mir_Pasillo", "K5_Img_Grassrivers_Hidrodeslizador", "K5_Mir_Mirilla", "K5_Mir_Coche_Conductora"],
+     "planos": ["NUEVO_Filtracion_Foro", "K5_Mir_Llegada_Noche", "NUEVO_Comunicado_Rockstar", "K5_GTAV_Coche_Atardecer", "K5_Img_VC_Skyline_Helicoptero", "K5_T2_Atardecer_Aereo", "K5_Img_Leonida_Keys_Avioneta", "K5_Mir_Pasillo_Gancho", "K5_Img_Grassrivers_Hidrodeslizador", "K5_Mir_Mirilla", "K5_Mir_Coche_Conductora"],
      "planos_en": [{"en": "cincuenta", "plano": "K5_Mir_Llegada_Noche"},
               {"en": "noventa", "plano": "NUEVO_Filtracion_Foro"},
               {"en": "confirma", "plano": "NUEVO_Comunicado_Rockstar"},
