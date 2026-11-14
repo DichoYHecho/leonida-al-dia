@@ -39,7 +39,7 @@ VIDEOS_EXTRA = {  # 14 nov: fuentes oficiales de Rockstar en 2160p (planos_4k.md
     "Trilogy_4K": "https://videos-rockstargames-com.akamaized.net/v4/8ta2r546/flv/en-us-2160p.mp4",
 }
 SIN_BANDAS = {'GTAO_CE_4K', 'GTAO_Kanjo_4K', 'GTAO_PS5_4K', 'GTAO_Pizza_4K', 'GTAO_Vigero_4K', 'GTAO_Weevil_4K', 'Mirada4K', 'RDR2_Gameplay_4K', 'T1'}  # sin letterbox: sin cropdetect
-LENTO_MAX = {'GTAV_PC_4K': 2.0}  # 60 fps; en el resto la c�mara lenta se limita a 1,25
+LENTO_MAX = {'GTAV_PC_4K': 2.0}  # 60 fps; en el resto la cámara lenta se limita a 1,25
 FUENTES_REMOTAS = True  # cada tramo se lee de la URL 4K (no se baja el vídeo entero)
 
 PLANOS_FIJOS = {"NUEVO_Absurd_Logo", "NUEVO_Foto_Houser", "NUEVO_Foto_Zelnick", "NUEVO_Texto_Hechos"}
@@ -101,7 +101,7 @@ BLOQUES = [
                  {"en": "cincuenta", "texto": "50 MINUTOS|DE GTA VI"},
                  {"en": "trece", "texto": "13 AÑOS|DESPUÉS DE GTA V"}],
      "nombres": ["noventa", "trece"],
-     "planos": ["NUEVO_Filtracion_Foro", "K5_Mir_Llegada_Noche", "NUEVO_Comunicado_Rockstar", "K5_GTAV_Coche_Atardecer", "K5_Img_VC_Skyline_Helicoptero", "K5_T2_Atardecer_Aereo", "K5_Img_Leonida_Keys_Avioneta", "K5_Img_Grassrivers_Hidrodeslizador"],
+     "planos": ["NUEVO_Filtracion_Foro", "K5_Mir_Llegada_Noche", "NUEVO_Comunicado_Rockstar", "K5_GTAV_Coche_Atardecer", "K5_Img_VC_Skyline_Helicoptero", "K5_T2_Atardecer_Aereo", "K5_Img_Leonida_Keys_Avioneta", "K5_Mir_Pasillo", "K5_Img_Grassrivers_Hidrodeslizador", "K5_Mir_Mirilla", "K5_Mir_Coche_Conductora"],
      "planos_en": [{"en": "cincuenta", "plano": "K5_Mir_Llegada_Noche"},
               {"en": "noventa", "plano": "NUEVO_Filtracion_Foro"},
               {"en": "confirma", "plano": "NUEVO_Comunicado_Rockstar"},
