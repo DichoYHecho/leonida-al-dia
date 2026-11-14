@@ -45,6 +45,7 @@ FONETICA = {
     "Scholarship": "Escólarship", "Edition": "Edíshon",
     "Kmart": "Kmárt", "Collective": "Colectiv", "Shout": "Shaut", "OpenIV": "Opénaivi", "Steam": "Stim",
     "Shark": "Shárk", "Sarwar": "Sarwár", "The": "De", "Trilogy": "Trílogi", "Definitive": "Definitiv",
+    "IWGB": "i-uve-doble-ge-be", "Discord": "Díscord", "Glasgow": "Glásgou",
 }
 
 
@@ -60,30 +61,30 @@ def _voz(texto):
     return " ".join(salida)
 
 
-T = 16
+T = 17
 
 BLOQUES = [
     # ---------------------------------------------------------------- GANCHO
     {"id": "hook", "num": None, "titulo": "", "overlay": "", "capitulo": "Introducción",
-     "texto": ("Imagina a un publicista de escándalos ayudando a vender un juego de coches en 1997. Pues pasó. Y "
-               "veintinueve años después, GTA VI sale el diecinueve de noviembre. Entre medias hay campañas, demandas, "
-               "cambios de última hora, retiradas de tiendas y hasta un hackeo que enseñó parte del juego antes de "
-               "tiempo. Hoy las repasamos todas, en orden, con las fuentes delante. Y al final te pregunto algo que "
-               "quiero que me respondas."),
-     "rotulos": [{"en": "publicista", "texto": "PUBLICISTA|DE ESCÁNDALOS"},
-                 {"en": "hackeo", "texto": "HACKEO 2022|PARTE DEL JUEGO"}],
-     "nombres": ["publicista", "diecinueve", "hackeo"],
+     # 14 nov (revisión aprobada): gancho con el juez de Miami que revisó Bully antes de dejar que se vendiera
+     "texto": ("En octubre de 2006, un juez de Miami pasó unas dos horas viendo cómo se jugaba a Bully para decidir si "
+               "se podía vender. Y no es lo más raro de esta historia. En casi treinta años, GTA ha tenido un publicista "
+               "de escándalos, un minijuego escondido que costó millones, demandas, retiradas de tiendas y hasta despidos "
+               "a un año del estreno de GTA VI. Hoy las repasamos todas, en orden y con las fuentes delante. Y al final "
+               "te pregunto cuál fue la más grave."),
+     "rotulos": [{"en": "juez", "texto": "MIAMI · 2006|UN JUEZ REVISA BULLY"},
+                 {"en": "publicista", "texto": "PUBLICISTA|DE ESCÁNDALOS"},
+                 {"en": "despidos", "texto": "2025|DESPIDOS EN ROCKSTAR"}],
+     "nombres": ["juez", "publicista", "despidos"],
      "planos": ["@GTA3_2001:2", "GTA_15_01", "Mirada_Logo", "@GTA5_2013:2", "Lanz_Playa", "T1_Noche_Aerea"],
-     "planos_en": [{"en": "publicista", "plano": "IMG_GTA1"},
-                   {"en": "diecinueve", "plano": "VL_Fecha"},
-                   {"en": "hackeo", "plano": "GTA_15_01"}]},
+     "planos_en": [{"en": "publicista", "plano": "IMG_GTA1"}]},  # 14 nov: planos por rehacer (paso de imagen)
 
     # ---------------------------------------------------------------- ACTO I · EL PUBLICISTA (1997)
     {"id": "p01", "num": 1, "total": T, "titulo": "1997 · LA CAMPAÑA DE GTA 1",
      "capitulo": "1997 · La campaña de GTA 1", "overlay": "", "anio": 1997,
      "cartela": {"anio": "1997", "acto": "ACTO I", "titulo": "EL PUBLICISTA"}, "intro_original": "G1_Demo1_01",
-     "texto": ("Empecemos en 1997. GTA no nació como escándalo. Nació como un juego raro, visto desde arriba, con coches "
-               "y peatones. La polémica llegó después, y con ayuda. La distribuidora BMG contrató a Max Clifford, un "
+     "texto": ("Empecemos en 1997. GTA nace como un juego raro, visto desde arriba. Y la polémica llega con ayuda. "
+               "La distribuidora BMG contrató a Max Clifford, un "
                "publicista británico famoso por campañas construidas sobre escándalos. Los creadores, David Jones y Mike "
                "Dailly, han reconocido que su trabajo fue clave para que el juego tuviera tanta atención. Mientras tanto, "
                "en la Cámara de los Lores, un lord criticó el juego, y la prensa británica se lanzó. Según la prensa del "
@@ -107,33 +108,35 @@ BLOQUES = [
     {"id": "p02", "num": 2, "total": T, "titulo": "2001 · GTA III Y EL 11-S", "capitulo": "2001 · GTA III y el 11-S",
      "overlay": "", "anio": 2001, "cartela": {"anio": "2001", "acto": "ACTO II", "titulo": "EL SALTO AL 3D"},
      "intro_original": "G3_DE_01",
-     "texto": ("Llega 2001 y la saga da el salto al 3D. Por primera vez bajas a la calle en GTA III, y Liberty City deja "
-               "de ser un mapa para convertirse en una ciudad de verdad. Pero el 11 de septiembre cambia los planes. "
+     "texto": ("Llega 2001 y la saga da el salto al 3D: por primera vez, en GTA III, bajas a la calle. Pero el 11 de "
+               "septiembre cambia los planes. "
                "Rockstar retrasa el juego tres semanas, y el equipo lo revisa a toda prisa. Los coches de policía, azules "
                "con franjas blancas, se parecían demasiado a los de Nueva York: pasan a blanco y negro. Se quita una "
                "misión que hablaba de terroristas. Se rehace la portada de Estados Unidos. Un avión cambia su ruta para no "
-               "pasar cerca de los rascacielos. Y sale el veintitrés de octubre, con su nueva portada y sin aquella misión."),
+               "pasar cerca de los rascacielos. Y sale a finales de octubre, con su nueva portada y sin aquella misión."),
+     # 14 nov: las fuentes dudan entre el 22 y el 23 de octubre de 2001: «a finales de octubre»
      "rotulos": [{"en": "septiembre", "texto": "11-S|RETRASO DE 3 SEMANAS"},
                  {"en": "policía", "texto": "COCHES DE POLICÍA|BLANCO Y NEGRO"},
                  {"en": "terroristas", "texto": "MISIÓN|QUITADA"},
-                 {"en": "veintitrés", "texto": "23 OCT 2001|EE. UU."}],
-     "nombres": ["septiembre", "policía", "terroristas", "veintitrés"],
+                 {"en": "finales", "texto": "OCTUBRE 2001|SALE EN EE. UU."}],
+     "nombres": ["septiembre", "policía", "terroristas", "finales"],
      "planos": ["@GTA3_2001:6", "@GTA3_DE:3", "GTA_15_11", "GTA_15_12", "GTA_15_13", "GTA_15_14"],
      "planos_en": [{"en": "calle", "plano": "@GTA3_2001"},
                    {"en": "policía", "plano": "@GTA3_2001"},
                    {"en": "portada", "plano": "GTA_15_11"},
-                   {"en": "veintitrés", "plano": "GTA_15_14"}]},
+                   {"en": "finales", "plano": "GTA_15_14"}]},
     {"id": "p03", "num": 3, "total": T, "titulo": "2002 · VICE CITY Y LA DEMANDA",
      "capitulo": "2002 · Vice City y la demanda", "overlay": "", "anio": 2002,
-     "texto": ("En 2002 llega Vice City, y con ella una polémica distinta. En 2004, grupos de la comunidad haitiana de "
-               "Florida demandaron a Rockstar por una frase contra los haitianos que aparecía en el juego. Sostenían que "
-               "juegos como este hacían que los niños se acostumbraran a la violencia contra policías y civiles. Primero "
-               "llevaron el caso a un tribunal federal. Después lo retiraron y lo presentaron de nuevo en un tribunal "
-               "estatal de Florida. Rockstar dijo que quitaría esa frase en las versiones futuras, pero que no suspendería "
-               "el juego."),
+     # 14 nov: corregido el orden de la demanda (Game Developer, 2 y 28 ene 2004; Take-Two, 10 dic 2003)
+     "texto": ("En 2002 llega Vice City, y con ella una polémica distinta. En diciembre de 2003, grupos de la comunidad "
+               "haitiana de Florida demandan a Rockstar y a Take-Two por una frase contra los haitianos que aparecía en el "
+               "juego. Sostenían que juegos como este hacían que los niños se acostumbraran a la violencia contra policías "
+               "y civiles. La demanda empieza en un tribunal estatal de Florida. Rockstar la lleva a uno federal, y en "
+               "enero los demandantes la retiran para volver al estatal. Mientras tanto, Take-Two acepta quitar esa frase "
+               "de las copias nuevas del juego."),
      "rotulos": [{"en": "vice", "texto": "VICE CITY|= MIAMI"},
-                 {"en": "haitiana", "texto": "COMUNIDAD HAITIANA|FLORIDA · 2004"},
-                 {"en": "federal", "texto": "TRIBUNAL FEDERAL|→ TRIBUNAL ESTATAL"}],
+                 {"en": "haitiana", "texto": "COMUNIDAD HAITIANA|FLORIDA · DIC 2003"},
+                 {"en": "federal", "texto": "ESTATAL → FEDERAL|→ ESTATAL"}],
      "nombres": ["vice", "haitiana", "federal"],
      "planos": ["@Vice_City_2002:8", "@VC_DE:3", "IMG_VC_Portada", "GTA_15_16", "GTA_15_17", "NUEVO_Tribunal_Florida"],
      "planos_en": [{"en": "vice", "plano": "@Vice_City_2002"},
@@ -181,28 +184,32 @@ BLOQUES = [
                    {"en": "julio", "plano": "@GTA5_2013"}]},
     {"id": "p06", "num": 6, "total": T, "titulo": "2006 · BULLY Y LAS QUEJAS", "capitulo": "2006 · Bully",
      "overlay": "", "anio": 2006, "etiqueta_linea": "2006 · BULLY",
+     # 14 nov: el juez de Miami (The Register, 13 oct 2006; bit-tech, 16 oct 2006) y la coalición de profesores
+     # (The Escapist, 4 mar 2008: piden a las tiendas que no vendan la Scholarship Edition; no es una prohibición legal)
      "texto": ("En 2006 llega Bully, un juego ambientado en un internado llamado Bullworth, donde el protagonista se mueve "
-               "entre pandillas y profesores. Y empezaron las quejas. En 2008, con la Scholarship Edition, una federación de "
-               "profesores de Canadá pidió prohibirlo, por considerar que glorificaba el acoso escolar. La ESRB lo calificó como T, para "
-               "adolescentes. Y aun así despertó reacciones fuertes. ¿Quién decide qué es apropiado? Esa pregunta sigue viva."),
+               "entre pandillas y profesores. Antes de que saliera, Jack Thompson pidió en Miami que se declarara una "
+               "molestia pública. Y el juez hizo algo insólito: pasó unas dos horas viendo cómo un representante de la "
+               "compañía lo jugaba. Su conclusión: no había nada que un niño no pudiera ver en la televisión en horario de "
+               "máxima audiencia. En 2008, con la Scholarship Edition, una coalición de sindicatos de profesores, encabezada "
+               "por la federación canadiense, pidió a las tiendas que no lo vendieran. Decían que glorificaba el acoso escolar."),
      "rotulos": [{"en": "bullworth", "texto": "BULLWORTH|INTERNADO FICTICIO"},
-                 {"en": "federación", "texto": "FEDERACIÓN CANADIENSE|PIDE PROHIBIRLO"},
-                 {"en": "adolescentes", "texto": "ESRB · T|PARA ADOLESCENTES"}],
-     "nombres": ["bullworth", "federación", "adolescentes"],
+                 {"en": "molestia", "texto": "MIAMI · OCT 2006|¿MOLESTIA PÚBLICA?"},
+                 {"en": "juez", "texto": "EL JUEZ LO REVISA|UNAS DOS HORAS"},
+                 {"en": "coalición", "texto": "PROFESORES · 2008|PIDEN NO VENDERLO"}],
+     "nombres": ["bullworth", "molestia", "juez", "coalición"],
      "planos": ["NUEVO_Bully_Portada", "NUEVO_Bully_Captura", "@Historia_GTA:5"],
      "planos_en": [{"en": "bullworth", "plano": "NUEVO_Bully_Captura"},
                    {"en": "federación", "plano": "NUEVO_Bully_Portada"},
-                   {"en": "adolescentes", "plano": "@Historia_GTA"}]},
+                   {"en": "juez", "plano": "@Historia_GTA"}]},
     {"id": "p07", "num": 7, "total": T, "titulo": "2008 · JACK THOMPSON", "capitulo": "2008 · Jack Thompson",
      "overlay": "", "anio": 2008, "cta": True,
-     "texto": ("Y en esta etapa aparece un personaje: Jack Thompson, abogado de Florida y uno de los críticos más activos "
+     "texto": ("Y Thompson no era nuevo en esto. Jack Thompson, abogado de Florida, era uno de los críticos más activos "
                "de los videojuegos violentos. En 2003, un joven aficionado a GTA mató a dos policías y a una operadora de "
                "emergencias en Alabama. En 2005, Thompson demandó a Rockstar en nombre de las familias de las víctimas, "
                "alegando que el juego había influido en el crimen. Pero su propia carrera acabó en los tribunales. El "
                "colegio de abogados investigó su conducta, y el juez que llevó el caso le halló culpable en veintisiete de "
                "los treinta y un cargos. El veinticinco de septiembre de 2008, el Tribunal Supremo de Florida lo inhabilitó de "
-               "forma permanente para ejercer la abogacía. Además, tuvo que pagar las costas del colegio: cuarenta y tres mil "
-               "seiscientos setenta y cinco dólares."),
+               "forma permanente para ejercer la abogacía."),
      "rotulos": [{"en": "thompson", "texto": "JACK THOMPSON|ABOGADO DE FLORIDA"},
                  {"en": "alabama", "texto": "ALABAMA · 2003|2 POLICÍAS + 1"},
                  {"en": "veintisiete", "texto": "27 DE 31 CARGOS"},
@@ -252,10 +259,9 @@ BLOQUES = [
      "capitulo": "2014 · Target y Kmart en Australia", "overlay": "", "anio": 2014, "etiqueta_linea": "2014 · AUSTRALIA",
      "texto": ("Y en diciembre de 2014 llega una polémica sin tribunales. En Australia, las cadenas Target y Kmart retiran "
                "GTA V de sus tiendas. El motivo: una petición que pedía retirarlo por la violencia contra las mujeres que "
-               "muestra. Más de cuarenta mil personas firmaron la campaña, impulsada por Collective Shout. La petición nombraba a Target, y Kmart lo siguió aunque no estaba en ella. Kmart explicó que "
-               "había revisado todo el contenido de la saga y que tomaba la decisión. El consejero delegado de Take-Two criticó "
-               "la retirada: que un grupo decida por millones de personas, dijo, está mal. Los jugadores también se volvieron "
-               "contra las cadenas. Target de Estados Unidos aseguró que en Norteamérica seguiría vendiéndolo."),
+               "muestra. Más de cuarenta mil personas firmaron la campaña, impulsada por Collective Shout. La petición nombraba a Target, y Kmart lo siguió aunque no estaba en ella. "
+               "El consejero delegado de Take-Two criticó "
+               "la retirada: que un grupo decida por millones de personas, dijo, está mal. Target de Estados Unidos aseguró que en Norteamérica seguiría vendiéndolo."),
      "rotulos": [{"en": "australia", "texto": "AUSTRALIA · 2014|TARGET Y KMART"},
                  {"en": "cuarenta", "texto": "+40.000 FIRMAS|COLLECTIVE SHOUT"},
                  {"en": "consejero", "texto": "TAKE-TWO|CRITICA LA RETIRADA"}],
@@ -270,8 +276,7 @@ BLOQUES = [
                "GTA V. En junio, los abogados de Take-Two envían una carta de cese y desista a sus creadores, y la herramienta "
                "deja de distribuirse. La reacción fue inmediata: una avalancha de reseñas negativas en la página del juego en "
                "Steam, y peticiones en internet. Dos semanas después, Take-Two da marcha atrás. La herramienta vuelve a estar "
-               "disponible, y los mods para un jugador vuelven a estar permitidos. Sus creadores dijeron después que nunca apoyaron los mods de GTA Online. Los jugadores "
-               "también tienen algo que decir."),
+               "disponible, y los mods para un jugador vuelven a estar permitidos."),
      "rotulos": [{"en": "openiv", "texto": "OPENIV|HERRAMIENTA DE MODS"},
                  {"en": "junio", "texto": "JUN 2017|CESE Y DESISTA"},
                  {"en": "reseñas", "texto": "RESEÑAS NEGATIVAS|EN STEAM"},
@@ -287,8 +292,8 @@ BLOQUES = [
      "texto": ("En octubre de 2017, otra discusión: el dinero. GTA Online vende las Shark Cards, paquetes de dinero del "
                "juego que se compran con dinero real. Rockstar lo defiende. Su director de diseño, Imran Sarwar, dijo en Game "
                "Informer que la gente puede jugar sin gastarse un dólar, aparte de comprar el juego, porque todas las "
-               "actualizaciones son gratis. Y que las críticas aparecen con cada gran cambio de la saga. Los críticos responden que la economía del juego está pensada para empujar a comprar. Hay quien lo ve como "
-               "un modelo justo. Esa discusión sigue abierta."),
+               "actualizaciones son gratis. Los críticos responden que la economía del juego está pensada para empujar a "
+               "comprar. Esa discusión sigue abierta."),
      "rotulos": [{"en": "shark", "texto": "SHARK CARDS|DINERO REAL"},
                  {"en": "sarwar", "texto": "IMRAN SARWAR|DIRECTOR DE DISEÑO"},
                  {"en": "gratis", "texto": "ACTUALIZACIONES|GRATIS"}],
@@ -318,15 +323,35 @@ BLOQUES = [
                    {"en": "tienda", "plano": "@GTA6_Mirada"}]},
     {"id": "p14", "num": 14, "total": T, "titulo": "2022 · EL HACKEO DE ROCKSTAR", "capitulo": "2022 · El hackeo",
      "overlay": "", "anio": 2022,
-     "texto": ("Septiembre de 2022. Rockstar sufre un hackeo, y aparece en internet material de GTA VI, un juego que todavía "
-               "no había salido. Rockstar lo confirma al día siguiente y dice que el desarrollo sigue. Un juego que despierta "
-               "tanto interés que cualquier filtración se convierte en noticia. Y deja una pregunta en el aire: cómo protege "
-               "un estudio un lanzamiento tan esperado."),
-     "rotulos": [{"en": "septiembre", "texto": "SEPT 2022|HACKEO A ROCKSTAR"}],
-     "nombres": ["septiembre"],
+     # 14 nov: corto; la filtración y el juicio ya los cuenta el vídeo 5 (tarjeta de YouTube a ese vídeo en este bloque)
+     "texto": ("Septiembre de 2022. Un hackeo saca a internet unos noventa vídeos de GTA VI en pleno desarrollo. Rockstar "
+               "lo confirma al día siguiente y dice que el trabajo sigue. Esa historia, con el juicio incluido, la "
+               "contamos en el vídeo de por qué GTA VI ha tardado trece años. Te lo dejo aquí arriba."),
+     "tarjeta_youtube": "https://youtu.be/0wN5lX7CVvc",
+     "rotulos": [{"en": "septiembre", "texto": "SEPT 2022|HACKEO A ROCKSTAR"},
+                 {"en": "noventa", "texto": "~90 VÍDEOS|DE GTA VI"}],
+     "nombres": ["septiembre", "noventa"],
      "planos": ["NUEVO_Pantalla_Texto_Hack", "@GTA_Online:3", "@GTA_Online:4"],
      "planos_en": [{"en": "septiembre", "plano": "NUEVO_Pantalla_Texto_Hack"}]},
-    {"id": "p15", "num": 15, "total": T, "titulo": "2026 · EL DEBATE SOBRE GTA VI",
+    # 14 nov (revisión aprobada): bloque nuevo. Fuentes: The Register (6 nov 2025), Aftermath (10 sep 2026), TechRadar
+    # (ene 2026, sin sueldo provisional). Sin nombres de trabajadores. Antes de publicar, mirar si ya hay sentencia.
+    {"id": "p14b", "num": 15, "total": T, "titulo": "2025 · LOS DESPIDOS EN ROCKSTAR", "capitulo": "2025 · Los despidos",
+     "overlay": "", "anio": 2025, "etiqueta_linea": "2025 · DESPIDOS",
+     "texto": ("Y la polémica más reciente llega desde dentro. A finales de octubre de 2025, Rockstar despide a más de "
+               "treinta empleados en Reino Unido. El sindicato IWGB dice que los echaron por organizarse en un grupo "
+               "privado de Discord, y lo llama persecución sindical. Rockstar responde que compartían información "
+               "confidencial en un foro público, y que no tiene nada que ver con su derecho a sindicarse. En enero de "
+               "2026, el tribunal rechazó obligar a Rockstar a pagarles un sueldo provisional. Y en septiembre empezó el "
+               "juicio en Glasgow, con treinta y un despedidos. A mediados de noviembre, la decisión aún no se conocía."),
+     "rotulos": [{"en": "octubre", "texto": "OCT 2025|+30 DESPIDOS"},
+                 {"en": "iwgb", "texto": "SINDICATO IWGB|«PERSECUCIÓN SINDICAL»"},
+                 {"en": "confidencial", "texto": "ROCKSTAR|«INFORMACIÓN CONFIDENCIAL»"},
+                 {"en": "glasgow", "texto": "GLASGOW · SEP 2026|JUICIO · 31 DESPEDIDOS"}],
+     "nombres": ["octubre", "iwgb", "confidencial", "glasgow"],
+     "planos": ["NUEVO_Despidos_Captura", "NUEVO_Juicio_Glasgow_Captura"],
+     "planos_en": [{"en": "octubre", "plano": "NUEVO_Despidos_Captura"},
+                   {"en": "glasgow", "plano": "NUEVO_Juicio_Glasgow_Captura"}]},
+    {"id": "p15", "num": 16, "total": T, "titulo": "2026 · EL DEBATE SOBRE GTA VI",
      "capitulo": "2026 · El debate sobre GTA VI", "overlay": "", "anio": 2026,
      "final_revisado": True,  # 13 nov: la última frase está entera (36,2-37,9 s); el «No» que oye Whisper es una respiración
      "texto": ("Y llegamos a hoy. GTA VI sale el diecinueve de noviembre, con Vice City otra vez como telón de fondo. Y la "
@@ -343,16 +368,16 @@ BLOQUES = [
      "planos_en": [{"en": "vice", "plano": "@Vice_City"},
                    {"en": "miami", "plano": "T2_Autopista"},
                    {"en": "diecinueve", "plano": "@GTA6_Mirada"}]},
-    {"id": "p16", "num": 16, "total": T, "titulo": "2026 · ¿POR QUÉ ROCKSTAR SIEMPRE GANA?",
+    {"id": "p16", "num": 17, "total": T, "titulo": "2026 · ¿POR QUÉ ROCKSTAR SIEMPRE GANA?",
      "capitulo": "¿Por qué Rockstar siempre gana?", "overlay": "", "anio": 2026,
      "texto": ("Así que la pregunta de fondo: ¿por qué Rockstar parece salir ganando siempre? Primero, la publicidad. En "
                "1997, la polémica de GTA 1 se convirtió en titulares gratis, según los propios creadores. Después, Hot "
-               "Coffee le costó a Take-Two veinticuatro millones y medio de dólares en devoluciones. Pero GTA V ya supera los "
+               "Coffee le costó a Take-Two veinticuatro millones y medio de dólares en devoluciones. Pero GTA V ya roza los "
                "doscientos treinta millones de copias, según Take-Two. En los tribunales, Lindsay Lohan perdió en todas las "
                "instancias, y Jack Thompson acabó inhabilitado. Escándalo, ruido y ventas. Esa es la fórmula que se repite."),
      "rotulos": [{"en": "publicidad", "texto": "PUBLICIDAD|GRATIS"},
                  {"en": "veinticuatro", "texto": "24,5 M$|HOT COFFEE"},
-                 {"en": "doscientos", "texto": "+230 MILLONES|GTA V · TAKE-TWO"}],
+                 {"en": "doscientos", "texto": "CASI 230 MILLONES|GTA V · TAKE-TWO"}],  # proxy de Take-Two, jul 2026
      "nombres": ["publicidad", "veinticuatro", "doscientos"],
      "planos": ["@GTA1_1997:2", "@GTA_Online:2", "Mirada_Terraza", "@Historia_GTA:2"],
      "planos_en": [{"en": "publicidad", "plano": "@Historia_GTA"},
@@ -362,15 +387,15 @@ BLOQUES = [
     {"id": "cierre", "num": None, "titulo": "", "overlay": "", "capitulo": "Cierre", "anio": 2026,
      "texto": ("Y aquí cerramos. En 1997, un juego de coches vistos desde arriba se convirtió en titular por una campaña y "
                "un debate en la Cámara de los Lores. Hoy, con GTA VI a la vuelta de la esquina, la polémica sigue, con otras "
-               "formas. Ahora te toca a ti. ¿Cuál de estas polémicas te parece la más seria: la campaña de 1997, la tortura "
-               "de GTA V o el hackeo de 2022? Y ¿con qué GTA empezaste? Déjamelo en los comentarios, que tengo curiosidad por "
-               "ver cuál gana. Si te ha gustado, suscríbete, que el diecinueve estaremos por aquí. Nos vemos en Leónida."),
+               "formas. Ahora te toca a ti: ¿cuál fue la más grave? ¿Hot Coffee, la tortura de GTA V, el hackeo de 2022 o "
+               "los despidos de 2025? Déjamelo en los comentarios. Si te ha "
+               "gustado, suscríbete, que el diecinueve estaremos por aquí. Nos vemos en Leónida."),
      "rotulos": [{"en": "1997", "texto": "1997 → 2026"},
-                 {"en": "empezaste", "texto": "¿CON CUÁL|EMPEZASTE?"}],
-     "nombres": ["1997", "empezaste"],
+                 {"en": "grave", "texto": "¿CUÁL FUE|LA MÁS GRAVE?"}],
+     "nombres": ["1997", "grave"],
      "planos": ["Mirada_Skyline_Noche", "VL_Atardecer_Final", "VL_Lancha_Pareja", "@Vice_City:3", "VL_Azotea_1", "@GTA6_Mirada:1"],
      "planos_en": [{"en": "1997", "plano": "GTA_15_02"},
-                   {"en": "empezaste", "plano": "@GTA6_Mirada"}]},
+                   {"en": "grave", "plano": "@GTA6_Mirada"}]},
 ]
 
 for _b in BLOQUES:
