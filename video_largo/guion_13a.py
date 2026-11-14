@@ -6,9 +6,43 @@ Sin VIDEOS_EXTRA: los vídeos oficiales se añaden cuando estén verificados.
 """
 import re
 
-VIDEOS_EXTRA = {}  # vacío: solo URLs oficiales verificadas (ver investigacion.md)
+VIDEOS_EXTRA = {  # 14 nov: fuentes oficiales de Rockstar en 2160p (planos_4k.md)
+    "GTAO_Bounties_4K": "https://videos-rockstargames-com.akamaized.net/v4/oa46rs8r/flv/en-us-2160p.mp4",
+    "GTAO_CE_4K": "https://videos-rockstargames-com.akamaized.net/v4/8rakra67/flv/en-us-2160p.mp4",
+    "GTAO_Cluckin_4K": "https://videos-rockstargames-com.akamaized.net/v4/r3175t5r/flv/en-us-2160p.mp4",
+    "GTAO_Kanjo_4K": "https://videos-rockstargames-com.akamaized.net/v4/3ra4t562/flv/en-us-2160p.mp4",
+    "GTAO_Kortz_4K": "https://videos-rockstargames-com.akamaized.net/v4/a0a0rre4/flv/en-us-2160p.mp4",
+    "GTAO_Luiva_4K": "https://videos-rockstargames-com.akamaized.net/v4/203as2rs/flv/en-us-2160p.mp4",
+    "GTAO_PS5_4K": "https://videos-rockstargames-com.akamaized.net/v4/1s626s55/flv/en-us-2160p.mp4",
+    "GTAO_Pizza_4K": "https://videos-rockstargames-com.akamaized.net/v4/aro34sg4/flv/en-us-2160p.mp4",
+    "GTAO_Sabotage_4K": "https://videos-rockstargames-com.akamaized.net/v4/r50k6mmg/flv/en-us-2160p.mp4",
+    "GTAO_Safehouse_4K": "https://videos-rockstargames-com.akamaized.net/v4/to78rk1o/flv/en-us-2160p.mp4",
+    "GTAO_Vigero_4K": "https://videos-rockstargames-com.akamaized.net/v4/k1t75kk6/flv/en-us-2160p.mp4",
+    "GTAO_Weevil_4K": "https://videos-rockstargames-com.akamaized.net/v4/a9233r59/flv/en-us-2160p.mp4",
+    "GTAV_PC_4K": "https://videos-rockstargames-com.akamaized.net/v4/ks18e7s9/flv/en-us-2160p.mp4",
+    "GTAV_PS5_4K": "https://videos-rockstargames-com.akamaized.net/v4/r3too449/flv/en-us-2160p.mp4",
+    "LANoire_4K": "https://videos-rockstargames-com.akamaized.net/v4/3rr4o8so/flv/en-us-2160p.mp4",
+    "Lanz": "https://media-rockstargames-com.akamaized.net/VI/downloads/videos/GTAVI_Launch_Trailer/GTAVI_Launch_Trailer.mp4",
+    "Mirada4K": "https://videos-rockstargames-com.akamaized.net/v4/rk721912/flv/es-es-2160p.mp4",
+    "PreLoad": "https://media-rockstargames-com.akamaized.net/VI/downloads/videos/GTAVI_Pre-Load_Now/GTAVI_Pre-Load_Now.mp4",
+    "RDO_Beta_4K": "https://videos-rockstargames-com.akamaized.net/v4/r5tc99c3/flv/en-us-2160p.mp4",
+    "RDO_BloodMoney_4K": "https://videos-rockstargames-com.akamaized.net/v4/3a753kct/flv/en-us-2160p.mp4",
+    "RDO_Frontier_4K": "https://videos-rockstargames-com.akamaized.net/v4/c686k8ok/flv/en-us-2160p.mp4",
+    "RDO_Lanz_4K": "https://videos-rockstargames-com.akamaized.net/v4/5611kt7k/flv/en-us-2160p.mp4",
+    "RDO_Moonshiners_4K": "https://videos-rockstargames-com.akamaized.net/v4/57s1k75o/flv/en-us-2160p.mp4",
+    "RDO_Naturalist_4K": "https://videos-rockstargames-com.akamaized.net/v4/k56k16rs/flv/en-us-2160p.mp4",
+    "RDR2_4K": "https://videos-rockstargames-com.akamaized.net/v4/6c8k48rr/flv/en-us-2160p.mp4",
+    "RDR2_Gameplay_4K": "https://videos-rockstargames-com.akamaized.net/v4/1ook234t/flv/en-us-2160p.mp4",
+    "RDR2_PC_4K": "https://videos-rockstargames-com.akamaized.net/v4/9krr33s1/flv/en-us-2160p.mp4",
+    "T1": "https://media-rockstargames-com.akamaized.net/VI/downloads/videos/GTAVI_Trailer_1/GTAVI_Trailer_1.mp4",
+    "T2": "https://media-rockstargames-com.akamaized.net/VI/downloads/videos/GTAVI_Trailer_2/GTAVI_Trailer_2.mp4",
+    "Trilogy_4K": "https://videos-rockstargames-com.akamaized.net/v4/8ta2r546/flv/en-us-2160p.mp4",
+}
+SIN_BANDAS = {'GTAO_CE_4K', 'GTAO_Kanjo_4K', 'GTAO_PS5_4K', 'GTAO_Pizza_4K', 'GTAO_Vigero_4K', 'GTAO_Weevil_4K', 'Mirada4K', 'RDR2_Gameplay_4K', 'T1'}  # sin letterbox: sin cropdetect
+LENTO_MAX = {'GTAV_PC_4K': 2.0}  # 60 fps; en el resto la c�mara lenta se limita a 1,25
+FUENTES_REMOTAS = True  # cada tramo se lee de la URL 4K (no se baja el vídeo entero)
 
-PLANOS_FIJOS = {"GTA_15_01", "Mirada_Logo", "VL_Fecha", "VL_Atardecer_Final", "NUEVO_Absurd_Logo"}
+PLANOS_FIJOS = {"NUEVO_Absurd_Logo", "NUEVO_Foto_Houser", "NUEVO_Foto_Zelnick", "NUEVO_Texto_Hechos"}
 
 RECORTES = {}
 MARCO = True
@@ -67,10 +101,13 @@ BLOQUES = [
                  {"en": "cincuenta", "texto": "50 MINUTOS|DE GTA VI"},
                  {"en": "trece", "texto": "13 AÑOS|DESPUÉS DE GTA V"}],
      "nombres": ["noventa", "trece"],
-     "planos": ["NUEVO_Filtracion_Foro", "NUEVO_Comunicado_Rockstar", "GTA_15_01", "Mirada_Logo", "T1_Noche_Aerea", "@GTA5_2013:2", "@GTA6_Mirada:1"],
-     "planos_en": [{"en": "noventa", "plano": "NUEVO_Filtracion_Foro"},
-                   {"en": "confirma", "plano": "NUEVO_Comunicado_Rockstar"},
-                   {"en": "trece", "plano": "GTA_15_01"}]},
+     "planos": ["NUEVO_Filtracion_Foro", "K5_Mir_Llegada_Noche", "NUEVO_Comunicado_Rockstar", "K5_GTAV_Coche_Atardecer", "K5_Img_VC_Skyline_Helicoptero", "K5_T2_Atardecer_Aereo", "K5_Img_Leonida_Keys_Avioneta", "K5_Img_Grassrivers_Hidrodeslizador"],
+     "planos_en": [{"en": "cincuenta", "plano": "K5_Mir_Llegada_Noche"},
+              {"en": "noventa", "plano": "NUEVO_Filtracion_Foro"},
+              {"en": "confirma", "plano": "NUEVO_Comunicado_Rockstar"},
+              {"en": "trece", "plano": "K5_GTAV_Coche_Atardecer"},
+              {"en": "noviembre", "plano": "K5_Img_VC_Skyline_Helicoptero"},
+              {"en": "tiempo", "plano": "K5_T2_Atardecer_Aereo"}]},
 
     # ---------------------------------------------------------------- ACTO I · EL DINERO NO PARA (2013-2015)
     {"id": "p01", "num": 1, "total": T, "titulo": "2013 · GTA V", "capitulo": "2013 · GTA V",
@@ -84,10 +121,12 @@ BLOQUES = [
                  {"en": "ladrón", "texto": "MICHAEL|LADRÓN RETIRADO"},
                  {"en": "doscientos", "texto": "CASI 230 MILLONES|DE COPIAS"}],
      "nombres": ["septiembre", "ladrón", "desierto", "atraco", "doscientos"],
-     "planos": ["@GTA5_2013:4", "Lanz_Paseo", "Mirada_Atardecer", "@GTA5_2013:4"],
-     "planos_en": [{"en": "ladrón", "plano": "@GTA5_2013"},
-                   {"en": "desierto", "plano": "Lanz_Paseo"},
-                   {"en": "atraco", "plano": "@GTA5_2013"}]},
+     "planos": ["K5_GTAV_Puesta_Cables", "K5_GTAV_Michael_Tenis", "K5_GTAV_Franklin_Puerta", "K5_GTAO_Chimeneas", "K5_GTAO_Edificio_Contrapicado", "K5_Img_GTAO_Laser", "K5_GTAV_Trevor_Trio", "K5_GTAV_Puente_Rio", "K5_GTAV_Coche_Costa", "K5_Img_GTAO_Camara_Kortz", "K5_GTAO_Rascacielos", "K5_Img_GTAO_Michael_Sofa", "K5_Img_GTAO_Coche_Verde"],
+     "planos_en": [{"en": "septiembre", "plano": "K5_GTAV_Puesta_Cables"},
+              {"en": "Michael", "plano": "K5_GTAV_Michael_Tenis"},
+              {"en": "Franklin", "plano": "K5_GTAV_Franklin_Puerta"},
+              {"en": "cambiar", "plano": "K5_GTAV_Trevor_Trio"},
+              {"en": "atraco", "plano": "K5_Img_GTAO_Camara_Kortz"}]},
     {"id": "p02", "num": 2, "total": T, "titulo": "2013-2026 · EL DINERO", "capitulo": "2013-2026 · El dinero",
      "overlay": "", "anio": 2013, "etiqueta_linea": "2013-2026 · DINERO",
      "texto": ("Y después está GTA Online, el modo online que se abre en octubre de dos mil trece y no se acaba nunca. En febrero de dos mil catorce, Take-Two dijo que cerca del setenta por ciento de los jugadores de GTA V con internet ya lo había probado. "
@@ -101,9 +140,12 @@ BLOQUES = [
                  {"en": "setenta", "n": 2, "texto": "78% DE LOS|INGRESOS"},
                  {"en": "toda", "texto": "TODA TAKE-TWO|NO SOLO GTA"}],
      "nombres": ["Online", "octubre", "toda"],
-     "planos": ["@GTA_Online:4", "NUEVO_Cuentas_TakeTwo", "@GTA_Online:11"],
-     "planos_en": [{"en": "online", "plano": "@GTA_Online"},
-                   {"en": "ingresos", "plano": "NUEVO_Cuentas_TakeTwo"}]},
+     "planos": ["K5_GTAO_Atico_Fiesta", "K5_GTAO_Atico_Ventanal", "K5_GTAO_Dos_Hombres_Casa", "K5_Img_GTAO_Derrape_Doble", "K5_GTAO_Garaje_Neon", "K5_Img_GTAO_Plan_Golpe", "K5_Img_GTAO_Vitrina_Oro", "K5_Img_GTAO_Banda", "K5_GTAO_Aereo_Kortz", "K5_GTAO_Tuning_Garaje", "K5_Img_GTAO_Coche_Neon", "NUEVO_Cuentas_TakeTwo", "K5_GTAO_Oficina_Agentes", "K5_Img_GTAO_Coches_Noche", "K5_GTAO_Dos_Personajes", "K5_Img_GTAO_Grupo_Camion"],
+     "planos_en": [{"en": "online", "plano": "K5_GTAO_Atico_Fiesta"},
+              {"en": "ingresos", "plano": "NUEVO_Cuentas_TakeTwo"},
+              {"en": "monedas", "plano": "K5_Img_GTAO_Vitrina_Oro"},
+              {"en": "contenidos", "plano": "K5_Img_GTAO_Coche_Neon"},
+              {"en": "motores", "plano": "K5_GTAO_Garaje_Neon"}]},
 
     # ---------------------------------------------------------------- NUEVO · EL ROL (2019-2023)
     {"id": "p03", "num": 3, "total": T, "titulo": "2019-2023 · EL ROL", "capitulo": "2019-2023 · El rol",
@@ -121,10 +163,14 @@ BLOQUES = [
                  {"en": "Cfx", "texto": "CFX.RE|COMPRADO EN 2023"},
                  {"en": "quince", "texto": "PROHIBIDO|EN 2015"}],
      "nombres": ["Twitch", "Cfx"],
-     "planos": ["NUEVO_Twitch_Captura", "NUEVO_Cfx_Comunicado", "@GTA_Online:2", "@GTA_Online:11", "@GTA6_Mirada:2"],
-     "planos_en": [{"en": "Twitch", "plano": "NUEVO_Twitch_Captura"},
-                   {"en": "Cfx", "plano": "NUEVO_Cfx_Comunicado"},
-                   {"en": "quince", "plano": "@GTA_Online"}]},
+     "planos": ["K5_Img_GTAV_Skyline_Rol", "K5_GTAV_Persecucion_Policia", "K5_Img_GTAV_Rol_BurgerShot", "K5_GTAO_Pizza_Moto", "K5_GTAO_Pizza_Moto_2", "K5_GTAO_Lavadero", "K5_GTAV_Ruta68_Policia", "NUEVO_Twitch_Captura", "K5_Img_GTAO_Bicis", "K5_GTAO_Paso_Inferior", "K5_Img_GTAO_Policia_Comisaria", "K5_Img_GTAO_Desguace", "K5_GTAO_Carretera_Noche", "K5_GTAO_Carretera_Monte", "K5_Img_GTAO_Jugador_Noche", "K5_GTAO_Granja_Aerea", "NUEVO_Cfx_Comunicado", "K5_GTAO_Taller_Bennys", "K5_RDR2_Pueblo_Valentine", "K5_Img_GTAO_Coche_Policia", "K5_Img_GTAO_Coche_Neon_PS5"],
+     "planos_en": [{"en": "rol", "plano": "K5_Img_GTAV_Rol_BurgerShot"},
+              {"en": "policía", "plano": "K5_GTAV_Persecucion_Policia"},
+              {"en": "taxista", "plano": "K5_GTAO_Pizza_Moto"},
+              {"en": "Twitch", "plano": "NUEVO_Twitch_Captura"},
+              {"en": "prohibido", "plano": "K5_GTAV_Ruta68_Policia"},
+              {"en": "Cfx", "plano": "NUEVO_Cfx_Comunicado"},
+              {"en": "RedM", "plano": "K5_RDR2_Pueblo_Valentine"}]},
 
     # ---------------------------------------------------------------- ACTO I (cont.) · REEDICIONES (2014-2022)
     {"id": "p04", "num": 4, "total": T, "titulo": "2014-2022 · REEDICIONES", "capitulo": "2014-2022 · Reediciones",
@@ -136,9 +182,10 @@ BLOQUES = [
                  {"en": "veintidós", "texto": "2022 · PS5 · XBOX SERIES"},
                  {"en": "mismo", "texto": "MISMO MAPA|OTRA VEZ"}],
      "nombres": [],
-     "planos": ["NUEVO_Reediciones_Logos", "@GTA5_2013:2", "T1_Autopista", "@GTA5_2013:3"],
+     "planos": ["NUEVO_Reediciones_Logos", "K5_GTAO_Colinas_Amanecer", "K5_GTAO_Autopista_Bruma", "K5_GTAO_Avion_Contraluz", "K5_GTAO_Cartel_Licores", "K5_Img_GTAO_Todoterreno", "K5_Img_GTAO_Muscle", "K5_Img_GTAO_Derrape_PS5"],
      "planos_en": [{"en": "catorce", "plano": "NUEVO_Reediciones_Logos"},
-                   {"en": "mismo", "plano": "@GTA5_2013"}]},
+              {"en": "veintidós", "plano": "K5_Img_GTAO_Todoterreno"},
+              {"en": "mapa", "plano": "K5_GTAO_Colinas_Amanecer"}]},
 
     # ---------------------------------------------------------------- NUEVO · GTA PLUS (2022)
     {"id": "p05", "num": 5, "total": T, "titulo": "2022 · GTA PLUS", "capitulo": "2022 · GTA Plus",
@@ -152,9 +199,11 @@ BLOQUES = [
      "rotulos": [{"en": "marzo", "texto": "25 MAR 2022|GTA PLUS"},
                  {"en": "cuota", "texto": "SUSCRIPCIÓN|MENSUAL"}],
      "nombres": [],
-     "planos": ["NUEVO_GTAPlus_Captura", "@GTA6_Mirada:6"],
+     "planos": ["NUEVO_GTAPlus_Captura", "K5_Img_GTAPlus_Quedada", "K5_Img_GTAPlus_Superdeportivo", "K5_Img_GTAO_Pareja_Helicoptero", "K5_Img_GTAPlus_Oficina", "K5_Img_GTAO_Garaje_Deportivo", "K5_Img_GTAO_Hombre_Coche", "K5_Img_GTAO_Ruleta", "K5_Img_GTAO_Exposicion", "K5_Img_GTAO_Hidroavion", "K5_Img_GTAO_Deportivo_Noche"],
      "planos_en": [{"en": "marzo", "plano": "NUEVO_GTAPlus_Captura"},
-                   {"en": "cuota", "plano": "@GTA6_Mirada"}]},
+              {"en": "suscripción", "plano": "K5_Img_GTAPlus_Quedada"},
+              {"en": "cuota", "plano": "K5_Img_GTAPlus_Superdeportivo"},
+              {"en": "recompensas", "plano": "K5_Img_GTAO_Ruleta"}]},
 
     # ---------------------------------------------------------------- ACTO II · EL OTRO GRAN PROYECTO (2010-2018)
     {"id": "p06", "num": 6, "total": T, "titulo": "2010-2018 · RED DEAD REDEMPTION 2",
@@ -170,9 +219,11 @@ BLOQUES = [
                  {"en": "veintiséis", "texto": "26 OCT 2018|RED DEAD 2"},
                  {"en": "morgan", "texto": "ARTHUR MORGAN"}],
      "nombres": ["Morgan", "western"],
-     "planos": ["NUEVO_RDR2_Paisaje", "NUEVO_RDR2_Arthur", "NUEVO_RDR2_Caballo", "@RDR2_2018:4", "@GTA6_Mirada:4"],
-     "planos_en": [{"en": "western", "plano": "NUEVO_RDR2_Paisaje"},
-                   {"en": "morgan", "plano": "NUEVO_RDR2_Arthur"}]},
+     "planos": ["K5_RDR2_Campamento", "K5_RDR2_Desierto_Cactus", "K5_RDR2_Bosque", "K5_RDR2_Pueblo_Ocaso", "K5_RDR2_Tren_Puente", "K5_RDR2_Pantano_Garza", "K5_RDR2_Puente_Cuerda", "K5_RDR2_Paisaje_Amanecer", "K5_RDR2_Pueblo_Atardecer", "K5_RDR2_Arthur_Caballo", "K5_RDR2_Ciervo_Bosque", "K5_RDR2_Pueblo_Caballo", "K5_RDR2_Bosque_Niebla", "K5_RDR2_Saint_Denis", "K5_RDR2_Arbol_Noche", "K5_RDR2_Valle_Lago", "NUEVO_Foto_RockstarNorth"],
+     "planos_en": [{"en": "Redemption", "plano": "K5_RDR2_Campamento"},
+              {"en": "western", "plano": "K5_RDR2_Desierto_Cactus"},
+              {"en": "Morgan", "plano": "K5_RDR2_Arthur_Caballo"},
+              {"en": "banda", "plano": "K5_RDR2_Arbol_Noche"}]},
     {"id": "p07", "num": 7, "total": T, "titulo": "2018-2019 · RED DEAD ONLINE", "capitulo": "2018-2019 · Red Dead Online",
      "overlay": "", "anio": 2018, "etiqueta_linea": "2018 · RED DEAD ONLINE",
      "texto": ("Y un mes después, el veintisiete de noviembre de dos mil dieciocho, abre en beta Red Dead Online, el modo online del juego. El juego, según Take-Two, ya suma más de ochenta y cinco millones de copias. Otra vez un mundo que no se acaba, con "
@@ -183,9 +234,10 @@ BLOQUES = [
                  {"en": "ochenta", "texto": "+85 MILLONES|RED DEAD 2"},
                  {"en": "hereda", "texto": "LO QUE HEREDA|GTA VI"}],
      "nombres": ["Online"],
-     "planos": ["NUEVO_RDO_Captura", "@Historia_GTA:8"],
-     "planos_en": [{"en": "online", "plano": "NUEVO_RDO_Captura"},
-                   {"en": "lugar", "plano": "@Historia_GTA"}]},
+     "planos": ["K5_RDO_Jinetes_Silueta", "K5_RDO_Jinetes_Galope", "K5_RDO_Cabana", "K5_RDO_Jinete_Ocaso", "K5_RDO_Ruedas_Carro", "K5_RDO_Jinete_Nieve", "K5_RDO_Bosque_Nevado", "K5_RDO_Mirador", "K5_RDO_Tren_Ocaso", "K5_RDO_Canon_Jinetes", "K5_RDO_Contrabajo", "K5_RDO_Casa_Grupo", "K5_RDO_Noche_Luna"],
+     "planos_en": [{"en": "beta", "plano": "K5_RDO_Jinetes_Silueta"},
+              {"en": "online", "plano": "K5_RDO_Jinetes_Galope"},
+              {"en": "lugar", "plano": "K5_RDO_Mirador"}]},
 
     # ---------------------------------------------------------------- ACTO III · EL CAMBIO Y EL SUSTO (2020-2022)
     {"id": "p08", "num": 8, "total": T, "titulo": "2020-2023 · DAN HOUSER SE VA", "capitulo": "2020-2023 · Dan Houser se va",
@@ -203,9 +255,12 @@ BLOQUES = [
                  {"en": "absurd", "texto": "ABSURD VENTURES|REGISTRADA 2021"},
                  {"en": "junio", "texto": "JUN 2023|ESTUDIO DE MEDIOS"}],
      "nombres": ["Houser", "Absurd"],
-     "planos": ["NUEVO_Houser_Captura", "NUEVO_Absurd_Logo", "Mirada_Mar_Atardecer", "@Historia_GTA:8"],
-     "planos_en": [{"en": "houser", "plano": "NUEVO_Houser_Captura"},
-                   {"en": "absurd", "plano": "NUEVO_Absurd_Logo"}]},
+     "planos": ["NUEVO_Houser_Captura", "K5_GTAV_Lester_Plan", "K5_RDR2_Dutch_Arthur", "K5_RDR2_Hoguera_Guitarra", "K5_RDR2_Banda_Baile", "NUEVO_Absurd_Logo", "K5_RDR2_Campamento_Hoguera", "K5_RDR2_Campamento_Charla", "K5_RDR2_Arthur_Pueblo", "K5_RDR2_Torre_Silueta", "K5_RDR2_Lago_Chimeneas", "K5_RDR2_Banda_Pueblo", "K5_Img_JL_Abrazo_Skyline", "NUEVO_Foto_Houser"],
+     "planos_en": [{"en": "Houser", "plano": "NUEVO_Houser_Captura"},
+              {"en": "guionista", "plano": "K5_GTAV_Lester_Plan"},
+              {"en": "Redemption", "plano": "K5_RDR2_Dutch_Arthur"},
+              {"en": "Absurd", "plano": "NUEVO_Absurd_Logo"},
+              {"en": "Sam", "plano": "K5_Img_JL_Abrazo_Skyline"}]},
 
     # ---------------------------------------------------------------- NUEVO · RUFFIAN (2020)
     {"id": "p09", "num": 9, "total": T, "titulo": "2020 · RUFFIAN", "capitulo": "2020 · Rockstar Dundee",
@@ -219,9 +274,10 @@ BLOQUES = [
                  {"en": "Dundee", "texto": "DUNDEE|→ ROCKSTAR DUNDEE"},
                  {"en": "cuarenta", "texto": "~40 EMPLEADOS"}],
      "nombres": ["Dundee"],
-     "planos": ["NUEVO_Ruffian_Captura", "Mirada_Skyline_Azotea", "T1_Lancha_Rapida", "@Historia_GTA:8"],
-     "planos_en": [{"en": "octubre", "plano": "NUEVO_Ruffian_Captura"},
-                   {"en": "cuarenta", "plano": "Mirada_Skyline_Azotea"}]},
+     "planos": ["NUEVO_Ruffian_Captura", "K5_Lanz_Barco_Manos", "K5_Img_VC_Ciudad_Aerea", "K5_Img_Port_Gellhorn_Ocaso", "K5_Img_Grassrivers_Skyline", "K5_Img_VC_Persecucion_Noche", "K5_Img_Kalaga_Canon", "K5_Img_VC_Concierto", "K5_Img_Ambrosia_Moteros", "NUEVO_Foto_Dundee"],
+     "planos_en": [{"en": "crece", "plano": "K5_Img_VC_Ciudad_Aerea"},
+              {"en": "octubre", "plano": "NUEVO_Ruffian_Captura"},
+              {"en": "manos", "plano": "K5_Lanz_Barco_Manos"}]},
 
     {"id": "p10", "num": 10, "total": T, "titulo": "2021 · THE TRILOGY", "capitulo": "2021 · The Trilogy",
      "overlay": "", "anio": 2021, "etiqueta_linea": "2021 · TRILOGY",
@@ -231,9 +287,10 @@ BLOQUES = [
      "rotulos": [{"en": "noviembre", "texto": "NOV 2021|THE TRILOGY"},
                  {"en": "veinte", "texto": "20 AÑOS DESPUÉS"}],
      "nombres": ["Trilogy"],
-     "planos": ["@GTA3_DE:3", "@VC_DE:3", "@SA_DE:2"],
-     "planos_en": [{"en": "trilogy", "plano": "@VC_DE"},
-                   {"en": "veinte", "plano": "@GTA3_DE"}]},
+     "planos": ["K5_Tril_SA_Desierto", "K5_Tril_GTA3_Tren", "K5_Img_Tril_VC_Calle", "K5_Tril_SA_Grove", "K5_Img_Tril_SA_Ciudad", "K5_Tril_SA_Casinos", "K5_Tril_GTA3_Lluvia", "K5_Tril_SA_Casa"],
+     "planos_en": [{"en": "Trilogy", "plano": "K5_Tril_SA_Desierto"},
+              {"en": "Vice", "plano": "K5_Img_Tril_VC_Calle"},
+              {"en": "veinte", "plano": "K5_Tril_GTA3_Lluvia"}]},
     {"id": "p11", "num": 11, "total": T, "titulo": "2022 · CÓMO OCURRIÓ", "capitulo": "2022 · Cómo ocurrió",
      "overlay": "", "anio": 2022, "etiqueta_linea": "2022 · FILTRACIÓN",
      "texto": ("Y en septiembre de dos mil veintidós llega el susto. Entra en los sistemas de Rockstar un chico de Oxford, "
@@ -246,9 +303,11 @@ BLOQUES = [
                  {"en": "hotel", "texto": "HOTEL · FIRE STICK|SEGÚN LA PRENSA"},
                  {"en": "noventa", "texto": "~90 CLIPS|DEL JUEGO"}],
      "nombres": ["Kurtaj"],
-     "planos": ["NUEVO_Texto_Hechos", "T1_Playa_Aerea", "@GTA6_Mirada:4"],
-     "planos_en": [{"en": "hotel", "plano": "NUEVO_Texto_Hechos"},
-                   {"en": "foro", "plano": "@GTA6_Mirada"}]},
+     "planos": ["K5_Mir_Monitores", "K5_Mir_Vestibulo", "NUEVO_Texto_Hechos", "K5_Img_Motel_Noche", "K5_Img_Lucia_Esposada", "K5_Mir_Telefono", "K5_Mir_Pasillo", "K5_Mir_Coche_Oscuro"],
+     "planos_en": [{"en": "sistemas", "plano": "K5_Mir_Monitores"},
+              {"en": "fianza", "plano": "NUEVO_Texto_Hechos"},
+              {"en": "hotel", "plano": "K5_Img_Motel_Noche"},
+              {"en": "teléfono", "plano": "K5_Mir_Telefono"}]},
     {"id": "p12", "num": 12, "total": T, "titulo": "2022-2023 · EL MENSAJE Y EL JUICIO",
      "capitulo": "2022-2023 · El mensaje y el juicio", "overlay": "", "anio": 2022, "etiqueta_linea": "2022 · JUICIO",
      "texto": ("El diecinueve de septiembre, Rockstar lo confirma: un tercero accedió sin permiso a sus sistemas y descargó "
@@ -261,14 +320,16 @@ BLOQUES = [
      "rotulos": [{"en": "diecinueve", "texto": "19 SEP 2022|ROCKSTAR LO CONFIRMA"},
                  {"en": "cinco", "texto": "5 MILLONES $|Y MILES DE HORAS"}],
      "nombres": ["Londres", "cinco"],
-     "planos": ["NUEVO_Juicio_Southwark", "@GTA6_Mirada:5"],
-     "planos_en": [{"en": "confirma", "plano": "@GTA6_Mirada"},
-                   {"en": "londres", "plano": "NUEVO_Juicio_Southwark"}]},
+     "planos": ["K5_Mir_Calle_Club", "K5_Img_VC_Noria_Noche", "K5_Lanz_Preparativos", "NUEVO_Juicio_Southwark", "K5_Mir_Coche_Pista", "K5_Img_JL_Conduce_Noche", "K5_Img_VC_Peluqueria", "K5_Img_VC_Gasolinera_Noche", "K5_Mir_Pista_Avion", "K5_Img_Ambrosia_Noche", "K5_Img_VC_Skyline_Noche", "NUEVO_Foto_Southwark"],
+     "planos_en": [{"en": "confirma", "plano": "K5_Img_VC_Noria_Noche"},
+              {"en": "trabajo", "plano": "K5_Mir_Calle_Club"},
+              {"en": "Londres", "plano": "NUEVO_Juicio_Southwark"},
+              {"en": "millones", "plano": "K5_Img_VC_Skyline_Noche"}]},
 
     # ---------------------------------------------------------------- ACTO IV · LA ESPERA (2023-2026)
     {"id": "p13", "num": 13, "total": T, "titulo": "2023 · EL PRIMER TRÁILER", "capitulo": "2023 · El primer tráiler",
      "overlay": "", "anio": 2023, "etiqueta_linea": "2023 · TRÁILER 1",
-     "cartela": {"anio": "2023", "acto": "ACTO IV", "titulo": "LA ESPERA"}, "intro_original": "T1_Musica_Petty",
+     "cartela": {"anio": "2023", "acto": "ACTO IV", "titulo": "LA ESPERA"},
      "texto": ("En diciembre de dos mil veintitrés llega el primer tráiler. Se filtra una versión de baja calidad un día "
                "antes, y Rockstar lo publica esa misma noche. Vuelve Vice City. Y de fondo suena Love Is a Long Road, de Tom "
                "Petty, una canción de los ochenta para la ciudad de los ochenta. Por fin, el juego empezaba a parecer real."),
@@ -276,10 +337,10 @@ BLOQUES = [
                  {"en": "petty", "texto": "TOM PETTY|LOVE IS A LONG ROAD"},
                  {"en": "vice", "texto": "VICE CITY"}],
      "nombres": ["Vice", "Petty"],
-     "planos": ["T1_Neones", "T1_Coches_Noche", "T1_Camioneta", "@Vice_City:4"],
-     "planos_en": [{"en": "vuelve", "plano": "T1_Neones"},
-                   {"en": "vice", "plano": "@GTA6_T1"},
-                   {"en": "petty", "plano": "T1_Musica_Petty"}]},
+     "planos": ["K5_T1_Lucia_Ventana", "K5_Img_VC_Letras", "K5_T1_Playa_Paseo", "K5_Img_Lucia_Calle", "K5_Img_VC_Neones_Policia", "K5_Img_JL_Baile_Neon", "K5_PreLoad_Club_Neon", "K5_Img_VC_Coche_Rosa"],
+     "planos_en": [{"en": "diciembre", "plano": "K5_T1_Lucia_Ventana"},
+              {"en": "Vice", "plano": "K5_Img_VC_Letras"},
+              {"en": "Petty", "plano": "K5_Img_VC_Neones_Policia"}]},
     {"id": "p14", "num": 14, "total": T, "titulo": "2025-2026 · LOS RETRASOS", "capitulo": "2025-2026 · Los retrasos",
      "overlay": "", "anio": 2025, "etiqueta_linea": "2025 · RETRASOS",
      "texto": ("Rockstar tenía fecha para el otoño de dos mil veinticinco. En mayo de ese año la mueve al veintiséis de mayo "
@@ -291,10 +352,10 @@ BLOQUES = [
                  {"en": "pointer", "texto": "THE POINTER SISTERS|HOT TOGETHER"},
                  {"en": "diecinueve", "texto": "RETRASO|→ 19 NOV 2026"}],
      "nombres": ["otoño", "veintiséis", "Pointer", "diecinueve"],
-     "planos": ["T2_Jason_Tejado", "T2_Cayos_Aereo", "T2_Autopista", "T2_Casa_Pilotes", "T2_Muelle_Atardecer", "Mirada_Paracaidas", "Lanz_Moto_Salto", "@GTA6_T2:1"],
-     "planos_en": [{"en": "otoño", "plano": "T2_Autopista"},
-                   {"en": "pointer", "plano": "T2_Muelle_Atardecer"},
-                   {"en": "diecinueve", "plano": "VL_Fecha"}]},
+     "planos": ["K5_T2_Jason_Noche", "K5_T2_Torre_Prision", "K5_T2_Reencuentro", "K5_T2_Moto_Avioneta", "K5_Img_JL_Moto_Helicoptero", "K5_Img_Jason_Noche", "K5_Img_VC_Puerto"],
+     "planos_en": [{"en": "mayo", "plano": "K5_T2_Jason_Noche"},
+              {"en": "Pointer", "plano": "K5_T2_Reencuentro"},
+              {"en": "diecinueve", "plano": "K5_Img_VC_Puerto"}]},
     {"id": "p15", "num": 15, "total": T, "titulo": "2025 · LO QUE SE CUENTA", "capitulo": "2025 · Lo que se cuenta desde dentro",
      "overlay": "", "anio": 2025, "etiqueta_linea": "2025 · DESDE DENTRO",
      "texto": ("Jason Schreier, de Bloomberg, escribió en redes que nadie de Rockstar creía "
@@ -305,9 +366,10 @@ BLOQUES = [
                  {"en": "crunch", "texto": "INFORMES, NO|DATOS OFICIALES"},
                  {"en": "cinco", "texto": "5 DÍAS A LA SEMANA|EN OFICINA"}],
      "nombres": ["Schreier", "crunch"],
-     "planos": ["NUEVO_Schreier_Bluesky", "@GTA6_Mirada:3"],
-     "planos_en": [{"en": "schreier", "plano": "NUEVO_Schreier_Bluesky"},
-                   {"en": "crunch", "plano": "@GTA6_Mirada"}]},
+     "planos": ["NUEVO_Schreier_Bluesky", "K5_Img_Brian_Papeles", "K5_Mir_Sofa", "K5_Img_Boobie_Despacho", "K5_Img_DreQuan_Estudio", "K5_Img_Raul_Telefono", "K5_Img_Jason_Mesa", "K5_Img_Cal_Billar"],
+     "planos_en": [{"en": "Schreier", "plano": "NUEVO_Schreier_Bluesky"},
+              {"en": "crunch", "plano": "K5_Mir_Sofa"},
+              {"en": "oficina", "plano": "K5_Img_Boobie_Despacho"}]},
 
     # ---------------------------------------------------------------- NUEVO · TAKE-TWO (2026)
     {"id": "p16", "num": 16, "total": T, "titulo": "2026 · TAKE-TWO", "capitulo": "2026 · Lo que dice Take-Two",
@@ -321,10 +383,11 @@ BLOQUES = [
                  {"en": "diecinueve", "texto": "19 NOV|SIN OTRO RETRASO"},
                  {"en": "récords", "texto": "RÉCORDS|AÑO FISCAL 2027"}],
      "nombres": ["Zelnick"],
-     "planos": ["NUEVO_Zelnick_Captura", "Mirada_Vista_Aerea", "@GTA6_Lanzamiento:5"],
+     "planos": ["NUEVO_Zelnick_Captura", "K5_Img_VC_Torres_Bahia", "K5_Img_Raul_Barco", "K5_PreLoad_Yate", "K5_Img_VC_Piscina_Aerea", "K5_T2_Moto_Agua", "K5_Img_Keys_Barcos", "K5_Img_JL_Coche", "K5_Img_Jason_Pesca", "K5_Img_Lucia_Piscina", "NUEVO_Foto_Zelnick"],
      "planos_en": [{"en": "Zelnick", "plano": "NUEVO_Zelnick_Captura"},
-                   {"en": "diecinueve", "plano": "@GTA6_Lanzamiento"},
-                   {"en": "récords", "plano": "Mirada_Vista_Aerea"}]},
+              {"en": "perfección", "plano": "K5_Img_VC_Torres_Bahia"},
+              {"en": "diecinueve", "plano": "K5_Img_JL_Coche"},
+              {"en": "récords", "plano": "K5_Img_Keys_Barcos"}]},
 
     # ---------------------------------------------------------------- ACTO IV · HOY (2026)
     {"id": "p17", "num": 17, "total": T, "titulo": "2026 · HOY", "capitulo": "2026 · Hoy",
@@ -341,10 +404,12 @@ BLOQUES = [
                  {"en": "doscientos", "texto": "CASI 230 MILLONES|GTA V"},
                  {"en": "Sídney", "texto": "VIDEO GAMES DELUXE|→ ROCKSTAR AUSTRALIA"}],
      "nombres": ["Sídney"],
-     "planos": ["T2_Casa_Aerea", "T2_Gimnasio_Playa", "@Vice_City:3", "NUEVO_VGD_Captura", "@GTA6_Mirada:3"],
-     "planos_en": [{"en": "diecinueve", "plano": "@GTA6_Mirada"},
-                   {"en": "espera", "plano": "@GTA6_Mirada"},
-                   {"en": "Sídney", "plano": "NUEVO_VGD_Captura"}]},
+     "planos": ["K5_Img_JL_Atardecer_Bolsas", "K5_PreLoad_Breakdance", "K5_Img_GTAO_Coche_Explosion", "K5_Img_Kalaga_Fauna", "K5_Lanz_Pantano_Siluetas", "K5_Img_Keys_Iguana", "NUEVO_VGD_Captura", "K5_LANoire_Phelps", "K5_Img_Kalaga_Helicoptero", "K5_Img_JL_Silueta_Atardecer", "K5_Img_VC_Grafiti", "K5_Img_Keys_Calle", "K5_Img_Port_Gellhorn_Coche", "K5_Img_Keys_Bar"],
+     "planos_en": [{"en": "diecinueve", "plano": "K5_Img_JL_Atardecer_Bolsas"},
+              {"en": "Trece", "plano": "K5_Img_GTAO_Coche_Explosion"},
+              {"en": "Sídney", "plano": "NUEVO_VGD_Captura"},
+              {"en": "Bondi", "plano": "K5_LANoire_Phelps"},
+              {"en": "espera", "plano": "K5_Img_JL_Silueta_Atardecer"}]},
 
     # ---------------------------------------------------------------- CIERRE
     {"id": "cierre", "num": None, "titulo": "", "overlay": "", "capitulo": "Cierre", "anio": 2026,
@@ -355,9 +420,9 @@ BLOQUES = [
      "rotulos": [{"en": "trece", "texto": "13 AÑOS|DE ESPERA"},
                  {"en": "comentarios", "texto": "¿FUE UNA ESPERA|JUSTA?"}],
      "nombres": ["Trece", "comentarios"],
-     "planos": ["Mirada_Skyline_Noche", "VL_Atardecer_Final", "VL_Lancha_Pareja", "VL_Interior_1", "@Vice_City:3"],
-     "planos_en": [{"en": "trece", "plano": "Mirada_Skyline_Noche"},
-                   {"en": "comentarios", "plano": "@GTA6_Mirada"}]},
+     "planos": ["K5_Img_JL_Arbol_Atardecer", "K5_Img_JL_Lucia_Coche", "K5_Img_Kalaga_Kayak", "K5_Img_Grassrivers_Aldea", "K5_Img_Ambrosia_Ocaso", "K5_Img_Keys_Fondo", "K5_Img_VC_Rascacielos_Bahia"],
+     "planos_en": [{"en": "Trece", "plano": "K5_Img_JL_Arbol_Atardecer"},
+              {"en": "comentarios", "plano": "K5_Img_JL_Lucia_Coche"}]},
 ]
 
 for _b in BLOQUES:

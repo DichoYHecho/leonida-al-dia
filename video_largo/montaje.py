@@ -61,6 +61,9 @@ SOLO = [x.strip() for x in os.environ.get("BLOQUES_SOLO", "").split(",") if x.st
 URL_ZIP = P._V + "GTAVI_Videos.zip"
 P.VIDEOS.update(getattr(guion_vl, "VIDEOS_EXTRA", {}))  # vídeos oficiales que añade el guion
 FIJOS = set(getattr(guion_vl, "PLANOS_FIJOS", ()))
+REMOTAS = bool(getattr(guion_vl, "FUENTES_REMOTAS", False))  # leer los tramos de la URL en vez de bajar el vídeo
+SIN_BANDAS = set(getattr(guion_vl, "SIN_BANDAS", ()))  # fuentes sin letterbox: no se mide con cropdetect
+LENTO_MAX = dict(getattr(guion_vl, "LENTO_MAX", {}))  # tope de cámara lenta por fuente (por defecto 1,25)
 CRISTAL = bool(getattr(guion_vl, "CRISTAL", False))  # vídeo 4: grafismo de cristal estilo Apple (cristal.py)
 if CRISTAL:
     import cristal  # noqa: E402  # logos y carteles: sin movimiento de cámara
@@ -99,6 +102,9 @@ def fuente(video):
         if not destino.exists() or destino.stat().st_size == 0:
             descargar(url, destino)
         return destino
+    url = P.VIDEOS.get(video, "")
+    if REMOTAS and url.startswith("http") and "#t=" not in url:
+        return url  # 14 nov: se lee el tramo directamente de la URL 4K de Rockstar (no cabe todo en el disco)
     destino = FUENTES / (video + ".mp4")
     if not destino.exists() or destino.stat().st_size == 0:
         print("Bajando", video, flush=True)
@@ -121,14 +127,18 @@ def fuente(video):
 
 def tabla():
     out = {}
-    for nombre in ("trozos.csv", "trozos_vl.csv", "trozos_vc.csv", "trozos_auto.csv", "trozos_auto_sg.csv", "trozos_auto_jl.csv", "trozos_jl.csv", "trozos_57.csv"):
+    for nombre in ("trozos.csv", "trozos_vl.csv", "trozos_vc.csv", "trozos_auto.csv", "trozos_auto_sg.csv", "trozos_auto_jl.csv", "trozos_jl.csv", "trozos_57.csv",
+                   "trozos_13a_4k.csv"):
         if not (AQUI / nombre).exists():
             continue
         with open(AQUI / nombre, encoding="utf-8") as f:
             for r in csv.DictReader(f):
+                video = (r.get("Vídeo") or "Mirada").strip()
+                lento = float(r.get("Lento") or 1)
+                if LENTO_MAX and not video.startswith("Imagen:"):  # 14 nov: más de 1,25 en 30 fps se ve a saltos
+                    lento = min(lento, LENTO_MAX.get(video, 1.25))
                 out[r["Trozo"]] = {"ini": float(r["Inicio (s)"]), "dur": float(r["Duración (s)"]),
-                                   "video": (r.get("Vídeo") or "Mirada").strip(), "lento": float(r.get("Lento") or 1),
-                                   "grupo": (r.get("Grupo") or "").strip()}
+                                   "video": video, "lento": lento, "grupo": (r.get("Grupo") or "").strip()}
     return out
 
 
@@ -198,6 +208,8 @@ def bandas(ruta):
     """Filtro crop que quita las bandas negras de una fuente (letterbox o pillarbox), medido con cropdetect en
     varios puntos del vídeo (se queda con el rectángulo más grande). "" si no tiene bandas."""
     ruta = str(ruta)
+    if any(P.VIDEOS.get(v) == ruta or ruta.endswith(f"{v}.mp4") for v in SIN_BANDAS):
+        return ""
     if ruta in _BANDAS:
         return _BANDAS[ruta]
     r = subprocess.run(["ffprobe", "-v", "error", "-select_streams", "v:0", "-show_entries", "stream=width,height:format=duration",
