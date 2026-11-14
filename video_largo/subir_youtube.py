@@ -108,6 +108,11 @@ def main():
         if st.get("publishAt") or st.get("privacyStatus") != "private":
             sys.exit("⚠️ sigue programado")
         return
+    if vid and os.environ.get("NUEVO") == "1":
+        # 14 nov: vídeo rehecho; la API no deja cambiar el archivo, así que se sube otro y el viejo se queda como
+        # esté (privado y sin fecha). No se borra nada.
+        print(f"Hay uno con el mismo título (https://youtu.be/{vid}); se sube el nuevo igualmente", flush=True)
+        vid = None
     if vid:
         print(f"Ya estaba subido: https://youtu.be/{vid} (no se sube otro)")
     else:

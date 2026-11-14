@@ -1,8 +1,9 @@
 # Vídeo 5 · Texto para YouTube (listo para pegar)
 
-**Publicación:** SUBIDO Y PROGRAMADO el 13 nov: https://youtu.be/KZJfYW5fdok (privado hasta el sábado 14 de noviembre a las 18:00 de Madrid; lo hizo subir_youtube.yml, con la miniatura A). Calendario aprobado el 13 nov: 5 el 14, 6 el 15, 7 el 16, 8 el 17, 9 el 18 y 10 el 19 de noviembre, día de la salida de GTA VI.
+**Publicación:** VÍDEO REHECHO (2K, todo material oficial 4K) aprobado por el usuario el 14 nov. Se publica el domingo 15 de noviembre de 2026 a las 18:00 de Madrid (17:00 UTC), subido con subir_youtube.yml (`nuevo=true`, `fecha=2026-11-15T17:00:00Z`).
+La versión antigua (https://youtu.be/KZJfYW5fdok) queda en privado y sin fecha; borrarla solo con permiso del usuario.
 
-**Hecho en YouTube Studio (13 nov):** experimento A/B «Solo miniatura» con A, B y C (Studio dice que empieza cuando el vídeo sea público) y «Título del juego: Grand Theft Auto VI». Sin avisos de derechos al subirlo.
+**En YouTube Studio:** experimento A/B «Solo miniatura» con A, B y C y «Título del juego: Grand Theft Auto VI». Sin etiqueta de contenido hecho con IA.
 
 **Miniatura:** `miniaturas/miniatura_13a.jpg`. Para «Probar y comparar» (YouTube Studio → el vídeo → Miniatura → Probar y comparar) subir también `miniatura_13a_b.jpg` y `miniatura_13a_c.jpg`; YouTube se queda con la que más tiempo de visualización consiga.
 
@@ -18,23 +19,23 @@ Y tú, ¿crees que la espera ha merecido la pena? Te leo en los comentarios.
 Capítulos:
 0:00 Introducción
 0:26 2013 · GTA V
-0:55 2013-2026 · El dinero
+0:56 2013-2026 · El dinero
 1:31 2019-2023 · El rol
 2:20 2014-2022 · Reediciones
 2:37 2022 · GTA Plus
 3:09 2010-2018 · Red Dead Redemption 2
-3:43 2018-2019 · Red Dead Online
-4:06 2020-2023 · Dan Houser se va
-4:36 2020 · Rockstar Dundee
-5:04 2021 · The Trilogy
-5:23 2022 · Cómo ocurrió la filtración
-5:47 2022-2023 · El mensaje y el juicio
-6:24 2023 · El primer tráiler
-6:50 2025-2026 · Los retrasos
-7:08 2025 · Lo que se cuenta desde dentro
-7:29 2026 · Lo que dice Take-Two
-7:52 2026 · Hoy
-8:32 Cierre
+3:45 2018-2019 · Red Dead Online
+4:09 2020-2023 · Dan Houser se va
+4:46 2020 · Rockstar Dundee
+5:14 2021 · The Trilogy
+5:32 2022 · Cómo ocurrió la filtración
+5:58 2022-2023 · El mensaje y el juicio
+6:35 2023 · El primer tráiler
+6:57 2025-2026 · Los retrasos
+7:15 2025 · Lo que se cuenta desde dentro
+7:36 2026 · Lo que dice Take-Two
+7:59 2026 · Hoy
+8:39 Cierre
 
 Fuentes:
 - Take-Two, resultados del año fiscal 2026 (21 may 2026): https://www.businesswire.com/news/home/20260521450562/en/
@@ -50,7 +51,9 @@ Fuentes:
 - Retraso al 19 nov 2026 (Engadget): https://www.engadget.com/gaming/grand-theft-auto-vi-is-delayed-to-november-19-2026-211848530.html
 - Twitch (datos de terceros, Rockstar Intel): https://rockstarintel.com/gta-v-second-most-watched-game-on-twitch-in-2023
 
-Capturas: Rockstar Newswire, Take-Two, Business Wire, Game Developer, PC Gamer, Game World Observer, GamesRadar+, TechRadar, Absurd Ventures y TwitchTracker. Imágenes de juego: tráileres oficiales de Rockstar Games.
+Imágenes de juego: vídeos y capturas oficiales de Rockstar Games (rockstargames.com): tráileres 1 y 2 y de lanzamiento de GTA VI, An Extended Look y Pre-Load Now; tráileres de GTA V (PS5 y PC) y de GTA Online (2022-2026); Red Dead Redemption 2 (lanzamiento, PC y gameplay) y Red Dead Online; GTA: The Trilogy – The Definitive Edition; L.A. Noire 4K.
+Fotos (Wikimedia Commons): «London: Southwark Crown Court», Jorge Franganillo (CC BY 2.0); «Strauss Zelnick», Christopher Michel (CC BY 2.0); «Dundee Waterfront Redevelopment Feb 2018 – V&A Near Completion», Laerol (CC BY-SA 4.0); «Sam Houser and Dan Houser», Anthony Parello (CC BY-SA 4.0); «Rockstar North», Discott (CC0). Las fotos están recortadas, y la de los Houser y la de Zelnick van sobre un fondo propio.
+Capturas: Rockstar Newswire, Take-Two / Business Wire, TwitchTracker, Game Developer, PC Gamer, Game World Observer, GamesRadar+, TechRadar, Bluesky (Jason Schreier) y Absurd Ventures.
 
 Leónida al Día no está afiliado ni patrocinado por Rockstar Games ni Take-Two Interactive. Grand Theft Auto y Red Dead Redemption son marcas de sus titulares.
 
@@ -70,5 +73,4 @@ Texto: Nuevo vídeo: ¿por qué GTA VI ha tardado 13 años? Antes de verlo, vota
 Opciones: GTA Online · Red Dead Redemption 2 · La filtración · Los retrasos de 2025
 Imagen: `miniatura_13a.jpg`
 
-**Montaje final (13 nov 2026):** todas las voces de Gemini; 8:55. Vídeo: release `montaje-13a-alta-calidad` → `video_largo.mp4`. Capítulos copiados de `capitulos.txt` de la rama `montaje-13a`.
-**Antes de publicar:** verlo entero.
+**Montaje final (14 nov 2026, rehecho):** 2560x1440 a 30 fps, BT.709, 9:17 (con 15 s de pantalla final), voces con gemini flash-lite TTS, 194 planos de material oficial 4K, sin huecos (16.711 fotogramas). Run 43637730903. Vídeo: release `montaje-13a-alta-calidad` → `video_largo.mp4`. Capítulos copiados de `capitulos.txt` de la rama `montaje-13a`. Visto bueno del usuario: 14 nov.
