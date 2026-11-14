@@ -154,7 +154,7 @@ def cortar(nombre, t, dur_out, destino, sentido):
         P.run(["ffmpeg", "-y", "-loglevel", "error", "-loop", "1", "-framerate", str(FPS), "-t", f"{dur_out:.2f}",
                "-i", str(fuente(t["video"])), "-vf",
                f"scale={W * 2}:{H * 2}:force_original_aspect_ratio=increase:flags=lanczos,crop={W * 2}:{H * 2},"
-               f"zoompan=z='{zoom}':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=1:s={W}x{H}:fps={FPS},scale=out_range=tv,format=yuv420p",
+               f"zoompan=z='{zoom}':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=1:s={W}x{H}:fps={FPS},scale=out_range=tv,format=yuv420p,tpad=stop_mode=clone:stop_duration=1",
                "-frames:v", str(round(dur_out * FPS)), "-c:v", "libx264", "-crf", "12", "-preset", "veryfast", *SEG, destino])
         return
     lento = t["lento"]
@@ -163,7 +163,7 @@ def cortar(nombre, t, dur_out, destino, sentido):
         pre = []
         entrada = ["-f", "lavfi", "-i", f"testsrc2=size={W}x{H}:rate=30:duration={dur_in + 0.3}"]
     else:
-        pre = ["-ss", f"{t['ini']:.2f}", "-t", f"{dur_in + 0.5:.2f}"]  # 0,5 s de margen: se corta por fotogramas
+        pre = ["-ss", f"{t['ini']:.2f}", "-t", f"{dur_in + 1.5:.2f}"]  # margen: se corta por fotogramas
         entrada = ["-i", str(fuente(t["video"]))]
     # movimiento de cámara suave (arranca y frena: coseno) sobre un sobrante del 6 %, alternando sentido y eje
     e = f"(0.5-0.5*cos(PI*t/{dur_out:.3f}))"
@@ -191,16 +191,31 @@ def cortar(nombre, t, dur_out, destino, sentido):
               f"scale={W}:{H}[f];"
               f"[b]scale=-2:{int(H * 0.82)}:flags=lanczos,scale='trunc(iw*({z})/2)*2':'trunc(ih*({z})/2)*2':eval=frame[c];"
               f"[f][c]overlay=(W-w)/2:(H-h)/2-24,format=yuv420p")
-    for _ in range(3):
+    n_f = round(dur_out * FPS)
+    for intento in range(4):
+        # 14 nov: la lectura remota a veces acaba antes sin error y el plano salía corto (saltos al unirlos):
+        # se comprueba el número de fotogramas y se repite; al último intento, se completa congelando el final
+        vf_i = vf + (",tpad=stop_mode=clone:stop_duration=2" if intento == 3 else "")
         try:
-            P.run(["ffmpeg", "-y", "-loglevel", "error", *pre, *entrada, "-an", "-vf", vf,
-                   "-frames:v", str(round(dur_out * FPS)),
+            P.run(["ffmpeg", "-y", "-loglevel", "error", *pre, *entrada, "-an", "-vf", vf_i, "-frames:v", str(n_f),
                    "-c:v", "libx264", "-crf", "12", "-preset", "veryfast", *SEG, destino])
-            return
+            hay = fotogramas(destino)
+            if DRY or hay >= n_f:
+                return
+            print(f"  {nombre}: {hay} de {n_f} fotogramas, se repite", flush=True)
         except RuntimeError as e:
             print("  reintento", nombre, str(e)[-200:], flush=True)
-            time.sleep(3)
+        time.sleep(3)
     raise RuntimeError("No se pudo cortar " + nombre)
+
+
+def fotogramas(ruta):
+    r = subprocess.run(["ffprobe", "-v", "error", "-select_streams", "v:0", "-count_packets", "-show_entries",
+                        "stream=nb_read_packets", "-of", "csv=p=0", str(ruta)], capture_output=True, text=True)
+    try:
+        return int(r.stdout.strip().split()[0])
+    except (ValueError, IndexError):
+        return 0
 
 
 _BANDAS = {}
