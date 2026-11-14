@@ -1,6 +1,6 @@
 # Vídeo 5 · Texto para YouTube (listo para pegar)
 
-**Publicación:** VÍDEO REHECHO (2K, todo material oficial 4K) aprobado por el usuario el 14 nov. Se publica el domingo 15 de noviembre de 2026 a las 18:00 de Madrid (17:00 UTC), subido con subir_youtube.yml (`nuevo=true`, `fecha=2026-11-15T17:00:00Z`).
+**Publicación:** VÍDEO REHECHO (2K, todo material oficial 4K) aprobado por el usuario el 14 nov. Se publica el domingo 15 de noviembre de 2026 a las 18:00 de Madrid (17:00 UTC), subido con subir_youtube.yml (`nuevo=true`, `fecha=2026-11-15T17:00:00Z`): https://youtu.be/0wN5lX7CVvc (privado y programado, miniatura A; A/B con A, B y C y título del juego hechos en Studio el 14 nov).
 La versión antigua (https://youtu.be/KZJfYW5fdok) queda en privado y sin fecha; borrarla solo con permiso del usuario.
 
 **En YouTube Studio:** experimento A/B «Solo miniatura» con A, B y C y «Título del juego: Grand Theft Auto VI». Sin etiqueta de contenido hecho con IA.
