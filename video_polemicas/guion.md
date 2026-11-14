@@ -2,7 +2,7 @@
 
 Canal: Leónida al Día · Revisión del 14 nov 2026 (aprobada) · GTA VI sale el 19 nov 2026.
 Estructura: gancho + 5 actos cronológicos (17 bloques) + cierre.
-Medición (3,4 palabras por segundo): 1799 palabras de voz, unos 8.8 min.
+Medición (3,4 palabras por segundo): 1769 palabras de voz, unos 8.7 min.
 Este archivo se genera desde video_largo/guion_pol.py (el texto hablado manda). Fuentes en investigacion.md y edicion.md.
 
 ---
@@ -17,7 +17,7 @@ En octubre de 2006, un juez de Miami pasó unas dos horas viendo cómo se jugaba
 
 ### Bloque 1 · 1997 · la campaña de gta 1
 
-Empecemos en 1997. GTA nace como un juego raro, visto desde arriba. Y la polémica llega con ayuda. La distribuidora BMG contrató a Max Clifford, un publicista británico famoso por campañas construidas sobre escándalos. Los creadores, David Jones y Mike Dailly, han reconocido que su trabajo fue clave para que el juego tuviera tanta atención. Mientras tanto, en la Cámara de los Lores, un lord criticó el juego, y la prensa británica se lanzó. Según la prensa del sector, el juego vendió medio millón de copias en Reino Unido solo en la campaña de Navidad. Y no todo fue publicidad: en 1998, Brasil prohibió GTA 1, y su Ministerio de Justicia ordenó retirar las copias de PC. Un patrón que se repetirá durante casi treinta años.
+Empecemos en 1997. GTA nace como un juego raro, visto desde arriba. Y la polémica llega con ayuda. La distribuidora BMG contrató a Max Clifford, un publicista británico famoso por campañas construidas sobre escándalos. Los creadores, David Jones y Mike Dailly, han reconocido que su trabajo fue clave para que el juego tuviera tanta atención. En mayo, antes de que saliera, un lord preguntó en la Cámara de los Lores qué pensaba hacer el Gobierno con el juego. Y la prensa británica se lanzó. Y no todo fue publicidad: en 1998, Brasil prohibió GTA 1, y su Ministerio de Justicia ordenó retirar las copias de PC. Un patrón que se repetirá durante casi treinta años.
 
 ---
 
@@ -25,7 +25,7 @@ Empecemos en 1997. GTA nace como un juego raro, visto desde arriba. Y la polémi
 
 ### Bloque 2 · 2001 · gta iii y el 11-s
 
-Llega 2001 y la saga da el salto al 3D: por primera vez, en GTA III, bajas a la calle. Pero el 11 de septiembre cambia los planes. Rockstar retrasa el juego tres semanas, y el equipo lo revisa a toda prisa. Los coches de policía, azules con franjas blancas, se parecían demasiado a los de Nueva York: pasan a blanco y negro. Se quita una misión que hablaba de terroristas. Se rehace la portada de Estados Unidos. Un avión cambia su ruta para no pasar cerca de los rascacielos. Y sale a finales de octubre, con su nueva portada y sin aquella misión.
+Llega 2001 y la saga da el salto al 3D: por primera vez, en GTA III, bajas a la calle. Pero el 11 de septiembre cambia los planes. Rockstar retrasa el juego unas semanas, y el equipo lo revisa a toda prisa. Los coches de policía, azules con franjas blancas, se parecían demasiado a los de Nueva York: pasan a blanco y negro. Se quita una misión que hablaba de terroristas. Un avión cambia su ruta para no pasar cerca de los rascacielos. Y sale a finales de octubre, sin aquella misión.
 
 ---
 
@@ -57,7 +57,7 @@ En 2006 llega Bully, un juego ambientado en un internado llamado Bullworth, dond
 
 ### Bloque 7 · 2008 · jack thompson
 
-Y Thompson no era nuevo en esto. Jack Thompson, abogado de Florida, era uno de los críticos más activos de los videojuegos violentos. En 2003, un joven aficionado a GTA mató a dos policías y a una operadora de emergencias en Alabama. En 2005, Thompson demandó a Rockstar en nombre de las familias de las víctimas, alegando que el juego había influido en el crimen. Pero su propia carrera acabó en los tribunales. El colegio de abogados investigó su conducta, y el juez que llevó el caso le halló culpable en veintisiete de los treinta y un cargos. El veinticinco de septiembre de 2008, el Tribunal Supremo de Florida lo inhabilitó de forma permanente para ejercer la abogacía.
+Y Thompson no era nuevo en esto. Jack Thompson, abogado de Florida, era uno de los críticos más activos de los videojuegos violentos. En 2003, un joven aficionado a GTA mató a dos policías y a una operadora de emergencias en Alabama. En 2005, Thompson demandó a Rockstar en nombre de las familias de las víctimas, alegando que el juego había influido en el crimen. Pero su propia carrera acabó en los tribunales. El colegio de abogados investigó su conducta, y la jueza que llevó el caso recomendó declararle culpable en veintisiete de los treinta y un cargos. El veinticinco de septiembre de 2008, el Tribunal Supremo de Florida lo inhabilitó de forma permanente para ejercer la abogacía.
 
 ---
 
@@ -77,7 +77,7 @@ En 2014, la polémica llega a una actriz famosa. Lindsay Lohan demanda a Rocksta
 
 ### Bloque 10 · 2014 · gta v fuera de las tiendas
 
-Y en diciembre de 2014 llega una polémica sin tribunales. En Australia, las cadenas Target y Kmart retiran GTA V de sus tiendas. El motivo: una petición que pedía retirarlo por la violencia contra las mujeres que muestra. Más de cuarenta mil personas firmaron la campaña, impulsada por Collective Shout. La petición nombraba a Target, y Kmart lo siguió aunque no estaba en ella. El consejero delegado de Take-Two criticó la retirada: que un grupo decida por millones de personas, dijo, está mal. Target de Estados Unidos aseguró que en Norteamérica seguiría vendiéndolo.
+Y en diciembre de 2014 llega una polémica sin tribunales. En Australia, las cadenas Target y Kmart retiran GTA V de sus tiendas. El motivo: una petición que pedía retirarlo por la violencia contra las mujeres que muestra. Más de cuarenta mil personas firmaron la campaña, impulsada por Collective Shout. La petición nombraba a Target, y Kmart lo siguió aunque no estaba en ella. El consejero delegado de Take-Two se mostró decepcionado: era un juego aclamado, que habían disfrutado decenas de millones de personas. Target de Estados Unidos aseguró que en Norteamérica seguiría vendiéndolo.
 
 ---
 
@@ -115,7 +115,7 @@ Y la polémica más reciente llega desde dentro. A finales de octubre de 2025, R
 
 ### Bloque 16 · 2026 · el debate sobre gta vi
 
-Y llegamos a hoy. GTA VI sale el diecinueve de noviembre, con Vice City otra vez como telón de fondo. Y la prensa debate tres cosas. La primera: cómo se retratan las comunidades de la ciudad, algo que ya se discutió con la demanda haitiana. La segunda: hasta dónde llega la sátira. La tercera: el papel de la polémica en el marketing. En Miami Beach, según la emisora WLRN, la comisión municipal aprobó una campaña de marketing del juego a cambio de un pago. La votación fue este mismo año. Hay opiniones para todos los gustos.
+Y llegamos a hoy. GTA VI sale el diecinueve de noviembre, con Vice City otra vez como telón de fondo. Y esta vez la relación con la ciudad real es otra. En septiembre, la comisión de Miami Beach aprobó una campaña de marketing del juego a cambio de tres millones de dólares, según la emisora WLRN. La misma emisora recordó la demanda haitiana de 2003, que se cerró cuando Rockstar cambió aquella frase. Más de veinte años después, GTA y Miami han pasado de la demanda al contrato.
 
 ---
 

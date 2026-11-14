@@ -86,22 +86,20 @@ BLOQUES = [
      "texto": ("Empecemos en 1997. GTA nace como un juego raro, visto desde arriba. Y la polémica llega con ayuda. "
                "La distribuidora BMG contrató a Max Clifford, un "
                "publicista británico famoso por campañas construidas sobre escándalos. Los creadores, David Jones y Mike "
-               "Dailly, han reconocido que su trabajo fue clave para que el juego tuviera tanta atención. Mientras tanto, "
-               "en la Cámara de los Lores, un lord criticó el juego, y la prensa británica se lanzó. Según la prensa del "
-               "sector, el juego vendió medio millón de copias en Reino Unido solo en la campaña de Navidad. Y no todo fue "
-               "publicidad: en 1998, Brasil prohibió GTA 1, y su Ministerio de Justicia ordenó retirar las copias de PC. "
+               "Dailly, han reconocido que su trabajo fue clave para que el juego tuviera tanta atención. En mayo, antes "
+               "de que saliera, un lord preguntó en la Cámara de los Lores qué pensaba hacer el Gobierno con el juego. Y la "
+               "prensa británica se lanzó. Y no todo fue publicidad: en 1998, Brasil prohibió GTA 1, y su Ministerio de Justicia ordenó retirar las copias de PC. "
                "Un patrón que se repetirá durante casi treinta años."),
      "rotulos": [{"en": "clifford", "texto": "MAX CLIFFORD|PUBLICISTA"},
-                 {"en": "lores", "texto": "CÁMARA DE LOS LORES|1997"},
+                 {"en": "lores", "texto": "CÁMARA DE LOS LORES|MAYO 1997"},  # Hansard, HL Deb 20 May 1997 c258
                  {"en": "creadores", "texto": "DAVID JONES|MIKE DAILLY"},
-                 {"en": "medio", "texto": "MEDIO MILLÓN|DE COPIAS · REINO UNIDO"},
                  {"en": "brasil", "texto": "BRASIL · 1998|PROHIBIDO GTA 1"}],
-     "nombres": ["clifford", "lores", "creadores", "medio", "brasil"],
+     # 14 nov: quitado «medio millón de copias en Navidad» (una sola fuente, sin confirmar)
+     "nombres": ["clifford", "lores", "creadores", "brasil"],
      "planos": ["@GTA1_1997:6", "IMG_GTA1_Caja", "IMG_RaceNChase", "GTA_15_03", "NUEVO_Recorte_Prensa_1997", "@GTA1_1997:2"],
      "planos_en": [{"en": "clifford", "plano": "NUEVO_Recorte_Prensa_1997"},
                    {"en": "lores", "plano": "@GTA1_1997"},
                    {"en": "creadores", "plano": "@GTA1_1997"},
-                   {"en": "medio", "plano": "IMG_GTA1_Caja"},
                    {"en": "brasil", "plano": "@GTA1_1997"}]},
 
     # ---------------------------------------------------------------- ACTO II · EL SALTO AL 3D (2001-2002)
@@ -110,12 +108,13 @@ BLOQUES = [
      "intro_original": "G3_DE_01",
      "texto": ("Llega 2001 y la saga da el salto al 3D: por primera vez, en GTA III, bajas a la calle. Pero el 11 de "
                "septiembre cambia los planes. "
-               "Rockstar retrasa el juego tres semanas, y el equipo lo revisa a toda prisa. Los coches de policía, azules "
+               "Rockstar retrasa el juego unas semanas, y el equipo lo revisa a toda prisa. Los coches de policía, azules "
                "con franjas blancas, se parecían demasiado a los de Nueva York: pasan a blanco y negro. Se quita una "
-               "misión que hablaba de terroristas. Se rehace la portada de Estados Unidos. Un avión cambia su ruta para no "
-               "pasar cerca de los rascacielos. Y sale a finales de octubre, con su nueva portada y sin aquella misión."),
+               "misión que hablaba de terroristas. Un avión cambia su ruta para no pasar cerca de los rascacielos. Y sale "
+               "a finales de octubre, sin aquella misión."),
+     # 14 nov: según Dan Houser en MCV, «un par de semanas»; la portada no aparece en la fuente, se quita
      # 14 nov: las fuentes dudan entre el 22 y el 23 de octubre de 2001: «a finales de octubre»
-     "rotulos": [{"en": "septiembre", "texto": "11-S|RETRASO DE 3 SEMANAS"},
+     "rotulos": [{"en": "septiembre", "texto": "11-S|RETRASO DE SEMANAS"},
                  {"en": "policía", "texto": "COCHES DE POLICÍA|BLANCO Y NEGRO"},
                  {"en": "terroristas", "texto": "MISIÓN|QUITADA"},
                  {"en": "finales", "texto": "OCTUBRE 2001|SALE EN EE. UU."}],
@@ -123,7 +122,6 @@ BLOQUES = [
      "planos": ["@GTA3_2001:6", "@GTA3_DE:3", "GTA_15_11", "GTA_15_12", "GTA_15_13", "GTA_15_14"],
      "planos_en": [{"en": "calle", "plano": "@GTA3_2001"},
                    {"en": "policía", "plano": "@GTA3_2001"},
-                   {"en": "portada", "plano": "GTA_15_11"},
                    {"en": "finales", "plano": "GTA_15_14"}]},
     {"id": "p03", "num": 3, "total": T, "titulo": "2002 · VICE CITY Y LA DEMANDA",
      "capitulo": "2002 · Vice City y la demanda", "overlay": "", "anio": 2002,
@@ -207,8 +205,8 @@ BLOQUES = [
                "de los videojuegos violentos. En 2003, un joven aficionado a GTA mató a dos policías y a una operadora de "
                "emergencias en Alabama. En 2005, Thompson demandó a Rockstar en nombre de las familias de las víctimas, "
                "alegando que el juego había influido en el crimen. Pero su propia carrera acabó en los tribunales. El "
-               "colegio de abogados investigó su conducta, y el juez que llevó el caso le halló culpable en veintisiete de "
-               "los treinta y un cargos. El veinticinco de septiembre de 2008, el Tribunal Supremo de Florida lo inhabilitó de "
+               "colegio de abogados investigó su conducta, y la jueza que llevó el caso recomendó declararle culpable en "
+               "veintisiete de los treinta y un cargos. El veinticinco de septiembre de 2008, el Tribunal Supremo de Florida lo inhabilitó de "
                "forma permanente para ejercer la abogacía."),
      "rotulos": [{"en": "thompson", "texto": "JACK THOMPSON|ABOGADO DE FLORIDA"},
                  {"en": "alabama", "texto": "ALABAMA · 2003|2 POLICÍAS + 1"},
@@ -260,11 +258,11 @@ BLOQUES = [
      "texto": ("Y en diciembre de 2014 llega una polémica sin tribunales. En Australia, las cadenas Target y Kmart retiran "
                "GTA V de sus tiendas. El motivo: una petición que pedía retirarlo por la violencia contra las mujeres que "
                "muestra. Más de cuarenta mil personas firmaron la campaña, impulsada por Collective Shout. La petición nombraba a Target, y Kmart lo siguió aunque no estaba en ella. "
-               "El consejero delegado de Take-Two criticó "
-               "la retirada: que un grupo decida por millones de personas, dijo, está mal. Target de Estados Unidos aseguró que en Norteamérica seguiría vendiéndolo."),
+               "El consejero delegado de Take-Two se mostró decepcionado: era un juego aclamado, que habían disfrutado "
+               "decenas de millones de personas. Target de Estados Unidos aseguró que en Norteamérica seguiría vendiéndolo."),
      "rotulos": [{"en": "australia", "texto": "AUSTRALIA · 2014|TARGET Y KMART"},
                  {"en": "cuarenta", "texto": "+40.000 FIRMAS|COLLECTIVE SHOUT"},
-                 {"en": "consejero", "texto": "TAKE-TWO|CRITICA LA RETIRADA"}],
+                 {"en": "consejero", "texto": "TAKE-TWO|«DECEPCIONADOS»"}],  # Fox Business, 3 dic 2014
      "nombres": ["australia", "cuarenta", "consejero"],
      "planos": ["@GTA5_2013:4", "NUEVO_Estanteria_Tienda", "@GTA_Online:2", "@GTA5_2013:5"],
      "planos_en": [{"en": "australia", "plano": "NUEVO_Estanteria_Tienda"},
@@ -354,16 +352,16 @@ BLOQUES = [
     {"id": "p15", "num": 16, "total": T, "titulo": "2026 · EL DEBATE SOBRE GTA VI",
      "capitulo": "2026 · El debate sobre GTA VI", "overlay": "", "anio": 2026,
      "final_revisado": True,  # 13 nov: la última frase está entera (36,2-37,9 s); el «No» que oye Whisper es una respiración
-     "texto": ("Y llegamos a hoy. GTA VI sale el diecinueve de noviembre, con Vice City otra vez como telón de fondo. Y la "
-               "prensa debate tres cosas. La primera: cómo se retratan las comunidades de la ciudad, algo que ya se discutió "
-               "con la demanda haitiana. La segunda: hasta dónde llega la sátira. La tercera: el papel de la polémica en el "
-               "marketing. En Miami Beach, según la emisora WLRN, la comisión municipal aprobó una campaña de marketing del "
-               "juego a cambio de un pago. La votación fue este mismo año. Hay opiniones para todos los gustos."),
+     # 14 nov: reescrito con lo que dice WLRN (24 sep 2026): campaña aprobada en septiembre por 3 M$ y la demanda de 2003
+     "texto": ("Y llegamos a hoy. GTA VI sale el diecinueve de noviembre, con Vice City otra vez como telón de fondo. Y "
+               "esta vez la relación con la ciudad real es otra. En septiembre, la comisión de Miami Beach aprobó una "
+               "campaña de marketing del juego a cambio de tres millones de dólares, según la emisora WLRN. La misma "
+               "emisora recordó la demanda haitiana de 2003, que se cerró cuando Rockstar cambió aquella frase. Más de "
+               "veinte años después, GTA y Miami han pasado de la demanda al contrato."),
      "rotulos": [{"en": "diecinueve", "texto": "19 NOV 2026|GTA VI"},
-                 {"en": "comunidades", "texto": "REPRESENTACIÓN|DE LAS COMUNIDADES"},
-                 {"en": "miami", "texto": "MIAMI BEACH|CAMPAÑA DE MARKETING"},
-                 {"en": "marketing", "texto": "MARKETING|Y POLÉMICA"}],
-     "nombres": ["diecinueve", "comunidades", "miami", "marketing"],
+                 {"en": "miami", "texto": "MIAMI BEACH · SEP 2026|CAMPAÑA DE GTA VI · 3 M$"},
+                 {"en": "contrato", "texto": "2003 → 2026|DE LA DEMANDA AL CONTRATO"}],
+     "nombres": ["diecinueve", "miami", "contrato"],
      "planos": ["T2_Jason_Tejado", "@Vice_City:4", "@Leonida_Keys:3", "@GTA6_Mirada:1"],
      "planos_en": [{"en": "vice", "plano": "@Vice_City"},
                    {"en": "miami", "plano": "T2_Autopista"},
