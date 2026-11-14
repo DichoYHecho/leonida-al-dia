@@ -352,16 +352,42 @@ class Linea:
                 pegar(L, self.digitos[dig], cx, yc + dy, alfa * vis)
 
 
-def render(hitos, eventos, total, salida, desde=0.0):
+ANTES_CAMBIO, DESPUES_CAMBIO, FUNDIDO = 0.6, 3.6, 0.45  # 14 nov: ventana visible alrededor de cada salto (s)
+
+
+def visibilidad(eventos, t):
+    """14 nov 2026 (pedido del usuario): la línea solo se ve cuando el cabezal salta de un punto al siguiente.
+    Devuelve 0..1: entra con fundido antes de cada cambio de año, se queda mientras viaja y se va unos segundos después."""
+    v, anterior = 0.0, None
+    for te, anio, _ in sorted(eventos):
+        if anio == anterior:
+            continue  # mismo año: el cabezal no salta
+        anterior = anio
+        a, z = te - ANTES_CAMBIO, te + D_VIAJE + DESPUES_CAMBIO
+        if a - FUNDIDO <= t <= z + FUNDIDO:
+            entra = salida_suave((t - (a - FUNDIDO)) / FUNDIDO)
+            sale = salida_suave((z + FUNDIDO - t) / FUNDIDO)
+            v = max(v, min(entra, sale, 1.0))
+    return v
+
+
+def render(hitos, eventos, total, salida, desde=0.0, solo_cambios=False):
     lin = Linea(hitos, eventos, total)
     n = int(round((total - desde) * FPS))
     proc = subprocess.Popen(["ffmpeg", "-y", "-loglevel", "error", "-f", "rawvideo", "-pix_fmt", "rgba", "-s", f"{W}x{ALTO}",
                              "-r", str(FPS), "-i", "-", "-c:v", "qtrle", "-pix_fmt", "argb", str(salida)],
                             stdin=subprocess.PIPE)
     previo, cache = None, None
+    vacio = bytes(W * ALTO * 4)
     for i in range(n):
         t = desde + i / FPS
+        vis = visibilidad(lin.eventos, t) if solo_cambios else 1.0
+        if vis <= 0.001:
+            proc.stdin.write(vacio)  # fuera de los saltos: transparente (y sin dibujar, más rápido)
+            continue
         L = lin.frame(t)
+        if vis < 1.0:
+            L = L * np.float32(vis)  # premultiplicado: color y alfa se atenúan juntos
         a = np.clip(L[..., 3:4], 1e-6, 1)
         rgb = np.where(L[..., 3:4] > 1e-4, L[..., :3] / a, 0)
         out = np.concatenate([np.clip(rgb, 0, 1), np.clip(L[..., 3:4], 0, 1)], axis=2)

@@ -149,7 +149,55 @@ def tabla():
     return out
 
 
+CACHE_PLANOS = pathlib.Path(os.environ.get("CACHE_PLANOS", "cache/planos"))
+_USADOS, _DE_CACHE = set(), []
+
+
+def clave_plano(nombre, t, dur_out, sentido):
+    """14 nov: huella de todo lo que decide cómo sale un plano (datos del trozo, fuente, código de corte, formato).
+    Si nada cambia, el plano se reutiliza de la caché en vez de volver a cortarlo de la fuente 4K."""
+    import inspect
+    v = t["video"]
+    src = ""
+    if v.startswith("Imagen:"):
+        src = hashlib.sha1(pathlib.Path(fuente(v)).read_bytes()).hexdigest()
+    datos = [inspect.getsource(_cortar), inspect.getsource(bandas), SEG, A709, W, H, FPS, nombre, t, round(dur_out, 4),
+             sentido, P.VIDEOS.get(v, v), src, RECORTES.get(v, 0), v in SIN_BANDAS, es_fijo(nombre)]
+    return hashlib.sha1(repr(datos).encode("utf-8")).hexdigest()
+
+
 def cortar(nombre, t, dur_out, destino, sentido):
+    """Corta el plano o lo saca de la caché de planos (cache/planos, guardada entre montajes por el workflow)."""
+    if DRY:
+        return _cortar(nombre, t, dur_out, destino, sentido)
+    import shutil
+    clave = clave_plano(nombre, t, dur_out, sentido)
+    _USADOS.add(clave)
+    guardado = CACHE_PLANOS / f"{clave}.mp4"
+    n_f = round(dur_out * FPS)
+    if guardado.exists() and fotogramas(guardado) == n_f:
+        shutil.copyfile(guardado, destino)
+        _DE_CACHE.append(nombre)
+        return
+    _cortar(nombre, t, dur_out, destino, sentido)
+    if fotogramas(destino) == n_f:
+        CACHE_PLANOS.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(destino, guardado)
+
+
+def podar_cache():
+    """En un montaje completo, la caché se queda solo con los planos de este vídeo (no crece sin fin)."""
+    if DRY or os.environ.get("BLOQUES_SOLO") or not CACHE_PLANOS.exists():
+        return
+    quitados = 0
+    for f in CACHE_PLANOS.glob("*.mp4"):
+        if f.stem not in _USADOS:
+            f.unlink()
+            quitados += 1
+    print(f"Caché de planos: {len(_USADOS)} en uso, {quitados} viejos quitados", flush=True)
+
+
+def _cortar(nombre, t, dur_out, destino, sentido):
     """Corta un trozo a W x H (2K) a pantalla completa con un ligero movimiento de cámara; los clips lentos se estiran
     a su duración final. Nunca hay bandas ni marcos: todo cubre el cuadro entero (14 nov 2026)."""
     if t["video"].startswith("Imagen:") and not DRY:
@@ -1013,7 +1061,9 @@ def empezar_linea(bloques, total):
     def trabajo():
         t0 = time.time()
         try:
-            LT.render([(a, n) for a, n in LINEA], eventos, total + 0.1, destino)
+            # 14 nov: por defecto la línea solo se ve al saltar de un punto al siguiente (LINEA_SOLO_CAMBIOS=0 = siempre)
+            solo = os.environ.get("LINEA_SOLO_CAMBIOS", "1" if getattr(guion_vl, "LINEA_SOLO_CAMBIOS", True) else "0") == "1"
+            LT.render([(a, n) for a, n in LINEA], eventos, total + 0.1, destino, solo_cambios=solo)
             estado["ruta"] = destino
             print(f"Línea de tiempo animada lista ({time.time() - t0:.0f} s)", flush=True)
         except Exception as e:  # noqa: BLE001
@@ -1467,7 +1517,8 @@ def main():
         futuros = [ex.submit(cortar, *tarea) for tarea in tareas]
         for f in futuros:
             f.result()
-    print(f"{len(tareas)} planos cortados ({time.time() - t0:.0f} s)", flush=True)
+    print(f"{len(tareas)} planos cortados ({time.time() - t0:.0f} s; {len(_DE_CACHE)} sacados de la caché)", flush=True)
+    podar_cache()
     (TMP / "lista.txt").write_text("".join(f"file '{pathlib.Path(p).resolve()}'\n" for p in lista_concat))
     P.run(["ffmpeg", "-y", "-loglevel", "error", "-f", "concat", "-safe", "0", "-i", TMP / "lista.txt", "-c", "copy",
            TMP / "sin_audio.mp4"])
@@ -1586,6 +1637,7 @@ def main():
     print(f"Fotogramas del vídeo final: {n_final} de {n_esperado}", flush=True)
     if abs(n_final - n_esperado) > FPS:  # 14 nov (2): el vídeo no puede acabar antes que el audio
         print("PARADO: el vídeo final tiene menos imagen que audio.")
+        final.unlink()  # 14 nov: que el paso de la release (if: always) no publique un vídeo roto
         sys.exit(7)
     P.run(["ffmpeg", "-y", "-loglevel", "error", "-i", final, "-vf", "scale=1280:720", "-c:v", "libx264", "-crf", "27",
            "-maxrate", "2000k", "-bufsize", "4000k", "-preset", "fast", "-force_key_frames", "expr:gte(t,n_forced*300)",

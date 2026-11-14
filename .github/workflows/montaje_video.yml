@@ -45,6 +45,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+          # (python fijado; ffmpeg sale de apt del runner: 8.0.1 el 14 nov 2026. Este PC tiene 9.0.2 y no reproduce
+          # todos sus fallos: tras tocar montaje.py, primero una previa corta con bloques=hook,p01,p02)
 
       - name: Instalar programas
         timeout-minutes: 15
@@ -110,11 +112,36 @@ jobs:
           path: cache/whisper-base
           key: whisper-base-directo-v1
 
+      # 14 nov 2026: los planos ya cortados se guardan entre montajes (cada guion los suyos). Si el trozo, la fuente y el
+      # código de corte no cambian, el plano no se vuelve a cortar de la fuente 4K (ahorra ~20 min por montaje).
+      - name: Recuperar los planos ya cortados
+        uses: actions/cache/restore@v4
+        with:
+          path: cache/planos
+          key: planos-${{ inputs.guion }}-${{ github.run_id }}
+          restore-keys: planos-${{ inputs.guion }}-
+
       - name: Montar el vídeo
         run: python3 video_largo/montaje.py
 
-      - name: Guardar el vídeo en alta calidad (en Releases, sin el límite de espacio de los artefactos)
+      - name: Guardar los planos cortados para el próximo montaje
         if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: cache/planos
+          key: planos-${{ inputs.guion }}-${{ github.run_id }}
+
+      # 14 nov 2026: revisión automática (resolución, fotogramas, huecos, imagen quieta, hojas de contactos). Si hay
+      # huecos o falta imagen, el vídeo no se publica en la release.
+      - name: Revisar el vídeo
+        id: revision
+        if: success() && inputs.solo_voces != '1'
+        run: |
+          ls salida_hq/video_largo.mp4 >/dev/null 2>&1 || { echo "No hay vídeo que revisar"; exit 0; }
+          python3 video_largo/revisar_video.py salida_hq/video_largo.mp4 salida_montaje
+
+      - name: Guardar el vídeo en alta calidad (en Releases, sin el límite de espacio de los artefactos)
+        if: always() && steps.revision.outcome != 'failure'
         run: |
           ls salida_hq/* >/dev/null 2>&1 || { echo "No hay vídeo en alta calidad"; exit 0; }
           TAG="${RAMA}-alta-calidad"
