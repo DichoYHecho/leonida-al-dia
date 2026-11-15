@@ -219,6 +219,54 @@ PLAN["p13"][0].insert(3, "K6_Img_Tril_GTA3_Coche_Puente")
 PLAN["p11"][0][-1:-1] = ["K6_GTAO_Humo", "K6_GTAO_Drift_Rampa"]
 PLAN["p14"][0].insert(2, "K6_Img_VI_Jason_Coche")
 
+# 15 nov (2): 9 capturas más y menos anclas (cada ancla recorta la imagen anterior y se pierde imagen)
+for n in ["Clifford_GD", "11S_MCV", "VC_Censura", "SA_AO_GD", "Australia_Stevivor", "Thompson_Bully_GD",
+          "Target_CollectiveShout", "OpenIV_PCGamer", "Trilogy_TechRadar"]:
+    IMG["K6_Cap_" + n] = (I2, f"K6_{n}.png", 8, "Captura propia de prensa (titular y fecha): " + n.replace("_", " "))
+for b, cap, pos in [("p01", "K6_Cap_Clifford_GD", 3), ("p02", "K6_Cap_11S_MCV", 2), ("p03", "K6_Cap_VC_Censura", 4),
+                    ("p04", "K6_Cap_SA_AO_GD", 2), ("p05", "K6_Cap_Australia_Stevivor", 3),
+                    ("p06", "K6_Cap_Thompson_Bully_GD", 2), ("p10", "K6_Cap_Target_CollectiveShout", 3),
+                    ("p11", "K6_Cap_OpenIV_PCGamer", 3), ("p13", "K6_Cap_Trilogy_TechRadar", 4)]:
+    PLAN[b][0].insert(pos, cap)
+MENOS_ANCLAS = {
+    "p01": {"clifford": "K6_Tarjeta_Clifford", "brasil": "K6_Tarjeta_Brasil"},
+    "p02": {"septiembre": "K6_Tarjeta_11S", "policía": "K6_Img_Tril_GTA3_Policia"},
+    "p03": {"haitiana": "K6_Cap_VC_Demanda"},
+    "p04": {"veinte": "K6_Cap_ESRB_AO", "veinticuatro": "K6_Tarjeta_HotCoffee"},
+    "p05": {"revocó": "K6_Tarjeta_Australia"},
+    "p06": {"juez": "K6_Tarjeta_Bully_Juez", "coalición": "K6_Cap_Bully_Profesores"},
+    "p07": {"veintisiete": "K6_Tarjeta_Thompson"},
+    "p08": {"tortura": "K6_Cap_Tortura_CNBC"},
+    "p09": {"lindsay": "K6_Cap_Lohan_Fortune"},
+    "p10": {"cuarenta": "K6_Tarjeta_Target"},
+    "p11": {"openiv": "K6_Cap_OpenIV"},
+    "p12": {"sarwar": "K6_Cap_SharkCards_GI"},
+    "p13": {"disculpas": "K6_Cap_Trilogy_NME"},
+    "p14b": {"octubre": "K6_Cap_Despidos_Register", "glasgow": "K6_Cap_Juicio_Aftermath"},
+    "p15": {"miami": "K6_Foto_MiamiBeach_Noche", "contrato": "K6_Tarjeta_Miami"},
+}
+for b, anc in MENOS_ANCLAS.items():
+    PLAN[b] = (PLAN[b][0], anc)
+PLAN["p03"][0].remove("K6_Cap_VC_Demanda"); PLAN["p03"][0].insert(2, "K6_Cap_VC_Demanda")
+# 15 nov (3): reparto para los bloques cortos
+for n in ["Tortura", "SharkCards"]:
+    IMG["K6_Tarjeta_" + n] = (I2, f"K6_Tarjeta_{n}.png", 8, "Tarjeta propia con los datos y su fuente: " + n)
+IMG["K6_Img_VI_Brian_Coche"] = (I4, "K6_VI_Brian_Coche.jpg", 8, "Imagen oficial 4K de Rockstar: VI Brian Coche")
+PLAN["p03"][0].remove("K6_Img_Tril_VC_Tommy_Moto"); PLAN["p07"][0].insert(3, "K6_Img_Tril_VC_Tommy_Moto")
+PLAN["p08"][0].insert(5, "K6_Tarjeta_Tortura")
+PLAN["p12"][0].insert(4, "K6_Tarjeta_SharkCards")
+PLAN["p16"][0].remove("K6_GTAO_Conversacion"); PLAN["p09"][0].insert(4, "K6_GTAO_Conversacion")
+PLAN["p14b"][0].insert(3, "K6_Img_VI_Brian_Coche")
+for b, anc in {"p06": {"juez": "K6_Tarjeta_Bully_Juez"}, "p09": {}, "p10": {}, "p12": {},
+               "p14b": {"glasgow": "K6_Cap_Juicio_Aftermath"}, "p15": {"contrato": "K6_Tarjeta_Miami"}}.items():
+    PLAN[b] = (PLAN[b][0], anc)
+# 15 nov (3): no dejar una imagen larga justo antes de un ancla (se recorta a 1 s y falta material)
+for b, mover, tras in [("p06", "K6_Cap_Thompson_Bully_GD", "K6_Tarjeta_Bully_Juez"),
+                       ("p07", "K6_Cap_Thompson_Cargos", "K6_Tarjeta_Thompson"),
+                       ("p08", "K6_Tarjeta_Tortura", "K6_Cap_Tortura_CNBC")]:
+    PLAN[b][0].remove(mover); PLAN[b][0].insert(PLAN[b][0].index(tras) + 1, mover)
+PLAN["p06"] = (PLAN["p06"][0], {}); PLAN["p07"] = (PLAN["p07"][0], {})
+
 
 def lento(dur):
     return 1.25 if dur < 2.4 else 1.0
@@ -246,19 +294,73 @@ textos = {}
 for el in lista.elts:
     d = {k.value: v for k, v in zip(el.keys, el.values)}
     textos[ast.literal_eval(d["id"])] = ast.literal_eval(d["texto"])
+PALABRAS_S = float(__import__("os").environ.get("PALABRAS_S", "2.85"))  # 15 nov: calibrado con la previa real (p04, p05, p13)
+
+
+def simular(b, pl, anc):
+    """Copia del planificador de montaje.py (planificar_anclado + alargar_ultimo) con la voz a PALABRAS_S palabras/s:
+    devuelve los segundos que faltarían."""
+    pal = textos[b].split()
+    dur_voz = len(pal) / PALABRAS_S
+    vis = dur_voz + 1.3
+    def momento(clave):
+        idx = [i for i, w in enumerate(pal) if w.lower().strip("¿¡«»,.:;!?").startswith(clave.lower())]
+        return 0.4 + (idx[0] / len(pal) if idx else 0) * dur_voz
+    ancl = sorted((momento(a), p) for a, p in anc.items())
+    relleno = [n for n in pl if n not in {p for _, p in ancl}]
+    lista, cur, i, falta = [], 0.0, 0, 0.0
+    def alargar(extra):
+        nonlocal falta
+        n, d = lista[-1]
+        cabe = max(0.0, (8.0 if n in IMG else dur[n]) - d)
+        lista[-1][1] += min(cabe, extra)
+        falta += max(0.0, extra - cabe)
+    def rellenar(hasta):
+        nonlocal cur, i
+        while hasta - cur > 0.05:
+            if i >= len(relleno) and lista:
+                alargar(hasta - cur); cur = hasta; break
+            hueco = hasta - cur
+            if lista and hueco < 0.7 and hasta < vis - 0.01:  # el ancla entra unas décimas antes (igual que montaje.py)
+                break
+            if lista and hueco < 2.0 and dur[relleno[i]] > hueco + 1.0:  # igual que montaje.py (15 nov)
+                corto = next((j for j in range(i, len(relleno)) if dur[relleno[j]] <= hueco + 0.6), None)
+                if corto is not None:
+                    relleno[i], relleno[corto] = relleno[corto], relleno[i]
+                else:
+                    u, du = lista[-1]
+                    if (8.0 if u in IMG else dur[u]) - du >= hueco:
+                        lista[-1][1] += hueco; cur = hasta; break
+            n = relleno[i]; i += 1
+            d = min(dur[n], hasta - cur)
+            if d < 0.7 and lista:
+                lista[-1][1] += d
+            else:
+                lista.append([n, d])
+            cur += d
+    for k, (t, n) in enumerate(ancl):
+        rellenar(min(max(t, cur), vis))
+        sig = ancl[k + 1][0] if k + 1 < len(ancl) else vis
+        d = min(dur[n], max(0.8, sig - cur), vis - cur)
+        if d > 0.05:
+            lista.append([n, d]); cur += d
+    rellenar(vis)
+    if __import__('os').environ.get('DEPURAR') == b:
+        print([(n, round(d, 1)) for n, d in lista], 'anclas', [(round(t, 1), n) for t, n in ancl])
+    return vis, falta
+
+
 usados, mal = [], False
 for b, (pl, anc) in PLAN.items():
-    est = len(textos[b].split()) / 3.4 + 1.2
-    cap = sum(dur[p] for p in pl)
-    ult = pl[-1]
-    cap8 = cap + (8 - dur[ult] if ult in IMG else 0)
     falt = [p for p in pl + list(anc.values()) if p not in dur]
     fuera = [a for a in anc if a.lower() not in textos[b].lower()]
     noen = [p for p in anc.values() if p not in pl]
     usados += pl
-    estado = "OK" if cap8 >= est and not falt and not fuera and not noen else "REVISAR"
+    vis, falta = simular(b, pl, anc) if not falt else (0, 99)
+    cap = sum(dur.get(p, 0) for p in pl)
+    estado = "OK" if falta < 0.05 and not falt and not fuera and not noen else "REVISAR"
     mal |= estado != "OK"
-    print(f"{b:7s} voz≈{est:5.1f}s  imagen {cap:5.1f}s (hasta {cap8:5.1f})  {estado} {falt or ''} {fuera or ''} {noen or ''}")
+    print(f"{b:7s} imagen necesaria {vis:5.1f}s  disponible {cap:5.1f}s  faltan {falta:4.1f}s  {estado} {falt or ''} {fuera or ''} {noen or ''}")
 rep = {p for p in usados if usados.count(p) > 1}
 print("repetidos:", rep or "ninguno", "| trozos en la tabla:", len(filas), "| usados:", len(set(usados)))
 sys.exit(1 if mal or rep else 0)

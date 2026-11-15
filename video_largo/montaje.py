@@ -416,6 +416,24 @@ def planificar_anclado(b, dur_visual, tb):
                 alargar_ultimo(b, lista, extra, tb)
                 estado["cursor"] = hasta
                 break
+            hueco = hasta - estado["cursor"]
+            if lista and hueco < 0.7 and hasta < dur_visual - 0.01:
+                break  # 15 nov: el plano anclado entra unas décimas antes en vez de gastar otro plano en ese hueco
+            i0 = estado["i"] % len(relleno)
+            if lista and hueco < 2.0 and tb[relleno[i0]]["dur"] * tb[relleno[i0]]["lento"] > hueco + 1.0:
+                # 15 nov: hueco corto antes de un ancla: no se gasta un plano largo en un trozo de él (se perdía
+                # hasta 7 s de imagen). Primero un plano corto que quepa; si no hay, se alarga un poco el anterior.
+                corto = next((j for j in range(i0, len(relleno))
+                              if tb[relleno[j]]["dur"] * tb[relleno[j]]["lento"] <= hueco + 0.6), None)
+                if corto is not None:
+                    relleno[i0], relleno[corto] = relleno[corto], relleno[i0]
+                else:
+                    u, du = lista[-1]
+                    cabe = (8.0 if tb[u]["video"].startswith("Imagen:") else tb[u]["dur"] * tb[u]["lento"]) - du
+                    if cabe >= hueco:
+                        lista[-1][1] += hueco
+                        estado["cursor"] = hasta
+                        break
             n = relleno[estado["i"] % len(relleno)]
             estado["i"] += 1
             d = min(tb[n]["dur"] * tb[n]["lento"], hasta - estado["cursor"])

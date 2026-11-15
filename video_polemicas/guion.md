@@ -2,7 +2,7 @@
 
 Canal: Leónida al Día · Revisión del 14 nov 2026 (aprobada) · GTA VI sale el 19 nov 2026.
 Estructura: gancho + 5 actos cronológicos (17 bloques) + cierre.
-Medición (3,4 palabras por segundo): 1769 palabras de voz, unos 8.7 min.
+Medición (3,4 palabras por segundo): 1771 palabras de voz, unos 8.7 min.
 Este archivo se genera desde video_largo/guion_pol.py (el texto hablado manda). Fuentes en investigacion.md y edicion.md.
 
 ---
@@ -65,7 +65,7 @@ Y Thompson no era nuevo en esto. Jack Thompson, abogado de Florida, era uno de l
 
 ### Bloque 8 · 2013 · gta v y la tortura
 
-2013. GTA V sale el diecisiete de septiembre, con tres protagonistas. Y una misión provoca una avalancha de críticas: una escena de tortura en la que el jugador participa. El diputado británico Keith Vaz dice que se quedó asombrado por la violencia. Freedom from Torture, una ONG que atiende a víctimas de tortura, asegura que el estudio cruzó una línea. Los defensores responden que la escena muestra la crueldad de la tortura, y que es sátira. Unos la ven como una denuncia. Otros, como una línea roja. Tú decides.
+2013. GTA V sale el diecisiete de septiembre, con tres protagonistas. Y una misión provoca una avalancha de críticas: una escena de tortura en la que el jugador participa. El diputado británico Keith Vaz pide a la industria que informe bien del contenido extremo. Freedom from Torture, una ONG que atiende a víctimas de tortura, asegura que el estudio cruzó una línea. Los defensores responden que la escena muestra la crueldad de la tortura, y que es sátira. Unos la ven como una denuncia. Otros, como una línea roja. Tú decides.
 
 ---
 
