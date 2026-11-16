@@ -2,7 +2,7 @@
 
 **Montaje final (16 nov 2026, aprobado):** release `montaje-pol-alta-calidad` → `video_largo.mp4`. 2560x1440 a 30 fps, 10:15, 18466 fotogramas de 18466, sin huecos; las 19 voces de Gemini. Capítulos copiados de `capitulos.txt` de la rama `montaje-pol`.
 
-**Subida:** pendiente. Con subir_youtube.yml (video=guion_pol, nuevo=true, fecha que diga el usuario). La subida antigua (https://youtu.be/cU0FaBkNkqU) está en privado; no se borra.
+**Subida:** SUBIDO Y PROGRAMADO el 16 nov: https://youtu.be/1Qi5jHaz6KE (privado hasta hoy, 16 nov, a las 18:00 de Madrid; miniatura A puesta). La subida antigua (https://youtu.be/cU0FaBkNkqU) está en privado; no se borra.
 
 **En YouTube Studio tras subirlo:** miniaturas A/B (`miniatura_pol.jpg`, `_b`, `_c`), «Título del juego: Grand Theft Auto VI», pantalla final en el bloque 14 hacia https://youtu.be/0wN5lX7CVvc. Sin etiqueta de contenido hecho con IA. Comentario fijado: aparcado.
 
