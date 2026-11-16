@@ -1,0 +1,14 @@
+## Revisión automática del vídeo
+- Resolución: 2560x1440 a 30 fps
+- Fotogramas: 18466 de 18466 esperados por la duración del audio (10:15.53)
+- Huecos en los tiempos (saltos de más de 1,5 fotogramas): 0
+- Imagen quieta 0,25 s o más: 157 tramos, 92.2 s en total (cartelas, logos y pantalla final son normales); los más largos:
+    - 10:00.73 durante 14.3 s
+    - 2:58.33 durante 1.0 s
+    - 5:45.03 durante 1.0 s
+    - 2:03.53 durante 0.9 s
+    - 4:32.00 durante 0.9 s
+    - 7:35.50 durante 0.9 s
+    - 8:17.67 durante 0.9 s
+    - 9:04.63 durante 0.9 s
+- Hojas de contactos (un fotograma cada 2,5 s): carpeta `hojas/` de la rama del montaje
