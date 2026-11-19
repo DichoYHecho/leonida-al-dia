@@ -20,25 +20,70 @@ from config import CANAL_IG, CANAL_TT, CANAL_YT, MADRID, YT_CATEGORIA  # noqa: E
 REPO = os.environ.get("GITHUB_REPOSITORY", "DichoYHecho/leonida-al-dia")
 URL = f"https://github.com/{REPO}/releases/download/shorts-directo/{{id}}.mp4"
 
-BLOQUES = """
- reel: createPost(input: { text: $textq, channelId: "%(ig)s", schedulingType: automatic, MODO,
+BLOQUES = {
+    "reel": """ reel: createPost(input: { text: $textq, channelId: "%s", schedulingType: automatic, MODO,
    assets: [ { video: { url: $video, metadata: { thumbnailOffset: 1000 } } } ],
    metadata: { instagram: { type: reel, shouldShareToFeed: true, isAiGenerated: false } } })
    { ... on PostActionSuccess { post { id status } } ... on MutationError { message } }
- tiktok: createPost(input: { text: $textq, channelId: "%(tt)s", schedulingType: automatic, MODO,
+""" % CANAL_IG,
+    "tiktok": """ tiktok: createPost(input: { text: $textq, channelId: "%s", schedulingType: automatic, MODO,
    assets: [ { video: { url: $video, metadata: { thumbnailOffset: 1000 } } } ],
    metadata: { tiktok: { isAiGenerated: false } } })
    { ... on PostActionSuccess { post { id status } } ... on MutationError { message } }
- youtube: createPost(input: { text: $textq, channelId: "%(yt)s", schedulingType: automatic, MODO,
-   assets: [ { video: { url: $video } } ],
-   metadata: { youtube: { title: $titulo, categoryId: "%(cat)s", isAiGenerated: false } } })
-   { ... on PostActionSuccess { post { id status } } ... on MutationError { message } }
-""" % {"ig": CANAL_IG, "tt": CANAL_TT, "yt": CANAL_YT, "cat": YT_CATEGORIA}
+""" % CANAL_TT,
+}
+
+# YouTube va por su API y no por Buffer: Buffer solo deja programar 2 Shorts de YouTube al día y esos los usan los
+# Shorts diarios (lo vimos el 19 nov). Se sube en privado con publishAt (o público si la hora ya pasó).
+YT = "https://www.googleapis.com/youtube/v3"
 
 
-def mutacion(cuando_utc):
+def mutacion(cuando_utc, redes):
     modo = f'mode: customScheduled, dueAt: "{cuando_utc}"' if cuando_utc else "mode: shareNow"
-    return "mutation Publicar($textq: String!, $video: String!, $titulo: String!) {" + BLOQUES.replace("MODO", modo) + "}"
+    return "mutation Publicar($textq: String!, $video: String!) {\n" + "".join(BLOQUES[r].replace("MODO", modo) for r in redes) + "}"
+
+
+def yt_token():
+    r = requests.post("https://oauth2.googleapis.com/token", timeout=30, data={
+        "client_id": os.environ["GOOGLE_CLIENT_ID"], "client_secret": os.environ["GOOGLE_CLIENT_SECRET"],
+        "refresh_token": os.environ["GOOGLE_YT_REFRESH_TOKEN"], "grant_type": "refresh_token"})
+    r.raise_for_status()
+    return r.json()["access_token"]
+
+
+def yt_ya_subido(tok, titulo):
+    h = {"Authorization": f"Bearer {tok}"}
+    canal = requests.get(f"{YT}/channels", headers=h, params={"part": "contentDetails", "mine": "true"}, timeout=60).json()
+    lista = canal["items"][0]["contentDetails"]["relatedPlaylists"]["uploads"]
+    items = requests.get(f"{YT}/playlistItems", headers=h, timeout=60,
+                         params={"part": "snippet,contentDetails", "playlistId": lista, "maxResults": 50}).json().get("items", [])
+    return next((i["contentDetails"]["videoId"] for i in items if i["snippet"]["title"].strip() == titulo.strip()), None)
+
+
+def yt_subir(s, url, due):
+    tok = yt_token()
+    vid = yt_ya_subido(tok, s["titulo"])
+    if vid:
+        return f"ya estaba: https://youtu.be/{vid}"
+    datos = requests.get(url, timeout=300).content
+    estado = {"privacyStatus": "private", "publishAt": due} if due else {"privacyStatus": "public"}
+    estado.update(selfDeclaredMadeForKids=False, embeddable=True, license="youtube")
+    cuerpo = {"snippet": {"title": s["titulo"][:100], "description": s["texto"].replace("<", "‹").replace(">", "›"),
+                          "tags": ["GTA 6", "GTA VI", "Grand Theft Auto VI", "gameplay GTA 6", "Leonida", "Vice City"],
+                          "categoryId": YT_CATEGORIA, "defaultLanguage": "es", "defaultAudioLanguage": "es"},
+              "status": estado}
+    r = requests.post("https://www.googleapis.com/upload/youtube/v3/videos", timeout=120,
+                      params={"uploadType": "resumable", "part": "snippet,status", "notifySubscribers": "true"},
+                      headers={"Authorization": f"Bearer {tok}", "Content-Type": "application/json; charset=UTF-8",
+                               "X-Upload-Content-Type": "video/mp4", "X-Upload-Content-Length": str(len(datos))},
+                      data=json.dumps(cuerpo))
+    r.raise_for_status()
+    r = requests.put(r.headers["Location"], data=datos, timeout=900, headers={"Authorization": f"Bearer {tok}"})
+    r.raise_for_status()
+    vid = r.json()["id"]
+    st = requests.get(f"{YT}/videos", headers={"Authorization": f"Bearer {tok}"}, params={"part": "status", "id": vid},
+                      timeout=60).json()["items"][0]["status"]
+    return f"https://youtu.be/{vid} · {st.get('privacyStatus')} · sale {st.get('publishAt') or 'ya'}"
 
 
 def main():
@@ -68,15 +113,25 @@ def main():
         if prueba:
             resumen.append(f"- {s['id']}: PRUEBA (no se manda) · {s['cuando']}")
             continue
-        r = requests.post("https://api.buffer.com", timeout=180,
-                          json={"query": mutacion(due), "variables": {"textq": s["texto"], "video": url, "titulo": s["titulo"][:100]}},
-                          headers={"Authorization": f"Bearer {os.environ['BUFFER_API_KEY']}", "Content-Type": "application/json"})
-        r.raise_for_status()
-        d = r.json()
-        res = d.get("data") or {}
-        bien = [k for k in ("reel", "tiktok", "youtube") if (res.get(k) or {}).get("post")]
-        mal = {k: (res.get(k) or {}).get("message") or d.get("errors") for k in ("reel", "tiktok", "youtube") if k not in bien}
-        print(f"   Buffer: bien {bien}; fallos {mal}", flush=True)
+        redes = [x.strip() for x in os.environ.get("REDES", "reel,tiktok,youtube").split(",") if x.strip()]
+        bien, mal = [], {}
+        en_buffer = [x for x in redes if x in BLOQUES]
+        if en_buffer:
+            r = requests.post("https://api.buffer.com", timeout=180,
+                              json={"query": mutacion(due, en_buffer), "variables": {"textq": s["texto"], "video": url}},
+                              headers={"Authorization": f"Bearer {os.environ['BUFFER_API_KEY']}", "Content-Type": "application/json"})
+            r.raise_for_status()
+            d = r.json()
+            res = d.get("data") or {}
+            bien += [k for k in en_buffer if (res.get(k) or {}).get("post")]
+            mal.update({k: (res.get(k) or {}).get("message") or d.get("errors") for k in en_buffer if k not in bien})
+        if "youtube" in redes:
+            try:
+                print(f"   YouTube: {yt_subir(s, url, due)}", flush=True)
+                bien.append("youtube")
+            except Exception as e:  # noqa: BLE001
+                mal["youtube"] = str(e)[:300]
+        print(f"   bien {bien}; fallos {mal}", flush=True)
         if mal:
             fallos += 1
         resumen.append(f"- {s['id']} ({s['cuando']} Madrid): bien {', '.join(bien) or '—'}" + (f"; fallos {json.dumps(mal, ensure_ascii=False)[:300]}" if mal else ""))
