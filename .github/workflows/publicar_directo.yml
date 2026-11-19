@@ -1,0 +1,37 @@
+name: Publicar Shorts del directo
+
+# Pedido por el usuario el 19 nov 2026: programa en Buffer (Reel, TikTok y YouTube Shorts) los Shorts de gameplay
+# del directo. Vídeos en la release «shorts-directo»; textos y horas (Madrid) en gta/directo_shorts.json.
+on:
+  workflow_dispatch:
+    inputs:
+      short:
+        description: "Qué Short (id de directo_shorts.json) o «todos»"
+        required: true
+        default: todos
+      prueba:
+        description: "Prueba: solo enseñar lo que mandaría"
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: publicar-directo
+  cancel-in-progress: false
+
+jobs:
+  publicar:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      BUFFER_API_KEY: ${{ secrets.BUFFER_API_KEY }}
+      PRUEBA: ${{ inputs.prueba && 'true' || 'false' }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+      - run: pip install -q requests
+      - run: python gta/publicar_directo.py "${{ inputs.short }}"
