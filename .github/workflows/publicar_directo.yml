@@ -9,6 +9,10 @@ on:
         description: "Qué Short (id de directo_shorts.json) o «todos»"
         required: true
         default: todos
+      redes:
+        description: "Redes (reel, tiktok, youtube). YouTube va por su API, no por Buffer"
+        required: true
+        default: "reel,tiktok,youtube"
       prueba:
         description: "Prueba: solo enseñar lo que mandaría"
         type: boolean
@@ -27,6 +31,10 @@ jobs:
     timeout-minutes: 15
     env:
       BUFFER_API_KEY: ${{ secrets.BUFFER_API_KEY }}
+      GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+      GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+      GOOGLE_YT_REFRESH_TOKEN: ${{ secrets.GOOGLE_YT_REFRESH_TOKEN }}
+      REDES: ${{ inputs.redes }}
       PRUEBA: ${{ inputs.prueba && 'true' || 'false' }}
     steps:
       - uses: actions/checkout@v5
