@@ -1,32 +1,29 @@
-# Radar de virales de GTA 6 · 2026-11-20
+# Radar de virales de GTA 6 · 2026-11-21
 
 Vídeos de los últimos 7 días con ≥ ×3 la mediana de su canal y ≥ 10.000 vistas. Ordenados por ×media. Solo referencia de estructura: no se copia texto, audio ni imagen.
 
-**Candidatos:** 18 (Shorts 14, largos 4, medios 0)
+**Candidatos:** 19 (Shorts 18, largos 1, medios 0)
 
 ## Top 10 Shorts (≤ 3 min)
 
 | # | Título | Canal | Vistas | ×media | Duración | Tema | Gancho | Enlace |
 |---|---|---|---:|---:|---:|---|---|---|
-| 1 | We Bought a NEW TV For GTA 6 😎 | Sick Plays | 10.954.861 | ×1069.0 | 1:22 | comprar televisor para GTA 6 | otro | https://youtu.be/6lpyJUyu2kk |
-| 2 | Don't miss the TOP GTA 6 MOMENTS... 😂 #gta6 #gtavi | GTA by Sam | 2.941.135 | ×797.1 | 1:20 | momentos divertidos de GTA 6 | pregunta | https://youtu.be/SUiwFz6SQtU |
-| 3 | How to Crack Lucia in GTA 6 (Most People Miss This) | Blin. | 1.854.588 | ×208.5 | 0:57 | trucos sobre Lucia en GTA 6 | pregunta | https://youtu.be/Ok06cqF97zk |
-| 4 | How Many Rockstar Maps Fit Inside GTA 6?! | VicePulse | 5.741.146 | ×181.9 | 0:25 | comparación de mapas de GTA | pregunta | https://youtu.be/6TfN4d2f28A |
-| 5 | RIL, GIBRAN MAU MAIN GTA 6 | Umat Game | 4.052.215 | ×111.9 | 0:26 | Gibran juega GTA 6 | otro | https://youtu.be/A2XaCRY-qTE |
-| 6 | Inilah Detail Keren Yang Ada di GTA 6 #1 | Darsa Gaming | 3.625.792 | ×105.5 | 0:52 | detalles de GTA 6 | dato sorprendente | https://youtu.be/AvxMlK0jPD8 |
-| 7 | GTA 6 Physical Edition 💀 | Gleb POV | 15.064.251 | ×77.8 | 0:07 | edición física de GTA 6 | dato sorprendente | https://youtu.be/JicCJV_8Gcw |
-| 8 | La Map de GTA 6 est Absurde! | Hiken | 2.800.666 | ×41.4 | 1:25 | mapa de GTA 6 | dato sorprendente | https://youtu.be/jQJDBw0NLIE |
-| 9 | Airports in GTA 6 are Insane | Aaron Rheins | 3.199.743 | ×10.5 | 1:05 | aeropuertos en GTA 6 | dato sorprendente | https://youtu.be/e2LhuyWCn4E |
-| 10 | El GTA VI en consola RETRO (Sale MUY MAL) - Sergio Encinas | Sergio Encinas Oficial | 3.690.473 | ×10.4 | 0:30 | GTA VI en consola retro | contradicción | https://youtu.be/vwYOP5hviJM |
+| 1 | GIRLS BUYING GTA VI😂 | LOS STUDIOS | 106.797.647 | ×2234.1 | 0:29 | chicas comprando GTA 6 | otro | https://youtu.be/XSnmNq2GbJk |
+| 2 | Kai Cenat’s GTA 6 Reaction Went WRONG 😭 | Insomnia Clipz | 2.799.357 | ×361.7 | 0:32 | reacción de Kai Cenat a GTA 6 | contradicción | https://youtu.be/QVNl55A2GXo |
+| 3 | GTA VI Disc Version 😭 | Techmagnet | 4.279.768 | ×70.0 | 1:01 | versión en disco de GTA 6 | otro | https://youtu.be/nQf8AMCXdKM |
+| 4 | GTA Launch !! 😱#shorts #gta6 #explore #trending #gta #gtavi | EstubeGaming | 12.252.767 | ×65.9 | 0:17 | lanzamiento de GTA 6 | dato sorprendente | https://youtu.be/M66BZdVelYg |
+| 5 | How to Spend your Last Day in GTA 5 Before GTA 6! | lukogta | 2.156.671 | ×56.2 | 1:02 | último día en GTA 5 | otro | https://youtu.be/yODXUC-pxIU |
+| 6 | Beberapa Detail Keren Yang Ada di GTA 6 #2 | Darsa Gaming | 1.863.602 | ×54.2 | 1:09 | detalles geniales en GTA 6 | lista | https://youtu.be/ebgkUMQY0R4 |
+| 7 | GTA VI #comedy #funny #cutebaby #shortsfeed #viralvideo | Chunnu Munnu Vines | 43.668.582 | ×51.3 | 0:16 | comedia sobre GTA 6 | otro | https://youtu.be/IyN837oNRiM |
+| 8 | O que tem no topo da torre mais alta do GTA 6? | Brunelviss Games | 2.511.572 | ×41.6 | 1:19 | cima de la torre en GTA 6 | pregunta | https://youtu.be/MoNLMwesBos |
+| 9 | Pov: Intentas jugar GTA 6 en tu PS1 #gta6 | Davisuuarez2 | 5.333.005 | ×26.6 | 0:17 | jugar GTA 6 en PS1 | otro | https://youtu.be/C1GXMu5EcjE |
+| 10 | 5 Things You NEED To Know Before Playing GTA 6 🤯 | GTA Intel | 2.206.846 | ×26.2 | 1:07 | cosas que saber antes de GTA 6 | lista | https://youtu.be/GprmRMxusSs |
 
 ## Top 10 largos (≥ 8 min)
 
 | # | Título | Canal | Vistas | ×media | Duración | Tema | Gancho | Enlace |
 |---|---|---|---:|---:|---:|---|---|---|
-| 1 | GTA 6 – CRAZY 5-Star Police Chase & Rampage at Vice Ocean Beach! | Champs Network | 3.932.130 | ×222.8 | 8:43 | persecución policial en Vice Beach | dato sorprendente | https://youtu.be/8-DRGbQ1IXc |
-| 2 | GTA 6 - Stealing a Jet From the Military Base | TmarTn2 | 6.903.017 | ×23.6 | 13:17 | robar un jet militar | otro | https://youtu.be/6E2cBXFCDyQ |
-| 3 | GTA 6 - Explorando a PRAIA em MUNDO ABERTO! | LipaoGamer | 2.127.422 | ×8.7 | 24:12 | explorando la playa en GTA 6 | otro | https://youtu.be/JD6Y4PNThSI |
-| 4 | MI PRIMERA VEZ EN GTA 6 - TheGrefg | TheGrefg | 3.129.274 | ×7.4 | 59:51 | primera vez jugando GTA 6 | otro | https://youtu.be/IKmDcF0QhBA |
+| 1 | GTA 6 WTF and Funny Moments! #2 | Zynxize | 3.284.350 | ×140.2 | 18:19 | momentos divertidos en GTA 6 | otro | https://youtu.be/dUYIMa2ifWM |
 
 ## Medios (3-8 min)
 
@@ -37,14 +34,14 @@ _Ninguno hoy._
 - Búsqueda «GTA 6» (es): 50 vídeos
 - Búsqueda «GTA 6»: 50 vídeos
 - Búsqueda «GTA VI»: 50 vídeos
-- Vídeos encontrados: 93; pasan el primer filtro: 41; descartes: no es de GTA 6 1, directo 17, pocas vistas 1, ya visto 33
-- Canales: 36 (10 con mediana guardada, 26 nuevos)
-- Candidatos (×3 y 10.000 vistas): 18; sin mediana fiable: 0
-- Gemini: 18 vídeos etiquetados (1 llamada)
+- Vídeos encontrados: 97; pasan el primer filtro: 52; descartes: no es de GTA 6 2, directo 13, pocas vistas 0, ya visto 30
+- Canales: 46 (19 con mediana guardada, 27 nuevos)
+- Candidatos (×3 y 10.000 vistas): 19; sin mediana fiable: 1
+- Gemini: 19 vídeos etiquetados (1 llamada)
 
 ## Cupo gastado
 
-- YouTube esta ejecución: **355 unidades** (3 búsquedas)
-- YouTube hoy en total: 355 de 2000 unidades; 3 de 6 búsquedas
+- YouTube esta ejecución: **357 unidades** (3 búsquedas)
+- YouTube hoy en total: 357 de 2000 unidades; 3 de 6 búsquedas
 - Gemini: 1 llamada de texto, 0 de voz
 - Acceso: permiso del canal (GOOGLE_YT_REFRESH_TOKEN), ámbitos: youtube.force-ssl
