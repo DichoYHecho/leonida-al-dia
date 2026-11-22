@@ -1,29 +1,34 @@
-# Radar de virales de GTA 6 · 2026-11-21
+# Radar de virales de GTA 6 · 2026-11-22
 
 Vídeos de los últimos 7 días con ≥ ×3 la mediana de su canal y ≥ 10.000 vistas. Ordenados por ×media. Solo referencia de estructura: no se copia texto, audio ni imagen.
 
-**Candidatos:** 19 (Shorts 18, largos 1, medios 0)
+**Candidatos:** 19 (Shorts 13, largos 6, medios 0)
 
 ## Top 10 Shorts (≤ 3 min)
 
 | # | Título | Canal | Vistas | ×media | Duración | Tema | Gancho | Enlace |
 |---|---|---|---:|---:|---:|---|---|---|
-| 1 | GIRLS BUYING GTA VI😂 | LOS STUDIOS | 106.797.647 | ×2234.1 | 0:29 | chicas comprando GTA 6 | otro | https://youtu.be/XSnmNq2GbJk |
-| 2 | Kai Cenat’s GTA 6 Reaction Went WRONG 😭 | Insomnia Clipz | 2.799.357 | ×361.7 | 0:32 | reacción de Kai Cenat a GTA 6 | contradicción | https://youtu.be/QVNl55A2GXo |
-| 3 | GTA VI Disc Version 😭 | Techmagnet | 4.279.768 | ×70.0 | 1:01 | versión en disco de GTA 6 | otro | https://youtu.be/nQf8AMCXdKM |
-| 4 | GTA Launch !! 😱#shorts #gta6 #explore #trending #gta #gtavi | EstubeGaming | 12.252.767 | ×65.9 | 0:17 | lanzamiento de GTA 6 | dato sorprendente | https://youtu.be/M66BZdVelYg |
-| 5 | How to Spend your Last Day in GTA 5 Before GTA 6! | lukogta | 2.156.671 | ×56.2 | 1:02 | último día en GTA 5 | otro | https://youtu.be/yODXUC-pxIU |
-| 6 | Beberapa Detail Keren Yang Ada di GTA 6 #2 | Darsa Gaming | 1.863.602 | ×54.2 | 1:09 | detalles geniales en GTA 6 | lista | https://youtu.be/ebgkUMQY0R4 |
-| 7 | GTA VI #comedy #funny #cutebaby #shortsfeed #viralvideo | Chunnu Munnu Vines | 43.668.582 | ×51.3 | 0:16 | comedia sobre GTA 6 | otro | https://youtu.be/IyN837oNRiM |
-| 8 | O que tem no topo da torre mais alta do GTA 6? | Brunelviss Games | 2.511.572 | ×41.6 | 1:19 | cima de la torre en GTA 6 | pregunta | https://youtu.be/MoNLMwesBos |
-| 9 | Pov: Intentas jugar GTA 6 en tu PS1 #gta6 | Davisuuarez2 | 5.333.005 | ×26.6 | 0:17 | jugar GTA 6 en PS1 | otro | https://youtu.be/C1GXMu5EcjE |
-| 10 | 5 Things You NEED To Know Before Playing GTA 6 🤯 | GTA Intel | 2.206.846 | ×26.2 | 1:07 | cosas que saber antes de GTA 6 | lista | https://youtu.be/GprmRMxusSs |
+| 1 | Now I can play my game in peace!😂🫡 #gta #GTA6 #marriedlife #relatable #relationships | Bam and Bri Nation | 9.079.415 | ×344.3 | 0:23 | vida de casado y GTA 6 | otro | https://youtu.be/XtCzxJUrE_s |
+| 2 | Did GTA 6 Finally Fix BLOCKED Car Doors? | Mr Spring | 17.627.194 | ×207.3 | 0:36 | puertas de coches en GTA 6 | pregunta | https://youtu.be/ZFEJNsik7kQ |
+| 3 | 5 Things You Didn’t Know About GTA 6 | JayWayyGaming | 10.747.521 | ×62.7 | 1:03 | curiosidades de GTA 6 | lista | https://youtu.be/T8FzQ5cW-94 |
+| 4 | GTA 6 ist wichtiger als Liebe! 😂 | Rene Redo | 6.581.810 | ×51.0 | 0:12 | priorizar GTA 6 ante el amor | otro | https://youtu.be/FYX61ZbxYhY |
+| 5 | Aapne download kia kya gta6 #shorts #gta #gta6 #funny #couple #shortvideo | Varsha & Aditya | 19.863.188 | ×42.8 | 0:58 | descargar GTA 6 | pregunta | https://youtu.be/S3g3ooJARP8 |
+| 6 | Cuando NO PUEDES Jugar GTA 6⚠️😭#comedia | Rossi | 17.641.922 | ×33.2 | 0:13 | no poder jugar GTA 6 | otro | https://youtu.be/9IAVYy8io5g |
+| 7 | POV: Jeder am 19.11 , wenn GTA 6 ONLINE GEHT😱 / Lukas712 | Lukas 712 | 3.938.853 | ×31.4 | 0:40 | lanzamiento online de GTA 6 | otro | https://youtu.be/4Cn7r2-bAnQ |
+| 8 | POV: Giving Birth When GTA 6 Drops... | Dimucc | 25.545.499 | ×10.8 | 0:15 | jugar GTA 6 dando a luz | otro | https://youtu.be/pcFGTiL593U |
+| 9 | Penampakan BIGFOOT di GTA 6 #shorts | Marcade | 7.761.183 | ×10.7 | 0:42 | Bigfoot en GTA 6 | otro | https://youtu.be/9PvoMZMo5Yw |
+| 10 | GTA 5 vs GTA 6 😭 | TheAnimeMen | 10.130.252 | ×8.4 | 0:10 | comparación GTA 5 y GTA 6 | comparación | https://youtu.be/iH0al0JWUWo |
 
 ## Top 10 largos (≥ 8 min)
 
 | # | Título | Canal | Vistas | ×media | Duración | Tema | Gancho | Enlace |
 |---|---|---|---:|---:|---:|---|---|---|
-| 1 | GTA 6 WTF and Funny Moments! #2 | Zynxize | 3.284.350 | ×140.2 | 18:19 | momentos divertidos en GTA 6 | otro | https://youtu.be/dUYIMa2ifWM |
+| 1 | 24H POUR SURVIVRE AUX 6 ÉTOILES DE GTA 6 (ft Inoxtag, Mister V & Amine) | SQUEEZIE | 10.425.697 | ×61.9 | 86:30 | sobrevivir con 6 estrellas | otro | https://youtu.be/WOl5jjqBJYA |
+| 2 | GTA 6 #1 - Início de Gameplay!!! / Grand Theft Auto VI em Português PT-BR no PS5 Pro | BRKsEDU | 3.512.074 | ×29.1 | 50:36 | inicio de gameplay GTA 6 | otro | https://youtu.be/BG_y4qpQA-g |
+| 3 | MI PRIMERA VEZ JUGANDO A GTA 6 | DaniRep / +6 Vídeos Diarios De GTA 5 Onl | 4.494.374 | ×11.1 | 81:23 | primera vez jugando GTA 6 | otro | https://youtu.be/ftaKaYHYL1I |
+| 4 | COMIENZA la HISTORIA de GTA 6! #1 🚔🌴 (Grand Theft Auto VI) | E-MasterSensei | 3.498.294 | ×4.2 | 112:58 | historia de GTA 6 | otro | https://youtu.be/2YMiTFW-WKM |
+| 5 | MY FIRST DAY IN VICE CITY / GTA 6 GAMEPLAY #1 | Techno Gamerz | 29.469.305 | ×3.2 | 123:59 | primer día en Vice City | otro | https://youtu.be/169ZzvPxvvM |
+| 6 | The GTA 6 backlash is getting out of hand.. | Asmongold TV   | 4.333.918 | ×3.2 | 17:49 | polémica sobre GTA 6 | otro | https://youtu.be/4RqYHJmmmuw |
 
 ## Medios (3-8 min)
 
@@ -34,14 +39,14 @@ _Ninguno hoy._
 - Búsqueda «GTA 6» (es): 50 vídeos
 - Búsqueda «GTA 6»: 50 vídeos
 - Búsqueda «GTA VI»: 50 vídeos
-- Vídeos encontrados: 97; pasan el primer filtro: 52; descartes: no es de GTA 6 2, directo 13, pocas vistas 0, ya visto 30
-- Canales: 46 (19 con mediana guardada, 27 nuevos)
+- Vídeos encontrados: 95; pasan el primer filtro: 45; descartes: no es de GTA 6 0, directo 32, pocas vistas 0, ya visto 18
+- Canales: 37 (13 con mediana guardada, 24 nuevos)
 - Candidatos (×3 y 10.000 vistas): 19; sin mediana fiable: 1
 - Gemini: 19 vídeos etiquetados (1 llamada)
 
 ## Cupo gastado
 
-- YouTube esta ejecución: **357 unidades** (3 búsquedas)
-- YouTube hoy en total: 357 de 2000 unidades; 3 de 6 búsquedas
+- YouTube esta ejecución: **351 unidades** (3 búsquedas)
+- YouTube hoy en total: 351 de 2000 unidades; 3 de 6 búsquedas
 - Gemini: 1 llamada de texto, 0 de voz
 - Acceso: permiso del canal (GOOGLE_YT_REFRESH_TOKEN), ámbitos: youtube.force-ssl
