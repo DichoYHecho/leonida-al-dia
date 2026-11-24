@@ -205,8 +205,8 @@
   "n": 30
  },
  "UCELAIy1E8A-7IrUlAaGr_vA": {
-  "fecha": "2026-11-13",
-  "mediana": 115741.5,
+  "fecha": "2026-11-24",
+  "mediana": 294696.0,
   "n": 30
  },
  "UCK4vuzS4fX8qxWi5Ik7XQYA": {
@@ -1143,5 +1143,55 @@
   "fecha": "2026-11-23",
   "mediana": 109632.5,
   "n": 30
+ },
+ "UCdj4tDUy8z5fxrdm3cPXvPQ": {
+  "fecha": "2026-11-24",
+  "mediana": 1072055.5,
+  "n": 30
+ },
+ "UCwJJxcke-uBJcLJ58HqrdSw": {
+  "fecha": "2026-11-24",
+  "mediana": 236762.0,
+  "n": 30
+ },
+ "UCgSeIWlJSDs5XjODclT-jAw": {
+  "fecha": "2026-11-24",
+  "mediana": 90064.0,
+  "n": 30
+ },
+ "UCiYcA0gJzg855iSKMrX3oHg": {
+  "fecha": "2026-11-24",
+  "mediana": 9697721.5,
+  "n": 30
+ },
+ "UCi7TVXyvrIwqeS9tfYD8UDA": {
+  "fecha": "2026-11-24",
+  "mediana": 138745.5,
+  "n": 30
+ },
+ "UChocYxNSOmyI53eGUuiECvA": {
+  "fecha": "2026-11-24",
+  "mediana": 983396.5,
+  "n": 30
+ },
+ "UCKEnDzt7VxpVXPkRHVv35nQ": {
+  "fecha": "2026-11-24",
+  "mediana": 73567.0,
+  "n": 30
+ },
+ "UCWz6L4zbfAwKq-8CwJ_Ezzg": {
+  "fecha": "2026-11-24",
+  "mediana": 78973.5,
+  "n": 30
+ },
+ "UC63anZxfVGHUEmfBAf5w7pw": {
+  "fecha": "2026-11-24",
+  "mediana": 591281.0,
+  "n": 30
+ },
+ "UC4plRabXFGdAE6HP-tBQKdQ": {
+  "fecha": "2026-11-24",
+  "mediana": 1134474,
+  "n": 9
  }
 }
