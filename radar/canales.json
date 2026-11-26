@@ -175,9 +175,9 @@
   "n": 30
  },
  "UCDcsKrsuHgy55hH8V4_elOQ": {
-  "fecha": "2026-11-13",
-  "mediana": 344368.0,
-  "n": 10
+  "fecha": "2026-11-26",
+  "mediana": 284709,
+  "n": 15
  },
  "UCtqMeDVoJ44OOfU0iaddOhg": {
   "fecha": "2026-11-21",
@@ -425,8 +425,8 @@
   "n": 30
  },
  "UCBmD4dNtecesIHGgQnI-l2A": {
-  "fecha": "2026-11-15",
-  "mediana": 618002.5,
+  "fecha": "2026-11-26",
+  "mediana": 2157064.0,
   "n": 30
  },
  "UCHYmtFLekfqyCbUHquT2s2g": {
@@ -570,8 +570,8 @@
   "n": 30
  },
  "UCYBetkejPxK8t_41zueazcA": {
-  "fecha": "2026-11-16",
-  "mediana": 188597.5,
+  "fecha": "2026-11-26",
+  "mediana": 334123.0,
   "n": 30
  },
  "UClxhk-zz2J2QM2pl5jyiTKA": {
@@ -1232,6 +1232,61 @@
  "UCa6vIuw2jqv-5ar6YebPiBw": {
   "fecha": "2026-11-25",
   "mediana": 281874.0,
+  "n": 30
+ },
+ "UCLZefG8N0Si_GUxIAwji6uQ": {
+  "fecha": "2026-11-26",
+  "mediana": 1827969.0,
+  "n": 30
+ },
+ "UC4eGl54oVBP4WGE7KZ71IWA": {
+  "fecha": "2026-11-26",
+  "mediana": 39237.5,
+  "n": 30
+ },
+ "UCIViDU4PpVKV83kJEAHMMjQ": {
+  "fecha": "2026-11-26",
+  "mediana": 25488.0,
+  "n": 30
+ },
+ "UCKThXzHZ351-auVmUFWT36Q": {
+  "fecha": "2026-11-26",
+  "mediana": 157384,
+  "n": 29
+ },
+ "UC0fa7jE9MkzMwDHzr6V9eYQ": {
+  "fecha": "2026-11-26",
+  "mediana": 77282.5,
+  "n": 30
+ },
+ "UC8YWe8zJ2is_-xQIhycuD4w": {
+  "fecha": "2026-11-26",
+  "mediana": 56187.5,
+  "n": 30
+ },
+ "UC7eAfUjR9gdIjoaoQaS0W-A": {
+  "fecha": "2026-11-26",
+  "mediana": 267999.0,
+  "n": 30
+ },
+ "UCS3ijDAyd0_P2399L1Itz0A": {
+  "fecha": "2026-11-26",
+  "mediana": 947052.5,
+  "n": 30
+ },
+ "UCGxAOvni3fct-SOe0pjzDRw": {
+  "fecha": "2026-11-26",
+  "mediana": 160414.5,
+  "n": 30
+ },
+ "UCnSWkrRWNQWNhDusoWr_HXQ": {
+  "fecha": "2026-11-26",
+  "mediana": 3474049.5,
+  "n": 30
+ },
+ "UCVAYy7_zddIx6USjXscV9Vg": {
+  "fecha": "2026-11-26",
+  "mediana": 659296.0,
   "n": 30
  }
 }
