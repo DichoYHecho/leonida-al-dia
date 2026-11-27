@@ -100,9 +100,9 @@
   "n": 30
  },
  "UCV6mNrW8CrmWtcxWfQXy11g": {
-  "fecha": "2026-11-13",
-  "mediana": 0,
-  "n": 0
+  "fecha": "2026-11-27",
+  "mediana": 105698,
+  "n": 21
  },
  "UCmp5y07YIV6i2jPX4x82hVQ": {
   "fecha": "2026-11-13",
@@ -250,8 +250,8 @@
   "n": 30
  },
  "UCNvzD7Z-g64bPXxGzaQaa4g": {
-  "fecha": "2026-11-13",
-  "mediana": 727268.0,
+  "fecha": "2026-11-27",
+  "mediana": 775944.5,
   "n": 30
  },
  "UCJAbkIY17zAmCTNQHH0bQoQ": {
@@ -770,8 +770,8 @@
   "n": 15
  },
  "UCX8pnu3DYUnx8qy8V_c6oHg": {
-  "fecha": "2026-11-20",
-  "mediana": 9190939.0,
+  "fecha": "2026-11-27",
+  "mediana": 9467300.5,
   "n": 30
  },
  "UCkvfpTpMHcUyRCavmK6zKbA": {
@@ -795,8 +795,8 @@
   "n": 30
  },
  "UCWsDFcIhY2DBi3GB5uykGXA": {
-  "fecha": "2026-11-20",
-  "mediana": 5263501.5,
+  "fecha": "2026-11-27",
+  "mediana": 5951102.0,
   "n": 28
  },
  "UC0IcuSzkill_2QyBH1MnMOQ": {
@@ -1287,6 +1287,66 @@
  "UCVAYy7_zddIx6USjXscV9Vg": {
   "fecha": "2026-11-26",
   "mediana": 659296.0,
+  "n": 30
+ },
+ "UCR1Jltq7vMzGQVtRd-DR5AA": {
+  "fecha": "2026-11-27",
+  "mediana": 3121835.5,
+  "n": 30
+ },
+ "UC91V6D3nkhP89wUb9f_h17g": {
+  "fecha": "2026-11-27",
+  "mediana": 3794995.5,
+  "n": 30
+ },
+ "UCDDZOBAdDlPbUA4z42r_wvw": {
+  "fecha": "2026-11-27",
+  "mediana": 5655334.5,
+  "n": 30
+ },
+ "UCIROI3W3eWRlfwa_cBvHlhw": {
+  "fecha": "2026-11-27",
+  "mediana": 18424.5,
+  "n": 30
+ },
+ "UCJWSliY2CUWc4Dh6FfU4ynQ": {
+  "fecha": "2026-11-27",
+  "mediana": 30025.5,
+  "n": 30
+ },
+ "UCCQi3X-PJGmd6DrPN9Rb6iw": {
+  "fecha": "2026-11-27",
+  "mediana": 613669.0,
+  "n": 30
+ },
+ "UCcEX3RQl2rh9sbGDDhD8rKg": {
+  "fecha": "2026-11-27",
+  "mediana": 868500.0,
+  "n": 14
+ },
+ "UCJlaWQpNxO98zISv93R_qGA": {
+  "fecha": "2026-11-27",
+  "mediana": 44006.0,
+  "n": 30
+ },
+ "UC9CRwKx1Dt7ZosyO1AR8IHw": {
+  "fecha": "2026-11-27",
+  "mediana": 52202,
+  "n": 17
+ },
+ "UCS5Oz6CHmeoF7vSad0qqXfw": {
+  "fecha": "2026-11-27",
+  "mediana": 525014.0,
+  "n": 30
+ },
+ "UC5sGdW8Jf7ijogDhcIFRmlw": {
+  "fecha": "2026-11-27",
+  "mediana": 3428788.0,
+  "n": 30
+ },
+ "UCHZZo1h1cI1vg4I9g2RqOUQ": {
+  "fecha": "2026-11-27",
+  "mediana": 94016.5,
   "n": 30
  }
 }
