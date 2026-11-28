@@ -1,53 +1,51 @@
-# Radar de virales de GTA 6 · 2026-11-27
+# Radar de virales de GTA 6 · 2026-11-28
 
 Vídeos de los últimos 7 días con ≥ ×3 la mediana de su canal y ≥ 10.000 vistas. Ordenados por ×media. Solo referencia de estructura: no se copia texto, audio ni imagen.
 
-**Candidatos:** 12 (Shorts 5, largos 6, medios 1)
+**Candidatos:** 24 (Shorts 23, largos 0, medios 1)
 
 ## Top 10 Shorts (≤ 3 min)
 
 | # | Título | Canal | Vistas | ×media | Duración | Tema | Gancho | Enlace |
 |---|---|---|---:|---:|---:|---|---|---|
-| 1 | The CREEPIEST Secret in GTA 6! (Snake Secret) | Viceprint | 4.609.366 | ×250.2 | 0:44 | secreto de serpiente en GTA 6 | dato sorprendente | https://youtu.be/SDu9JP1mBlk |
-| 2 | Which One? GTA V or GTA VI? #drawing #sketch #art #gta #gta5 #gta6 #shorts | Minv Art | 4.497.798 | ×149.8 | 0:16 | comparación GTA V y GTA VI | comparación | https://youtu.be/NVeFdIHUZ50 |
-| 3 | Como Hacer a JASON MÁS FUERTE EN GTA 6 (ENTRENAMIENTO SECRETO) | FAZZGTA | 3.487.848 | ×79.3 | 0:36 | entrenamiento secreto de Jason | pregunta | https://youtu.be/72IEtK4FrUw |
-| 4 | Is GTA 5 Better Than GTA 6? #gta6 #gtavi #gtaonline | DarkViperAU | 2.904.153 | ×27.5 | 0:41 | comparación GTA 5 y GTA 6 | pregunta | https://youtu.be/vgsLezGC_fo |
-| 5 | Why PlayStation WON’T Refund GTA 6 ❌ | Garett | 3.701.841 | ×6.0 | 1:23 | reembolso de PlayStation en GTA 6 | pregunta | https://youtu.be/CKMpFGnL7PE |
+| 1 | His Dad is in GTA VI #shorts | Mae Bloom | 17.468.808 | ×367.0 | 0:27 | actor del padre en GTA 6 | otro | https://youtu.be/1mjvKEdq25Y |
+| 2 | POV: One Of The Best Side Missions (GTA 6) 💀 / #shorts #gta6 | VertyGoose | 9.735.340 | ×156.7 | 0:14 | mejores misiones secundarias de GTA 6 | otro | https://youtu.be/wwxZzQPrYgk |
+| 3 | Togi plays GTA6 🎮 #togi | TogiToon  | 16.380.616 | ×132.1 | 0:28 | gameplay de GTA 6 | otro | https://youtu.be/wPgZXwW_dhI |
+| 4 | Returning Characters In GTA 6 Then Vs Now // #shorts #gta6 #gta | Ryezy | 3.189.607 | ×129.5 | 0:18 | personajes que regresan en GTA 6 | comparación | https://youtu.be/ASM1t8hFCfU |
+| 5 | Drawing the VI from GTA VI: Beginner to Legend #drawing #sketch #art #gta #gta6 #shorts | Minv Art | 3.695.051 | ×123.1 | 0:39 | dibujar el logo de GTA 6 | otro | https://youtu.be/zQvoa0Stb8U |
+| 6 | Реакция Куплинова на Райское Такси в GTA 6 #shorts #куплинов #реакция | Реакция | 3.141.921 | ×107.0 | 0:48 | reacción a GTA 6 | otro | https://youtu.be/Yui7X54HUAA |
+| 7 | GTA 6 Funny NPC Moments #gta6 #grandtheftauto6 #gaming | GAGA Gaming  | 5.857.777 | ×79.9 | 0:40 | momentos graciosos de NPCs en GTA 6 | dato sorprendente | https://youtu.be/nljZzyBRm_Y |
+| 8 | How to REMOVE Trackers in GTA 6 🤯 | Syinite Gaming | 2.808.083 | ×77.8 | 0:35 | eliminar rastreadores en GTA 6 | pregunta | https://youtu.be/gAjSfgqnbG4 |
+| 9 | Map of all GTA 6 Players | GelNox | 29.201.683 | ×42.4 | 0:11 | mapa de jugadores de GTA 6 | otro | https://youtu.be/-s2nf0iD-eg |
+| 10 | GTA 5 vs GTA 6 Box Contents 🎮 | Gleb POV | 6.167.028 | ×41.3 | 0:07 | contenido físico de GTA 5 y GTA 6 | comparación | https://youtu.be/nfhq_VOcofw |
 
 ## Top 10 largos (≥ 8 min)
 
-| # | Título | Canal | Vistas | ×media | Duración | Tema | Gancho | Enlace |
-|---|---|---|---:|---:|---:|---|---|---|
-| 1 | The PERFECT Heist in GTA 6 (No Cops, No Alarms) | Nemsk | 3.776.594 | ×118.9 | 15:50 | asaltos sigilosos en GTA 6 | otro | https://youtu.be/RKHyVcR0aZc |
-| 2 | 15 Early Game Mistakes NOBODY Warned Me About (GTA 6) | Vexies | 2.746.222 | ×52.6 | 16:22 | errores de principiante en GTA 6 | lista | https://youtu.be/r3oAEokOT5w |
-| 3 | GTA 6 FAILS - #8 (GTA 6 Funny Moments) | Red Arcade | 770.347 | ×8.2 | 21:49 | momentos graciosos en GTA 6 | lista | https://youtu.be/-qIhJhkv9TM |
-| 4 | FOMOS OS PRIMEIROS DO MUNDO A JOGAR GTA 6! *deu muito ruim | Potetos Games | 3.697.398 | ×4.3 | 27:03 | primeros en jugar GTA 6 | otro | https://youtu.be/P378KlLbGTA |
-| 5 | Busting 33 MYTHS In GTA 6! | Caylus   | 2.267.780 | ×3.4 | 23:52 | mitos de GTA 6 | lista | https://youtu.be/wWXs9eKfllg |
-| 6 | GTA 6: 20 MISTAKES YOU SHOULDN'T MAKE | gameranx | 2.551.407 | ×3.3 | 29:27 | errores a evitar en GTA 6 | lista | https://youtu.be/rDJVx4dw848 |
+_Ninguno hoy._
 
 ## Medios (3-8 min)
 
 | # | Título | Canal | Vistas | ×media | Duración | Tema | Gancho | Enlace |
 |---|---|---|---:|---:|---:|---|---|---|
-| 1 | This Is Why You Hate GTA 6 (rant) | DanTDM | 2.688.141 | ×5.1 | 7:19 | opinión sobre GTA 6 | otro | https://youtu.be/paML_p4sbCo |
+| 1 | Travis Scott - Burn This Shit Down [from Grand Theft Auto VI: The Album (Deluxe Edition)] | Atlantic Records | 2.312.537 | ×33.8 | 4:21 | banda sonora de GTA 6 | otro | https://youtu.be/2sUhJahVWyQ |
 
 ## Notas
 
 - Búsqueda «GTA 6» (es): 50 vídeos
 - Búsqueda «GTA 6»: 50 vídeos
 - Búsqueda «GTA VI»: 50 vídeos
-- Vídeos encontrados: 73; pasan el primer filtro: 37; descartes: no es de GTA 6 0, directo 14, pocas vistas 0, ya visto 22
-- Canales: 28 (11 con mediana guardada, 17 nuevos)
+- Vídeos encontrados: 76; pasan el primer filtro: 47; descartes: no es de GTA 6 0, directo 10, pocas vistas 0, ya visto 19
+- Canales: 40 (15 con mediana guardada, 25 nuevos)
 - Canal UCf_gP4AMRSgAfyzbkeS9k4g: YouTube playlistItems 404: {
   "error": {
     "code": 404,
     "message": "The playlist identified with the request's \u
-- Candidatos (×3 y 10.000 vistas): 12; sin mediana fiable: 1
-- Gemini: 12 vídeos etiquetados (1 llamada)
+- Candidatos (×3 y 10.000 vistas): 24; sin mediana fiable: 1
+- Gemini: 24 vídeos etiquetados (1 llamada)
 
 ## Cupo gastado
 
-- YouTube esta ejecución: **336 unidades** (3 búsquedas)
-- YouTube hoy en total: 336 de 2000 unidades; 3 de 6 búsquedas
+- YouTube esta ejecución: **352 unidades** (3 búsquedas)
+- YouTube hoy en total: 352 de 2000 unidades; 3 de 6 búsquedas
 - Gemini: 1 llamada de texto, 0 de voz
 - Acceso: permiso del canal (GOOGLE_YT_REFRESH_TOKEN), ámbitos: youtube.force-ssl
